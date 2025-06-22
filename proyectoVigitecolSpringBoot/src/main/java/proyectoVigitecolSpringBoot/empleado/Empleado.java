@@ -1,0 +1,210 @@
+package proyectoVigitecolSpringBoot.empleado;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.LocalDate;
+import java.time.Period;
+
+@Table(name = "empleado")
+@Entity(name = "Empleado")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
+public class Empleado {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String nombres;
+    private String apellidos;
+
+    @Enumerated(EnumType.STRING)
+    private TipoDocumento tipoDocumento;
+
+    private String numeroDocumento;
+    private LocalDate fechaNacimiento;
+    private String lugarNacimiento;
+    private String ciudadExpedicion;
+    private int edad;
+
+    @Enumerated(EnumType.STRING)
+    private LibretaMilitar libretaMilitar;
+
+    @Enumerated(EnumType.STRING)
+    private EstadoCivil estadoCivil;
+
+    @Enumerated(EnumType.STRING)
+    private Genero genero;
+
+    private String direccion;
+    private String telefono;
+    private String correo;
+
+    @Enumerated(EnumType.STRING)
+    private TipoEmpleado tipoEmpleado;
+
+    @Enumerated(EnumType.STRING)
+    private Cargo cargo;
+
+    //Constructor para registrar empleado
+    public Empleado(DatosRegistroEmpleado datos) {
+        this.nombres = datos.nombres();
+        this.apellidos = datos.apellidos();
+        this.tipoDocumento = datos.tipoDocumento();
+        this.numeroDocumento = datos.numeroDocumento();
+        this.fechaNacimiento = datos.fechaNacimiento();
+        this.lugarNacimiento = datos.lugarNacimiento();
+        this.ciudadExpedicion = datos.ciudadExpedicion();
+        this.edad = Period.between(this.fechaNacimiento, LocalDate.now()).getYears();
+        this.libretaMilitar = datos.libretaMilitar();
+        this.estadoCivil = datos.estadoCivil();
+        this.genero = datos.genero();
+        this.direccion = datos.direccion();
+        this.telefono = datos.telefono();
+        this.correo = datos.correo();
+        this.tipoEmpleado = datos.tipoEmpleado();
+        this.cargo = datos.cargo();
+    }
+    //Getters and Setters
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNombres() {
+        return nombres;
+    }
+
+    public void setNombres(String nombres) {
+        this.nombres = nombres;
+    }
+
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
+    }
+
+    public TipoDocumento getTipoDocumento() {
+        return tipoDocumento;
+    }
+
+    public void setTipoDocumento(TipoDocumento tipoDocumento) {
+        this.tipoDocumento = tipoDocumento;
+    }
+
+    public String getNumeroDocumento() {
+        return numeroDocumento;
+    }
+
+    public void setNumeroDocumento(String numeroDocumento) {
+        this.numeroDocumento = numeroDocumento;
+    }
+
+    public LocalDate getFechaNacimiento() {
+        return fechaNacimiento;
+    }
+
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
+    }
+
+    public String getLugarNacimiento() {
+        return lugarNacimiento;
+    }
+
+    public void setLugarNacimiento(String lugarNacimiento) {
+        this.lugarNacimiento = lugarNacimiento;
+    }
+
+    public String getCiudadExpedicion() {
+        return ciudadExpedicion;
+    }
+
+    public void setCiudadExpedicion(String ciudadExpedicion) {
+        this.ciudadExpedicion = ciudadExpedicion;
+    }
+
+    public int getEdad() {
+        return edad;
+    }
+
+    public void setEdad(int edad) {
+        this.edad = edad;
+    }
+
+    public LibretaMilitar getLibretaMilitar() {
+        return libretaMilitar;
+    }
+
+    public void setLibretaMilitar(LibretaMilitar libretaMilitar) {
+        this.libretaMilitar = libretaMilitar;
+    }
+
+    public EstadoCivil getEstadoCivil() {
+        return estadoCivil;
+    }
+
+    public void setEstadoCivil(EstadoCivil estadoCivil) {
+        this.estadoCivil = estadoCivil;
+    }
+
+    public Genero getGenero() {
+        return genero;
+    }
+
+    public void setGenero(Genero genero) {
+        this.genero = genero;
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
+    public TipoEmpleado getTipoEmpleado() {
+        return tipoEmpleado;
+    }
+
+    public void setTipoEmpleado(TipoEmpleado tipoEmpleado) {
+        this.tipoEmpleado = tipoEmpleado;
+    }
+
+    public Cargo getCargo() {
+        return cargo;
+    }
+
+    public void setCargo(Cargo cargo) {
+        this.cargo = cargo;
+    }
+
+}
