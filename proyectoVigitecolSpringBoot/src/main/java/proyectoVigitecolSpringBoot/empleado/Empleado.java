@@ -10,7 +10,6 @@ import java.time.Period;
 @Entity(name = "Empleado")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class Empleado {
@@ -47,8 +46,7 @@ public class Empleado {
     @Enumerated(EnumType.STRING)
     private TipoEmpleado tipoEmpleado;
 
-    @Enumerated(EnumType.STRING)
-    private Cargo cargo;
+    private String cargo;
 
     //Constructor para registrar empleado
     public Empleado(DatosRegistroEmpleado datos) {
@@ -68,6 +66,10 @@ public class Empleado {
         this.correo = datos.correo();
         this.tipoEmpleado = datos.tipoEmpleado();
         this.cargo = datos.cargo();
+    }
+    //Constructor vacío
+    public Empleado() {
+
     }
     //Getters and Setters
 
@@ -199,11 +201,11 @@ public class Empleado {
         this.tipoEmpleado = tipoEmpleado;
     }
 
-    public Cargo getCargo() {
+    public String getCargo() {
         return cargo;
     }
 
-    public void setCargo(Cargo cargo) {
+    public void setCargo(String cargo) {
         this.cargo = cargo;
     }
 
