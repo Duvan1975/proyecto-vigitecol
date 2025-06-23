@@ -1,7 +1,7 @@
 export function Tabla() {
 
     return (
-        <table>
+        <table className="table table-striped table-hover" id="tabla">
             <thead>
                 <tr>
                     <th>Nombres</th>
@@ -21,26 +21,10 @@ export function Tabla() {
                     <th>Cargo</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>José</td>
-                    <td>García</td>
-                    <td>CE</td>
-                    <td>11111125</td>
-                    <td>10/09/2003</td>
-                    <td>Montería</td>
-                    <td>Medellín</td>
-                    <td>SEGUNDA</td>
-                    <td>SOLTERO</td>
-                    <td>MASCULINO</td>
-                    <td>Av. 6a calle 15</td>
-                    <td>321525253</td>
-                    <td>prueba1@hotmail.com</td>
-                    <td>OPERATIVO</td>
-                    <td>GUARDA DE SEGURIDAD</td>
-                </tr>
+            <tbody id="tablabody">
+                
             </tbody>
         </table>
     )
     
-}
+};

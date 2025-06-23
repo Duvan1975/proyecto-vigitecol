@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { CuadrosTexto } from './components/CuadrosTexto';
 import './styles/styles.css';
 import { Tabla } from './components/Tabla';
+import { AgregarTabla } from './components/AgregarTabla';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<div className='container'>
@@ -30,7 +31,7 @@ root.render(<div className='container'>
       tipoinput="text"
       nombreinput="tipoDocumento"
       idinput="tipoDocumento"
-      placeholderinput="Seleccione el tipo de documentor"
+      placeholderinput="Seleccione el tipo de documento"
     />
   </div>
 
@@ -149,7 +150,7 @@ root.render(<div className='container'>
     />
   </div>
   <br></br>
-  <button className='botonregistrar btn btn-success'>Registrar</button>
+  <button onClick={ AgregarTabla } className='botonregistrar btn btn-success'>Registrar</button>
   <br></br>
   <Tabla />
 </div>
