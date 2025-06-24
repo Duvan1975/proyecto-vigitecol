@@ -1,6 +1,8 @@
 package proyectoVigitecolSpringBoot.empleado;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,8 +23,7 @@ public class EmpleadoService {
         empleadoRepository.save(new Empleado(datos));
     }
 
-    public List<DatosListadoEmpleado> listarEmpleados() {
-        return empleadoRepository.findAll().stream().map(DatosListadoEmpleado::new).toList();
+    public Page<DatosListadoEmpleado> listarEmpleados(Pageable paginacion) {
+        return empleadoRepository.findAll(paginacion).map(DatosListadoEmpleado::new);
     }
-
 }

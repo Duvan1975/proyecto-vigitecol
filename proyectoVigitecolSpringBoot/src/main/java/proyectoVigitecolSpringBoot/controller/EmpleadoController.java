@@ -1,6 +1,9 @@
 package proyectoVigitecolSpringBoot.controller;
 
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import proyectoVigitecolSpringBoot.empleado.DatosListadoEmpleado;
 import proyectoVigitecolSpringBoot.empleado.DatosRegistroEmpleado;
@@ -26,7 +29,8 @@ public class EmpleadoController {
         empleadoService.registrarEmpleado(datos);
     }
     @GetMapping
-    public List<DatosListadoEmpleado> listadoEmpleados() {
-        return empleadoService.listarEmpleados();
+    public Page<DatosListadoEmpleado> listadoEmpleados(
+            @PageableDefault(size = 20, sort = "apellidos")Pageable paginacion) {
+        return empleadoService.listarEmpleados(paginacion);
     }
 }
