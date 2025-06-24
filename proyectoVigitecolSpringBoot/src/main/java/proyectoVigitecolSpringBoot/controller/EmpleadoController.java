@@ -5,10 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-import proyectoVigitecolSpringBoot.empleado.DatosListadoEmpleado;
-import proyectoVigitecolSpringBoot.empleado.DatosRegistroEmpleado;
-import proyectoVigitecolSpringBoot.empleado.Empleado;
-import proyectoVigitecolSpringBoot.empleado.EmpleadoService;
+import proyectoVigitecolSpringBoot.empleado.*;
 
 import java.util.List;
 
@@ -32,5 +29,9 @@ public class EmpleadoController {
     public Page<DatosListadoEmpleado> listadoEmpleados(
             @PageableDefault(size = 20, sort = "apellidos")Pageable paginacion) {
         return empleadoService.listarEmpleados(paginacion);
+    }
+    @PutMapping
+    public void actualizarEmpleado(@RequestBody @Valid DatosActualizarEmpleado datos) {
+        empleadoService.actualizarEmpleado(datos);
     }
 }

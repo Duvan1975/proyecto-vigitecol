@@ -1,6 +1,7 @@
 package proyectoVigitecolSpringBoot.empleado;
 
 public record DatosListadoEmpleado(
+        Long id,
         String nombres,
         String apellidos,
         String numeroDocumento,
@@ -11,6 +12,7 @@ public record DatosListadoEmpleado(
 ) {
     public DatosListadoEmpleado(Empleado empleado) {
         this(
+                empleado.getId(),
                 empleado.getNombres(),
                 empleado.getApellidos(),
                 empleado.getNumeroDocumento(),
