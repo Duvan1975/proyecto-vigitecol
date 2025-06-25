@@ -5,7 +5,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-import proyectoVigitecolSpringBoot.empleado.*;
+import proyectoVigitecolSpringBoot.domain.empleado.DatosActualizarEmpleado;
+import proyectoVigitecolSpringBoot.domain.empleado.DatosListadoEmpleado;
+import proyectoVigitecolSpringBoot.domain.empleado.DatosRegistroEmpleado;
+import proyectoVigitecolSpringBoot.domain.empleado.EmpleadoService;
 
 @RestController
 @RequestMapping("/empleados")

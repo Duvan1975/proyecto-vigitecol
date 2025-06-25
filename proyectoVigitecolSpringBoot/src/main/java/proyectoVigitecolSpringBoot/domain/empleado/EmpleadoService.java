@@ -1,4 +1,4 @@
-package proyectoVigitecolSpringBoot.empleado;
+package proyectoVigitecolSpringBoot.domain.empleado;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;

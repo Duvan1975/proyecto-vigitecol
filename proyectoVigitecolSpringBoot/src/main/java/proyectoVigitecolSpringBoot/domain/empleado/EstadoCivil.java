@@ -1,4 +1,4 @@
-package proyectoVigitecolSpringBoot.empleado;
+package proyectoVigitecolSpringBoot.domain.empleado;
 
 public enum EstadoCivil {
     CASADO,
