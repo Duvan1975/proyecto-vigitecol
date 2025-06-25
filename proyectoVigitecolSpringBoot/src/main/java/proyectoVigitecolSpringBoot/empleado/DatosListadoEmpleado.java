@@ -7,7 +7,8 @@ public record DatosListadoEmpleado(
         String numeroDocumento,
         int edad,
         EstadoCivil estadoCivil,
-        Genero genero,
+        String telefono,
+        String correo,
         String cargo
 ) {
     public DatosListadoEmpleado(Empleado empleado) {
@@ -18,7 +19,8 @@ public record DatosListadoEmpleado(
                 empleado.getNumeroDocumento(),
                 empleado.getEdad(),
                 empleado.getEstadoCivil(),
-                empleado.getGenero(),
+                empleado.getTelefono(),
+                empleado.getCorreo(),
                 empleado.getCargo()
         );
     }

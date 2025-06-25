@@ -7,8 +7,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import proyectoVigitecolSpringBoot.empleado.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/empleados")
 @CrossOrigin(origins = "http://localhost:3000")
@@ -33,5 +31,9 @@ public class EmpleadoController {
     @PutMapping
     public void actualizarEmpleado(@RequestBody @Valid DatosActualizarEmpleado datos) {
         empleadoService.actualizarEmpleado(datos);
+    }
+    @DeleteMapping("/{id}")
+    public void eliminarEmpleado(@PathVariable Long id) {
+        empleadoService.eliminarEmpleado(id);
     }
 }

@@ -27,7 +27,7 @@ export function AgregarTabla() {
     })
         .then((response) => {
             if (!response.ok) {
-                throw new ("Error al registrar");
+                throw new Error("Error al registrar");
             }
             return response.text();
         })
@@ -60,5 +60,4 @@ export function AgregarTabla() {
         fila.insertCell(13).innerText = datos.tipoEmpleado;
         fila.insertCell(14).innerText = datos.cargo;
     }
-
 };

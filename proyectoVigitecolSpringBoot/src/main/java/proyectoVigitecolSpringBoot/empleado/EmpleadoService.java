@@ -6,8 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class EmpleadoService {
 
@@ -46,5 +44,8 @@ public class EmpleadoService {
         if (datos.correo() != null) empleado.setCorreo(datos.correo());
         if (datos.tipoEmpleado() != null) empleado.setTipoEmpleado(datos.tipoEmpleado());
         if (datos.cargo() != null) empleado.setCargo(datos.cargo());
+    }
+    public void eliminarEmpleado(Long id) {
+        empleadoRepository.deleteById(id);
     }
 }
