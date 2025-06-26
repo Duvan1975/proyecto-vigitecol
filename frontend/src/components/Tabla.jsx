@@ -5,7 +5,7 @@ export function Tabla() {
     const [empleados, setEmpleados] = useState([]);
 
     useEffect(() => {
-        fetch("http://localhost:8080/empleados")
+        fetch("http://localhost:8080/empleados/activos")
         .then((response) => response.json())
         .then((data) => setEmpleados(data.content))
         .catch((error) => console.error("Error al cargar empleados:", error));

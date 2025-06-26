@@ -26,7 +26,7 @@ public class ContratoService {
     }
     public List<DatosListadoContrato> obtenerContratosPorEmpleado(Long empleadoId) {
         var empleado = empleadoRepository.findById(empleadoId)
-                .orElseThrow(() -> new RuntimeException("Empleado no encontrado o está inactiva"));
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado o está inactivo"));
         return empleado.getContratos()
                 .stream()
                 .map(DatosListadoContrato::new)

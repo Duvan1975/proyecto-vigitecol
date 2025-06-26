@@ -9,6 +9,7 @@ public record DatosRegistroContrato(
         LocalDate fechaRenuncia,
         LocalDate fechaOtroSi,
         String omiso,
+        boolean continua,
         LocalDate vacacionesDesde,
         LocalDate vacacionesHasta,
         Long empleadoId

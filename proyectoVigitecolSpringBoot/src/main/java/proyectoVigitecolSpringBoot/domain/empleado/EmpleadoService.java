@@ -4,12 +4,18 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import proyectoVigitecolSpringBoot.domain.contrato.Contrato;
+import proyectoVigitecolSpringBoot.domain.contrato.ContratoRepository;
 
 @Service
 public class EmpleadoService {
 
     @Autowired EmpleadoRepository empleadoRepository;
+
+    @Autowired
+    ContratoRepository contratoRepository;
 
     public void registrarEmpleado(DatosRegistroEmpleado datos) {
 
@@ -22,12 +28,14 @@ public class EmpleadoService {
         empleadoRepository.save(new Empleado(datos));
     }
 
-    public Page<DatosListadoEmpleado> listarEmpleados(Pageable paginacion) {
-        return empleadoRepository.findAll(paginacion).map(DatosListadoEmpleado::new);
+    public Page<DatosListadoEmpleado> listarEmpleadosActivos(Pageable pageable) {
+        Page<Empleado> empleados = contratoRepository.findEmpleadosConContratoActivo(pageable);
+        return empleados.map(DatosListadoEmpleado::new);
     }
     @Transactional
-    public void actualizarEmpleado(DatosActualizarEmpleado datos) {
+    public ResponseEntity actualizarEmpleado(DatosActualizarEmpleado datos) {
         Empleado empleado = empleadoRepository.getReferenceById(datos.id());
+        empleado.actualizarDatos(datos);
 
         if (datos.nombres() != null) empleado.setNombres(datos.nombres());
         if (datos.apellidos() != null) empleado.setApellidos(datos.apellidos());
@@ -44,8 +52,30 @@ public class EmpleadoService {
         if (datos.correo() != null) empleado.setCorreo(datos.correo());
         if (datos.tipoEmpleado() != null) empleado.setTipoEmpleado(datos.tipoEmpleado());
         if (datos.cargo() != null) empleado.setCargo(datos.cargo());
+
+        return ResponseEntity.ok(new DatosRespuestaEmpleado(
+                empleado.getId(),
+                empleado.getNombres(),
+                empleado.getApellidos(),
+                empleado.getNumeroDocumento(),
+                empleado.getEdad(),
+                empleado.getEstadoCivil(),
+                empleado.getTelefono(),
+                empleado.getCorreo(),
+                empleado.getCargo()
+        ));
     }
-    public void eliminarEmpleado(Long id) {
-        empleadoRepository.deleteById(id);
+    @Transactional
+    public ResponseEntity eliminarEmpleado(Long id) {
+        Empleado empleado = empleadoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
+
+        Contrato contrato = contratoRepository
+                .findTopByEmpleadoIdAndContinuaTrueOrderByFechaIngresoDesc(id)
+                .orElseThrow(() -> new RuntimeException("Contrato activo no encontrado para este empleado"));
+
+        contrato.setContinua(false);
+
+        return ResponseEntity.noContent().build();
     }
 }

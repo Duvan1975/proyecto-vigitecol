@@ -40,6 +40,7 @@ public class Contrato {
         this.fechaRenuncia = datos.fechaRenuncia();
         this.fechaOtroSi = datos.fechaOtroSi();
         this.omiso = datos.omiso();
+        this.continua = true;
         this.vacacionesDesde = datos.vacacionesDesde();
         this.vacacionesHasta = datos.vacacionesHasta();
         this.empleado = empleado;
