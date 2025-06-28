@@ -1,14 +1,28 @@
 import { useEffect, useState } from "react";
+import { ModalEditar } from "./ModalEditar";
 
 export function Tabla() {
 
     const [empleados, setEmpleados] = useState([]);
+    const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState(null);
+    const [mostrarModal, setMostrarModal] = useState(false);
+
+    useEffect(() => {
+        cargarEmpleados();
+    }, []);
+
+    const cargarEmpleados = () => {
+        fetch("http://localhost:8080/empleados")
+            .then((response) => response.json())
+            .then((data) => setEmpleados(data.content))
+            .catch((error) => console.error("Error al cargar empleados:", error));
+    };
 
     useEffect(() => {
         fetch("http://localhost:8080/empleados/activos")
-        .then((response) => response.json())
-        .then((data) => setEmpleados(data.content))
-        .catch((error) => console.error("Error al cargar empleados:", error));
+            .then((response) => response.json())
+            .then((data) => setEmpleados(data.content))
+            .catch((error) => console.error("Error al cargar empleados:", error));
     }, []);
 
     const eliminarEmpleado = async (id) => {
@@ -30,38 +44,58 @@ export function Tabla() {
     };
 
     return (
-        <table className="table table-bordered border-primary table-hover" id="tabla">
-            <thead>
-                <tr>
-                    <th>Nombres</th>
-                    <th>Apellidos</th>
-                    <th>Número Documento</th>
-                    <th>Edad</th>
-                    <th>Estado Civil</th>
-                    <th>Teléfono</th>
-                    <th>Correo</th>
-                    <th>Cargo</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {empleados.map((emp,index) => (
-                    <tr key={index}>
-                        <td>{emp.nombres}</td>
-                        <td>{emp.apellidos}</td>
-                        <td>{emp.numeroDocumento}</td>
-                        <td>{emp.edad}</td>
-                        <td>{emp.estadoCivil}</td>
-                        <td>{emp.telefono}</td>
-                        <td>{emp.correo}</td>
-                        <td>{emp.cargo}</td>
-                        <td>
-                            <button onClick={() => eliminarEmpleado(emp.id)} className="btn btn-danger">Eliminar</button>
-                        </td>
+        <>
+            <table className="table table-bordered border-primary table-hover" id="tabla">
+                <thead>
+                    <tr>
+                        <th>Nombres</th>
+                        <th>Apellidos</th>
+                        <th>Número Documento</th>
+                        <th>Edad</th>
+                        <th>Estado Civil</th>
+                        <th>Teléfono</th>
+                        <th>Correo</th>
+                        <th>Cargo</th>
+                        <th>Acciones</th>
                     </tr>
-                ))}
-                
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {empleados.map((emp, index) => (
+                        <tr key={index}>
+                            <td>{emp.nombres}</td>
+                            <td>{emp.apellidos}</td>
+                            <td>{emp.numeroDocumento}</td>
+                            <td>{emp.edad}</td>
+                            <td>{emp.estadoCivil}</td>
+                            <td>{emp.telefono}</td>
+                            <td>{emp.correo}</td>
+                            <td>{emp.cargo}</td>
+                            <td>
+                                <button onClick={() => {
+                                    setEmpleadoSeleccionado(emp);
+                                    setMostrarModal(true);
+                                }}
+                                    className="btn btn-sm btn-primary me-2"
+                                >Editar
+                                </button>
+                                <button onClick={() => eliminarEmpleado(emp.id)}
+                                    className="btn btn-danger"
+                                >Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+
+            <ModalEditar
+                empleado={empleadoSeleccionado}
+                visible={mostrarModal}
+                onClose={() => setMostrarModal(false)}
+                onActualizada={(empleadoActualizado) => {
+                    setEmpleados(empleados.map(e => e.id === empleadoActualizado.id ? empleadoActualizado : e));
+                }}
+            />
+        </>
     )
 };
