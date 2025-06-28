@@ -44,7 +44,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                 return response.json();
             })
             .then((data) => {
-                alert("Empleado actualizado con éxito", formulario.nombres);
+                alert(`Empleado ${formulario.nombres} actualizado con éxito`);
                 onActualizado(data); // actualiza la tabla
                 onClose(); // cierra el modal
             })
@@ -53,6 +53,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                 alert("Hubo un error al actualizar la persona");
             });
     };
+
     if (!visible) return null;
 
     return (
@@ -65,11 +66,13 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                         value={formulario.nombres}
                         onChange={handleChange}
                         placeholder="Nombres"
+                        className="form-control mb-2"
                     />
                     <input type="text"
                         name="apellidos"
                         value={formulario.apellidos}
                         onChange={handleChange}
+                        className="form-control mb-2"
                         placeholder="Apellidos"
                     />
                     <input type="text"
@@ -158,7 +161,5 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             </div>
 
         </div>
-    )
-
-
-}
+    );
+};

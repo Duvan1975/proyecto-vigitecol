@@ -6,8 +6,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 import proyectoVigitecolSpringBoot.domain.contrato.Contrato;
 import proyectoVigitecolSpringBoot.domain.contrato.ContratoRepository;
+
+import java.time.LocalDate;
+import java.time.Period;
 
 @Service
 public class EmpleadoService {
@@ -17,7 +21,8 @@ public class EmpleadoService {
     @Autowired
     ContratoRepository contratoRepository;
 
-    public void registrarEmpleado(DatosRegistroEmpleado datos) {
+    public ResponseEntity<DatosRespuestaEmpleado> registrarEmpleado(
+            DatosRegistroEmpleado datos, UriComponentsBuilder uriComponentsBuilder) {
 
         if (empleadoRepository.existsByCorreo(datos.correo())) {
             throw new RuntimeException("Correo duplicado");
@@ -25,35 +30,14 @@ public class EmpleadoService {
         if (empleadoRepository.existsByNumeroDocumento(datos.numeroDocumento())) {
             throw new RuntimeException("Número de documento duplicado");
         }
-        empleadoRepository.save(new Empleado(datos));
-    }
+        Empleado empleado = new Empleado(datos); //Aquí creamo el objeto
+        empleadoRepository.save(empleado); //Lo guardamos
 
-    public Page<DatosListadoEmpleado> listarEmpleadosActivos(Pageable pageable) {
-        Page<Empleado> empleados = contratoRepository.findEmpleadosConContratoActivo(pageable);
-        return empleados.map(DatosListadoEmpleado::new);
-    }
-    @Transactional
-    public ResponseEntity actualizarEmpleado(DatosActualizarEmpleado datos) {
-        Empleado empleado = empleadoRepository.getReferenceById(datos.id());
-        empleado.actualizarDatos(datos);
+        //Construímos la URI del recurso creado
+        var uri = uriComponentsBuilder.path("/empleados/{id}").buildAndExpand(empleado.getId()).toUri();
 
-        if (datos.nombres() != null) empleado.setNombres(datos.nombres());
-        if (datos.apellidos() != null) empleado.setApellidos(datos.apellidos());
-        if (datos.tipoDocumento() != null) empleado.setTipoDocumento(datos.tipoDocumento());
-        if (datos.numeroDocumento() != null) empleado.setNumeroDocumento(datos.numeroDocumento());
-        if (datos.fechaNacimiento() != null) empleado.setFechaNacimiento(datos.fechaNacimiento());
-        if (datos.lugarNacimiento() != null) empleado.setLugarNacimiento(datos.lugarNacimiento());
-        if (datos.ciudadExpedicion() != null) empleado.setCiudadExpedicion(datos.ciudadExpedicion());
-        if (datos.libretaMilitar() != null) empleado.setLibretaMilitar(datos.libretaMilitar());
-        if (datos.estadoCivil() != null) empleado.setEstadoCivil(datos.estadoCivil());
-        if (datos.genero() != null) empleado.setGenero(datos.genero());
-        if (datos.direccion() != null) empleado.setDireccion(datos.direccion());
-        if (datos.telefono() != null) empleado.setTelefono(datos.telefono());
-        if (datos.correo() != null) empleado.setCorreo(datos.correo());
-        if (datos.tipoEmpleado() != null) empleado.setTipoEmpleado(datos.tipoEmpleado());
-        if (datos.cargo() != null) empleado.setCargo(datos.cargo());
-
-        return ResponseEntity.ok(new DatosRespuestaEmpleado(
+        //Creamos la respuesta
+        DatosRespuestaEmpleado datosRespuestaEmpleado = new DatosRespuestaEmpleado(
                 empleado.getId(),
                 empleado.getNombres(),
                 empleado.getApellidos(),
@@ -62,6 +46,85 @@ public class EmpleadoService {
                 empleado.getEstadoCivil(),
                 empleado.getTelefono(),
                 empleado.getCorreo(),
+                empleado.getCargo()
+        );
+
+        return ResponseEntity.created(uri).body(datosRespuestaEmpleado);
+    }
+    public ResponseEntity<Page<DatosListadoEmpleado>> listarEmpleadosActivos(Pageable pageable) {
+        Page<Empleado> empleados = contratoRepository.findEmpleadosConContratoActivo(pageable);
+        Page<DatosListadoEmpleado> respuesta = empleados.map(DatosListadoEmpleado::new);
+        return ResponseEntity.ok(respuesta);
+    }
+    @Transactional
+    public ResponseEntity actualizarEmpleado(DatosActualizarEmpleado datos) {
+        Empleado empleado = empleadoRepository.getReferenceById(datos.id());
+        empleado.actualizarDatos(datos);
+
+        if (datos.nombres() != null && !datos.nombres().isBlank()) {
+            empleado.setNombres(datos.nombres());
+        }
+        if (datos.apellidos() != null && !datos.apellidos().isBlank()) {
+            empleado.setApellidos(datos.apellidos());
+        }
+        if (datos.tipoDocumento() != null && !datos.tipoDocumento().toString().isBlank()) {
+            empleado.setTipoDocumento(datos.tipoDocumento());
+        }
+        if (datos.numeroDocumento() != null && !datos.numeroDocumento().isBlank()) {
+            empleado.setNumeroDocumento(datos.numeroDocumento());
+        }
+        if (datos.fechaNacimiento() != null) {
+            empleado.setFechaNacimiento(datos.fechaNacimiento());
+            empleado.setEdad(Period.between(datos.fechaNacimiento(), LocalDate.now()).getYears());
+        }
+        if (datos.lugarNacimiento() != null && !datos.lugarNacimiento().isBlank()) {
+            empleado.setLugarNacimiento(datos.lugarNacimiento());
+        }
+        if (datos.ciudadExpedicion() != null && !datos.ciudadExpedicion().isBlank()) {
+            empleado.setCiudadExpedicion(datos.ciudadExpedicion());
+        }
+        if (datos.libretaMilitar() != null && !datos.libretaMilitar().toString().isBlank()) {
+            empleado.setLibretaMilitar(datos.libretaMilitar());
+        }
+        if (datos.estadoCivil() != null && !datos.estadoCivil().toString().isBlank()) {
+            empleado.setEstadoCivil(datos.estadoCivil());
+        }
+        if (datos.genero() != null && !datos.genero().toString().isBlank()) {
+            empleado.setGenero(datos.genero());
+        }
+        if (datos.direccion() != null && !datos.direccion().isBlank()) {
+            empleado.setDireccion(datos.direccion());
+        }
+        if (datos.telefono() != null && !datos.telefono().isBlank()) {
+            empleado.setTelefono(datos.telefono());
+        }
+        if (datos.correo() != null && !datos.correo().isBlank()) {
+            empleado.setCorreo(datos.correo());
+        }
+        if (datos.tipoEmpleado() != null && !datos.tipoEmpleado().toString().isBlank()) {
+            empleado.setTipoEmpleado(datos.tipoEmpleado());
+        }
+        if (datos.cargo() != null && !datos.cargo().isBlank()) {
+            empleado.setCargo(datos.cargo());
+        }
+
+        return ResponseEntity.ok(new DatosRespuestaEmpleado(
+                empleado.getId(),
+                empleado.getNombres(),
+                empleado.getApellidos(),
+                //empleado.getTipoDocumento(),
+                empleado.getNumeroDocumento(),
+                //empleado.getFechaNacimiento(),
+                //empleado.getLugarNacimiento(),
+                //empleado.getCiudadExpedicion(),
+                empleado.getEdad(),
+                //empleado.getLibretaMilitar(),
+                empleado.getEstadoCivil(),
+                //empleado.getGenero(),
+                //empleado.getDireccion(),
+                empleado.getTelefono(),
+                empleado.getCorreo(),
+                //empleado.getTipoEmpleado(),
                 empleado.getCargo()
         ));
     }
@@ -77,5 +140,20 @@ public class EmpleadoService {
         contrato.setContinua(false);
 
         return ResponseEntity.noContent().build();
+    }
+    public ResponseEntity<DatosRespuestaEmpleado>obtenerDatosEmpleado(Long id) {
+        Empleado empleado = empleadoRepository.getReferenceById(id);
+        var datosEmpleado = new DatosRespuestaEmpleado(
+                empleado.getId(),
+                empleado.getNombres(),
+                empleado.getApellidos(),
+                empleado.getNumeroDocumento(),
+                empleado.getEdad(),
+                empleado.getEstadoCivil(),
+                empleado.getTelefono(),
+                empleado.getCorreo(),
+                empleado.getCargo()
+        );
+        return ResponseEntity.ok(datosEmpleado);
     }
 }

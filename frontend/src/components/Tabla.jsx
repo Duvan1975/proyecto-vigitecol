@@ -42,7 +42,7 @@ export function Tabla() {
             console.error("Error en la petición DELETE", error);
         }
     };
-
+    
     return (
         <>
             <table className="table table-bordered border-primary table-hover" id="tabla">
@@ -89,9 +89,9 @@ export function Tabla() {
             </table>
 
             <ModalEditar
-                empleado={empleadoSeleccionado}
-                visible={mostrarModal}
-                onClose={() => setMostrarModal(false)}
+                empleado={empleadoSeleccionado} // Le envía al modal los datos de la persona que se quiere editar.
+                visible={mostrarModal} //Controla si el modal debe mostrarse (true) o no (false).
+                onClose={() => setMostrarModal(false)} //Función que se ejecuta cuando el usuario cierra el modal.
                 onActualizada={(empleadoActualizado) => {
                     setEmpleados(empleados.map(e => e.id === empleadoActualizado.id ? empleadoActualizado : e));
                 }}

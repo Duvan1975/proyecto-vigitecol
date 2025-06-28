@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 import proyectoVigitecolSpringBoot.domain.empleado.*;
 
 @RestController
@@ -20,12 +21,13 @@ public class EmpleadoController {
     }
 
     @PostMapping
-    public void registrarEmpleado(@RequestBody @Valid DatosRegistroEmpleado datos) {
-        System.out.println(datos);
-        empleadoService.registrarEmpleado(datos);
+    public ResponseEntity<DatosRespuestaEmpleado> registrarEmpleado(
+            @RequestBody @Valid DatosRegistroEmpleado datos,
+            UriComponentsBuilder uriComponentsBuilder) {
+        return empleadoService.registrarEmpleado(datos, uriComponentsBuilder);
     }
     @GetMapping("/activos")
-    public Page<DatosListadoEmpleado> listadoEmpleadosActivos(
+    public ResponseEntity<Page<DatosListadoEmpleado>> listadoEmpleadosActivos(
             @PageableDefault(size = 20)Pageable paginacion) {
         return empleadoService.listarEmpleadosActivos(paginacion);
     }
@@ -37,5 +39,9 @@ public class EmpleadoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminarEmpleado(@PathVariable Long id) {
        return empleadoService.eliminarEmpleado(id);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<DatosRespuestaEmpleado> obtenerDatosEmpleado(@PathVariable Long id) {
+        return empleadoService.obtenerDatosEmpleado(id);
     }
 }

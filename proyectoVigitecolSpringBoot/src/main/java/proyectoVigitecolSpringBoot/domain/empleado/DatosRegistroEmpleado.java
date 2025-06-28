@@ -39,7 +39,7 @@ public record DatosRegistroEmpleado(
         String correo,
         @NotNull(message = "Debe seleccionar el tipo de empleado")
         TipoEmpleado tipoEmpleado,
-        @NotNull(message = "Debe seleccionar o ingresar el cargo a ocupar")
+        @NotBlank(message = "Debe seleccionar o ingresar el cargo a ocupar")
         String cargo
 ) {
 }
