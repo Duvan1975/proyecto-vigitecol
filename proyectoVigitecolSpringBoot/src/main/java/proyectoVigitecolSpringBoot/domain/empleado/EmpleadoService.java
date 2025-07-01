@@ -112,19 +112,11 @@ public class EmpleadoService {
                 empleado.getId(),
                 empleado.getNombres(),
                 empleado.getApellidos(),
-                //empleado.getTipoDocumento(),
                 empleado.getNumeroDocumento(),
-                //empleado.getFechaNacimiento(),
-                //empleado.getLugarNacimiento(),
-                //empleado.getCiudadExpedicion(),
                 empleado.getEdad(),
-                //empleado.getLibretaMilitar(),
                 empleado.getEstadoCivil(),
-                //empleado.getGenero(),
-                //empleado.getDireccion(),
                 empleado.getTelefono(),
                 empleado.getCorreo(),
-                //empleado.getTipoEmpleado(),
                 empleado.getCargo()
         ));
     }
@@ -141,17 +133,25 @@ public class EmpleadoService {
 
         return ResponseEntity.noContent().build();
     }
-    public ResponseEntity<DatosRespuestaEmpleado>obtenerDatosEmpleado(Long id) {
+    public ResponseEntity<DatosRespuestaActualizarEmpleado>obtenerDatosEmpleado(Long id) {
         Empleado empleado = empleadoRepository.getReferenceById(id);
-        var datosEmpleado = new DatosRespuestaEmpleado(
+        var datosEmpleado = new DatosRespuestaActualizarEmpleado(
                 empleado.getId(),
                 empleado.getNombres(),
                 empleado.getApellidos(),
+                empleado.getTipoDocumento(),
                 empleado.getNumeroDocumento(),
+                empleado.getFechaNacimiento(),
+                empleado.getLugarNacimiento(),
+                empleado.getCiudadExpedicion(),
                 empleado.getEdad(),
+                empleado.getLibretaMilitar(),
                 empleado.getEstadoCivil(),
+                empleado.getGenero(),
+                empleado.getDireccion(),
                 empleado.getTelefono(),
                 empleado.getCorreo(),
+                empleado.getTipoEmpleado(),
                 empleado.getCargo()
         );
         return ResponseEntity.ok(datosEmpleado);

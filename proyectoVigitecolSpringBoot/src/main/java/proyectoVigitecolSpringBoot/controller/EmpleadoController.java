@@ -41,7 +41,7 @@ public class EmpleadoController {
        return empleadoService.eliminarEmpleado(id);
     }
     @GetMapping("/{id}")
-    public ResponseEntity<DatosRespuestaEmpleado> obtenerDatosEmpleado(@PathVariable Long id) {
+    public ResponseEntity<DatosRespuestaActualizarEmpleado> obtenerDatosEmpleado(@PathVariable Long id) {
         return empleadoService.obtenerDatosEmpleado(id);
     }
 }

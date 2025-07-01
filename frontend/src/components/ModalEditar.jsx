@@ -159,7 +159,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                     </div>
                 </div>
             </div>
-
         </div>
     );
 };

@@ -7,6 +7,10 @@ export function Tabla() {
     const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState(null);
     const [mostrarModal, setMostrarModal] = useState(false);
 
+    //Estados para buscar por ID
+    const [idBuscar, setIdBuscar] = useState("");
+    const [resultadoBusqueda, setResultadoBusqueda] = useState(null);
+
     useEffect(() => {
         cargarEmpleados();
     }, []);
@@ -42,9 +46,44 @@ export function Tabla() {
             console.error("Error en la petición DELETE", error);
         }
     };
-    
+    const buscareEmpleadoPorId = () => {
+        if (!idBuscar) {
+            alert("Por favor ingrese un id válido");
+            return;
+        }
+
+        fetch(`http://localhost:8080/empleados/${idBuscar}`)
+            .then((res) => {
+                if (!res.ok) throw new Error("Empleado no encontrado");
+                return res.json();
+            })
+            .then((data) => {
+                setResultadoBusqueda(data);
+            })
+            .catch((error) => {
+                console.error("Error en la búsqueda", error);
+                alert("No se encontró el empleado con ese ID");
+                setResultadoBusqueda(null);
+            })
+    }
+
     return (
         <>
+
+            <div className="mb-4">
+                <h5>Buscar Persona por ID</h5>
+                <input
+                    type="number"
+                    value={idBuscar}
+                    onChange={(e) => setIdBuscar(e.target.value)}
+                    placeholder="Ingrese el ID"
+                    className="form-control mb-2"
+                />
+                <button onClick={buscareEmpleadoPorId} className="btn btn-info">Buscar</button>
+
+                
+            </div>
+
             <table className="table table-bordered border-primary table-hover" id="tabla">
                 <thead>
                     <tr>
@@ -85,6 +124,31 @@ export function Tabla() {
                             </td>
                         </tr>
                     ))}
+                    {resultadoBusqueda && (
+                        <tr style={{backgroundColor: "red" }}>
+                            <td>{resultadoBusqueda.nombres}</td>
+                            <td>{resultadoBusqueda.apellidos}</td>
+                            <td>{resultadoBusqueda.numeroDocumento}</td>
+                            <td>{resultadoBusqueda.edad}</td>
+                            <td>{resultadoBusqueda.estadoCivil}</td>
+                            <td>{resultadoBusqueda.telefono}</td>
+                            <td>{resultadoBusqueda.correo}</td>
+                            <td>{resultadoBusqueda.cargo}</td>
+                            <td>
+                                <button onClick={() => {
+                                    setEmpleadoSeleccionado(resultadoBusqueda);
+                                    setMostrarModal(true);
+                                }}
+                                    className="btn btn-sm btn-primary me-2"
+                                >Editar
+                                </button>
+                                <button onClick={() => eliminarEmpleado(resultadoBusqueda.id)}
+                                    className="btn btn-danger"
+                                >Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                    )}
                 </tbody>
             </table>
 
