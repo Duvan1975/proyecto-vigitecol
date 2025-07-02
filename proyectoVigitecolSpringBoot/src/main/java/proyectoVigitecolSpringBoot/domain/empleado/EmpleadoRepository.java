@@ -6,7 +6,9 @@ import jakarta.validation.constraints.Pattern;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
-    boolean existsByCorreo(@Email(message = "Debe ser un correo electrónico válido") String correo);
+    boolean existsByCorreo(@Email(
+            message = "Debe ser un correo electrónico válido") String correo);
 
-    boolean existsByNumeroDocumento(@NotBlank @Pattern(regexp = "\\d{7,15}",message = "Debe contener solo números entre 7 y 15 digitos") String s);
+    boolean existsByNumeroDocumento(@NotBlank @Pattern(
+            regexp = "\\d{7,15}",message = "Debe contener solo números entre 7 y 15 digitos") String s);
 }

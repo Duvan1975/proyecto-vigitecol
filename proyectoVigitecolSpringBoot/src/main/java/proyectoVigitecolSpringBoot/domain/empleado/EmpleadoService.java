@@ -56,6 +56,11 @@ public class EmpleadoService {
         Page<DatosListadoEmpleado> respuesta = empleados.map(DatosListadoEmpleado::new);
         return ResponseEntity.ok(respuesta);
     }
+    public ResponseEntity<Page<DatosListadoEmpleado>> listarEmpleadosInactivos(Pageable pageable) {
+        Page<Empleado> empleados = contratoRepository.findEmpleadosConContratoInactivo(pageable);
+        Page<DatosListadoEmpleado> respuesta = empleados.map(DatosListadoEmpleado::new);
+        return ResponseEntity.ok(respuesta);
+    }
     @Transactional
     public ResponseEntity actualizarEmpleado(DatosActualizarEmpleado datos) {
         Empleado empleado = empleadoRepository.getReferenceById(datos.id());

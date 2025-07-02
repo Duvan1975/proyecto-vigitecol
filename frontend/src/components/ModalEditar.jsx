@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 
 export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     const [formulario, setFormulario] = useState({
@@ -154,7 +155,24 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                         placeholder="Cargo"
                     />
                     <div className="mt-3">
-                        <button onClick={actualizarEmpleado} className="btn btn-warning me-2">Actualizar</button>
+                        <button onClick={() => {
+                            Swal.fire({
+                                title: "¿Quieres guardar los cambios?",
+                                showDenyButton: true,
+                                showCancelButton: true,
+                                confirmButtonText: "Guardar",
+                                denyButtonText: `No guardar`
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    actualizarEmpleado(); //Se invoca la function para actualizar los datos
+                                    Swal.fire("Guardado!", "", "success");
+                                } else if (result.isDenied) {
+                                    Swal.fire("Los cambios no se guardaron", "", "info");
+                                }
+                            });
+                        }} className="btn btn-warning me-2">
+                            Actualizar
+                        </button>
                         <button onClick={onClose} className="btn btn-secondary">Cancelar</button>
                     </div>
                 </div>

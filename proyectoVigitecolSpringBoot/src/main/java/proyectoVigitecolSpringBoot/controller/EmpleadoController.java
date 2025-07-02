@@ -31,6 +31,11 @@ public class EmpleadoController {
             @PageableDefault(size = 20)Pageable paginacion) {
         return empleadoService.listarEmpleadosActivos(paginacion);
     }
+    @GetMapping("/inactivos")
+    public ResponseEntity<Page<DatosListadoEmpleado>> listadoEmpleadosInactivos(
+            @PageableDefault(size = 20)Pageable paginacion) {
+        return empleadoService.listarEmpleadosInactivos(paginacion);
+    }
     @PutMapping
     public ResponseEntity<DatosRespuestaEmpleado> actualizarEmpleado(
             @RequestBody @Valid DatosActualizarEmpleado datos) {
