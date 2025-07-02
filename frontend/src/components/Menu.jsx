@@ -22,9 +22,15 @@ export function Menu() {
                 onClick={() => setVista("tabla")}
                 >Listar Empleados
                 </button>
+                <button type="button" 
+                className="btn btn-warning " 
+                onClick={() => setVista("inactivas")}
+                >Empleados Retirados
+                </button>
             </div>
             {vista === "formulario" && <Formulario />}
-            {vista === "tabla" && <Tabla />}
+            {vista === "tabla" && <Tabla mostrarInactivos={false} />}
+            {vista === "inactivas" && <Tabla mostrarInactivos={true} />}
         </div>
     )
 };

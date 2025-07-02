@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import proyectoVigitecolSpringBoot.domain.empleado.Empleado;
 
 import java.util.Optional;
@@ -36,4 +37,8 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
     AND c.continua = false
     """)
     Page<Empleado> findEmpleadosConContratoInactivo(Pageable pageable);
+
+    @Query("SELECT MAX(c.numeroContrato) FROM Contrato c WHERE c.empleado.id = :empleadoId")
+    Integer obtenerUltimoNumeroContratoPorEmpleado(@Param("empleadoId") Long empleadoId);
+
 }

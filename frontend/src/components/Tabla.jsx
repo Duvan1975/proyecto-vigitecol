@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ModalEditar } from "./ModalEditar";
 import Swal from "sweetalert2";
 
-export function Tabla() {
+export function Tabla({ mostrarInactivos = false }) {
 
     const [empleados, setEmpleados] = useState([]);
     const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState(null);
@@ -14,21 +14,27 @@ export function Tabla() {
 
     useEffect(() => {
         cargarEmpleados();
-    }, []);
+        // eslint-disable-next-line
+    }, [mostrarInactivos]);
 
+    //Cargando el listado de Empleados activos y retirados
     const cargarEmpleados = () => {
-        fetch("http://localhost:8080/empleados")
+        const url = mostrarInactivos
+            ? "http://localhost:8080/empleados/inactivos"
+            : "http://localhost:8080/empleados/activos";
+
+        fetch(url)
             .then((response) => response.json())
             .then((data) => setEmpleados(data.content))
             .catch((error) => console.error("Error al cargar empleados:", error));
     };
 
-    useEffect(() => {
+    /*useEffect(() => {
         fetch("http://localhost:8080/empleados/activos")
             .then((response) => response.json())
             .then((data) => setEmpleados(data.content))
             .catch((error) => console.error("Error al cargar empleados:", error));
-    }, []);
+    }, []);*/
 
     const eliminarEmpleado = async (id) => {
         console.log("Id a eliminar:", id); //Prueba en consola
@@ -94,7 +100,8 @@ export function Tabla() {
                 )}
             </div>
 
-            <table className="table table-bordered border-primary table-hover" id="tabla">
+            <table className={`table table-bordered border-primary table-striped table-hover 
+                ${mostrarInactivos ? "table-warning" : "table-light"} `} id="tabla">
                 <thead>
                     <tr>
                         <th>Nombres</th>

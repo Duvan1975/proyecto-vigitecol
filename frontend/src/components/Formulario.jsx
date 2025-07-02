@@ -147,7 +147,10 @@ export function Formulario() {
                 />
             </div>
             <br></br>
-            <button onClick={AgregarTabla} className='botonregistrar btn btn-success'>Registrar</button>
+            <button onClick={AgregarTabla}
+                className='botonregistrar btn btn-success'>
+                Registrar
+            </button>
             <br></br>
         </div>
     )

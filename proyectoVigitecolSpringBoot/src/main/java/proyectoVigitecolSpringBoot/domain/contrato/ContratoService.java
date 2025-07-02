@@ -18,7 +18,15 @@ public class ContratoService {
     public void registrarContrato(Long empleadoId, DatosRegistroContrato datos) {
         var empleado = empleadoRepository.findById(empleadoId)
             .orElseThrow(() -> new RuntimeException("Persona NO encontrada"));
-        var contrato = new Contrato(datos, empleado);
+
+        //Obtener el número del último contrato
+        Integer ultimoNumeroContrato = contratoRepository.obtenerUltimoNumeroContratoPorEmpleado(empleadoId);
+        int nuevoNumeroContrato = (ultimoNumeroContrato == null) ? 1 : ultimoNumeroContrato + 1;
+
+        //Crear contrato con el número asignado
+        Contrato contrato = new Contrato(datos, empleado);
+        contrato.setNumeroContrato(nuevoNumeroContrato);
+
         contratoRepository.save(contrato);
     }
     public List<Contrato> listarContratos() {
