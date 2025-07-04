@@ -1,3 +1,4 @@
+import Swal from "sweetalert2";
 export function AgregarTabla() {
 
     const datos = {
@@ -25,39 +26,26 @@ export function AgregarTabla() {
         },
         body: JSON.stringify(datos),
     })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error("Error al registrar");
-            }
-            return response.text();
-        })
-        .then((data) => {
-            alert("Registro Exitoso");
-            agregarFila(datos);
-        })
-        .catch((error) => {
-            console.error("Error", error);
-            alert("Se presento un problema al registrar");
+    .then(async (response) => {
+        if (!response.ok) {
+            const errores = await response.json(); // Esto ahora sí funciona
+            const mensajes = errores.map(err => `<strong>${err.campo}</strong>: ${err.error}`).join('<br>');
+            throw new Error(mensajes); // Disparamos los errores
+        }
+        return response.json();
+    })
+    .then((data) => {
+        Swal.fire({
+            icon: 'success',
+            title: 'Registro exitoso',
+            text: 'La persona ha sido registrada correctamente.',
         });
-
-    function agregarFila(datos) {
-        const tabla = document.getElementById('tabla').getElementsByTagName('tbody')[0];
-        const fila = tabla.insertRow(0);
-
-        fila.insertCell(0).innerText = datos.nombres;
-        fila.insertCell(1).innerText = datos.apellidos;
-        fila.insertCell(2).innerText = datos.tipoDocumento;
-        fila.insertCell(3).innerText = datos.numeroDocumento;
-        fila.insertCell(4).innerText = datos.fechaNacimiento;
-        fila.insertCell(5).innerText = datos.lugarNacimiento;
-        fila.insertCell(6).innerText = datos.ciudadExpedicion;
-        fila.insertCell(7).innerText = datos.libretaMilitar;
-        fila.insertCell(8).innerText = datos.estadoCivil;
-        fila.insertCell(9).innerText = datos.genero;
-        fila.insertCell(10).innerText = datos.direccion;
-        fila.insertCell(11).innerText = datos.telefono;
-        fila.insertCell(12).innerText = datos.correo;
-        fila.insertCell(13).innerText = datos.tipoEmpleado;
-        fila.insertCell(14).innerText = datos.cargo;
-    }
-};
+    })
+    .catch((error) => {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error en el formulario',
+            html: error.message, // mostramos todos los errores formateados
+        });
+    });
+}
