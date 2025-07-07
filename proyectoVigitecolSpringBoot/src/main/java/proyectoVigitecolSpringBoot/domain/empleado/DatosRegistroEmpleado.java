@@ -35,6 +35,7 @@ public record DatosRegistroEmpleado(
         @NotBlank
         @Pattern(regexp = "\\d{7,15}",message = "Debe contener solo números entre 7 y 15 digitos")
         String telefono,
+        @NotBlank
         @Email(message = "Debe ser un correo electrónico válido")
         String correo,
         @NotNull(message = "Debe seleccionar el tipo de empleado")

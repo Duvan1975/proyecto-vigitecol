@@ -63,4 +63,13 @@ public class TratadorDeErrores {
 
         return ResponseEntity.badRequest().body(error);
     }
+    //Tratando error cuando enviamos un correo duplicado
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity tratarErrorRuntime(RuntimeException e){
+        return ResponseEntity.badRequest().body(new DatosErrorGeneral(e.getMessage()));
+    }
+
+    //Creamos el DTO para tratar este error
+
+    private record DatosErrorGeneral(String error){}
 }
