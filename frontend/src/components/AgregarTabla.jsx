@@ -29,14 +29,16 @@ export function AgregarTabla() {
         .then(async (response) => {
             if (!response.ok) {
                 const errores = await response.json();
-
                 let mensaje;
 
                 if (Array.isArray(errores)) {
-                    // Caso: errores de validación (nombre, apellido, etc.)
+                    // Caso: errores de validación múltiples
                     mensaje = errores.map(err => `<strong>${err.campo}</strong>: ${err.error}`).join('<br>');
+                } else if (errores.campo && errores.error) {
+                    // Caso: error individual con campo (por ejemplo enum mal enviado)
+                    mensaje = `<strong>${errores.campo}</strong>: ${errores.error}`;
                 } else if (errores.error) {
-                    // Caso: error general como "Correo duplicado"
+                    // Caso: error general sin campo
                     mensaje = errores.error;
                 } else {
                     mensaje = 'Ocurrió un error desconocido';
@@ -44,7 +46,8 @@ export function AgregarTabla() {
 
                 throw new Error(mensaje);
             }
-            return response.text();
+
+            return response.json();
         })
         .then((data) => {
             Swal.fire({
@@ -57,7 +60,8 @@ export function AgregarTabla() {
             Swal.fire({
                 icon: 'error',
                 title: 'Error en el formulario',
-                html: error.message, // Puede ser lista o mensaje general
+                html: error.message,
             });
         });
+
 }

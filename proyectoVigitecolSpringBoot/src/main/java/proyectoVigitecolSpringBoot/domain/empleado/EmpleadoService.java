@@ -30,7 +30,7 @@ public class EmpleadoService {
         if (empleadoRepository.existsByNumeroDocumento(datos.numeroDocumento())) {
             throw new RuntimeException("Número de documento duplicado");
         }
-        Empleado empleado = new Empleado(datos); //Aquí creamo el objeto
+        Empleado empleado = new Empleado(datos); //Aquí creamos el objeto
         empleadoRepository.save(empleado); //Lo guardamos
 
         //Construímos la URI del recurso creado
