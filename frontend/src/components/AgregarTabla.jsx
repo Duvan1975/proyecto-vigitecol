@@ -26,26 +26,38 @@ export function AgregarTabla() {
         },
         body: JSON.stringify(datos),
     })
-    .then(async (response) => {
-        if (!response.ok) {
-            const errores = await response.json(); // Esto ahora sí funciona
-            const mensajes = errores.map(err => `<strong>${err.campo}</strong>: ${err.error}`).join('<br>');
-            throw new Error(mensajes); // Disparamos los errores
-        }
-        return response.json();
-    })
-    .then((data) => {
-        Swal.fire({
-            icon: 'success',
-            title: 'Registro exitoso',
-            text: 'La persona ha sido registrada correctamente.',
+        .then(async (response) => {
+            if (!response.ok) {
+                const errores = await response.json();
+
+                let mensaje;
+
+                if (Array.isArray(errores)) {
+                    // Caso: errores de validación (nombre, apellido, etc.)
+                    mensaje = errores.map(err => `<strong>${err.campo}</strong>: ${err.error}`).join('<br>');
+                } else if (errores.error) {
+                    // Caso: error general como "Correo duplicado"
+                    mensaje = errores.error;
+                } else {
+                    mensaje = 'Ocurrió un error desconocido';
+                }
+
+                throw new Error(mensaje);
+            }
+            return response.text();
+        })
+        .then((data) => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Registro exitoso',
+                text: 'La persona ha sido registrada correctamente.',
+            });
+        })
+        .catch((error) => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error en el formulario',
+                html: error.message, // Puede ser lista o mensaje general
+            });
         });
-    })
-    .catch((error) => {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error en el formulario',
-            html: error.message, // mostramos todos los errores formateados
-        });
-    });
 }
