@@ -56,8 +56,8 @@ public class Empleado {
 
     //Constructor para registrar empleado
     public Empleado(DatosRegistroEmpleado datos) {
-        this.nombres = datos.nombres();
-        this.apellidos = datos.apellidos();
+        this.nombres = datos.nombres().trim(); //.trim() elimina espacios extra
+        this.apellidos = datos.apellidos().trim();
         this.tipoDocumento = datos.tipoDocumento();
         this.numeroDocumento = datos.numeroDocumento();
         this.fechaNacimiento = datos.fechaNacimiento();

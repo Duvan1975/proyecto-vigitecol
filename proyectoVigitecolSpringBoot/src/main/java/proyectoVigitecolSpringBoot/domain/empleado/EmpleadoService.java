@@ -1,5 +1,6 @@
 package proyectoVigitecolSpringBoot.domain.empleado;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -67,10 +68,10 @@ public class EmpleadoService {
         empleado.actualizarDatos(datos);
 
         if (datos.nombres() != null && !datos.nombres().isBlank()) {
-            empleado.setNombres(datos.nombres());
+            empleado.setNombres(datos.nombres().trim());
         }
         if (datos.apellidos() != null && !datos.apellidos().isBlank()) {
-            empleado.setApellidos(datos.apellidos());
+            empleado.setApellidos(datos.apellidos().trim());
         }
         if (datos.tipoDocumento() != null && !datos.tipoDocumento().toString().isBlank()) {
             empleado.setTipoDocumento(datos.tipoDocumento());
@@ -138,9 +139,36 @@ public class EmpleadoService {
 
         return ResponseEntity.noContent().build();
     }
-    public ResponseEntity<DatosRespuestaActualizarEmpleado>obtenerDatosEmpleado(Long id) {
-        Empleado empleado = empleadoRepository.getReferenceById(id);
-        var datosEmpleado = new DatosRespuestaActualizarEmpleado(
+    public ResponseEntity<DatosActualizarEmpleado> obtenerDatosEmpleadoActivo(Long id) {
+        var empleado = contratoRepository.findEmpleadoActivoPorId(id)
+                .orElseThrow(() -> new EntityNotFoundException("Empleado Activo NO encontrado"));
+
+        var datosEmpleado = new DatosActualizarEmpleado(
+                empleado.getId(),
+                empleado.getNombres(),
+                empleado.getApellidos(),
+                empleado.getTipoDocumento(),
+                empleado.getNumeroDocumento(),
+                empleado.getFechaNacimiento(),
+                empleado.getLugarNacimiento(),
+                empleado.getCiudadExpedicion(),
+                empleado.getEdad(),
+                empleado.getLibretaMilitar(),
+                empleado.getEstadoCivil(),
+                empleado.getGenero(),
+                empleado.getDireccion(),
+                empleado.getTelefono(),
+                empleado.getCorreo(),
+                empleado.getTipoEmpleado(),
+                empleado.getCargo()
+        );
+        return ResponseEntity.ok(datosEmpleado);
+    }
+    public ResponseEntity<DatosActualizarEmpleado> obtenerDatosEmpleadoInactivo(Long id) {
+        var empleado = contratoRepository.findEmpleadoInactivoPorId(id)
+                .orElseThrow(() -> new EntityNotFoundException("Empleado Inactivo NO encontrado"));
+
+        var datosEmpleado = new DatosActualizarEmpleado(
                 empleado.getId(),
                 empleado.getNombres(),
                 empleado.getApellidos(),

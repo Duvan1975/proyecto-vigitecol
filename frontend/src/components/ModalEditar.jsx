@@ -200,7 +200,15 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                         }} className="btn btn-warning me-2">
                             Actualizar
                         </button>
-                        <button onClick={onClose} className="btn btn-secondary">Cancelar</button>
+                        <button
+                            onClick={() => {
+                                if (empleado) setFormulario(empleado); // Restaurar los datos originales
+                                onClose(); // Cierra el modal
+                            }}
+                            className="btn btn-secondary"
+                        >
+                            Cancelar
+                        </button>
                     </div>
                 </div>
             </div>

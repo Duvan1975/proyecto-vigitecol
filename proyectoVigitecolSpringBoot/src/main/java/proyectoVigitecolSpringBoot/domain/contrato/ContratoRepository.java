@@ -41,4 +41,10 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
     @Query("SELECT MAX(c.numeroContrato) FROM Contrato c WHERE c.empleado.id = :empleadoId")
     Integer obtenerUltimoNumeroContratoPorEmpleado(@Param("empleadoId") Long empleadoId);
 
+    @Query("SELECT c.empleado FROM Contrato c WHERE c.empleado.id = :empleadoId AND c.continua = false ORDER BY c.fechaIngreso DESC")
+    Optional<Empleado> findEmpleadoInactivoPorId(@Param("empleadoId") Long empleadoId);
+
+    @Query("SELECT c.empleado FROM Contrato c WHERE c.empleado.id = :empleadoId AND c.continua = true ORDER BY c.fechaIngreso DESC")
+    Optional<Empleado> findEmpleadoActivoPorId(@Param("empleadoId") Long empleadoId);
+
 }

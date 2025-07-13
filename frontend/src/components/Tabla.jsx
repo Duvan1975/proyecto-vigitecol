@@ -29,13 +29,6 @@ export function Tabla({ mostrarInactivos = false }) {
             .catch((error) => console.error("Error al cargar empleados:", error));
     };
 
-    /*useEffect(() => {
-        fetch("http://localhost:8080/empleados/activos")
-            .then((response) => response.json())
-            .then((data) => setEmpleados(data.content))
-            .catch((error) => console.error("Error al cargar empleados:", error));
-    }, []);*/
-
     const eliminarEmpleado = async (id) => {
         console.log("Id a eliminar:", id); //Prueba en consola
         try {
@@ -53,25 +46,48 @@ export function Tabla({ mostrarInactivos = false }) {
             console.error("Error en la petición DELETE", error);
         }
     };
-    const buscareEmpleadoPorId = () => {
+    const buscarEmpleadoPorId = () => {
         if (!idBuscar) {
-            alert("Por favor ingrese un id válido");
+            Swal.fire({
+                icon: "warning",
+                title: "ID requerido",
+                text: "Por favor ingrese un ID válido.",
+            });
             return;
         }
+        //Buscar empleado de acuerdo al listado (activo inactivo)
+        const endpoint = mostrarInactivos
+            ? `http://localhost:8080/empleados/obtenerinactivos/${idBuscar}`
+            : `http://localhost:8080/empleados/obteneractivos/${idBuscar}`;
 
-        fetch(`http://localhost:8080/empleados/${idBuscar}`)
+        fetch(endpoint)
             .then((res) => {
                 if (!res.ok) throw new Error("Empleado no encontrado");
                 return res.json();
             })
             .then((data) => {
                 setResultadoBusqueda(data);
+                // Mensaje de éxito muestra nombre y apellido de la persona encontrada
+                Swal.fire({
+                    icon: "success",
+                    title: "Persona encontrada",
+                    text: `Nombre: ${data.nombres} ${data.apellidos}`,
+                    timer: 3000,
+                    showConfirmButton: false,
+                });
             })
             .catch((error) => {
                 console.error("Error en la búsqueda", error);
-                alert("No se encontró el empleado con ese ID");
+
+                // Mensaje de error
+                Swal.fire({
+                    icon: "error",
+                    title: "No encontrado",
+                    text: "No se encontró el empleado con ese ID.",
+                });
+
                 setResultadoBusqueda(null);
-            })
+            });
     }
 
     return (
@@ -85,7 +101,7 @@ export function Tabla({ mostrarInactivos = false }) {
                     placeholder="Ingrese el ID"
                     className="form-control mb-2"
                 />
-                <button onClick={buscareEmpleadoPorId} className="btn btn-info">Buscar</button>
+                <button onClick={buscarEmpleadoPorId} className="btn btn-info">Buscar</button>
                 {resultadoBusqueda && (
                     <button
                         onClick={() => {

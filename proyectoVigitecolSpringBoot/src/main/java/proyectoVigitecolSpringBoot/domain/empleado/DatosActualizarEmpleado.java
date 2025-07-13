@@ -1,17 +1,27 @@
 package proyectoVigitecolSpringBoot.domain.empleado;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
 public record DatosActualizarEmpleado(
         @NotNull
         Long id,
+
+        @Size(min = 2, message = "Debe tener al menos 2 caracteres (letras)")
+        @Pattern(
+                regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$",
+                message = "Debe contener solo letras"
+        )
         String nombres,
+
+        @Size(min = 2, message = "Debe tener al menos 2 caracteres (letras)")
+        @Pattern(
+                regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$",
+                message = "Debe contener solo letras"
+        )
         String apellidos,
+
         TipoDocumento tipoDocumento,
         @Pattern(regexp = "\\d{7,15}",message = "Debe contener solo números entre 7 y 15 digitos")
         String numeroDocumento,

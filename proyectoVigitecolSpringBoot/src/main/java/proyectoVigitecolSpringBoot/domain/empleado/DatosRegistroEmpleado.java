@@ -1,17 +1,26 @@
 package proyectoVigitecolSpringBoot.domain.empleado;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
 public record DatosRegistroEmpleado(
-        @NotBlank(message = "El nombre no puede estar vacío")
+        @NotBlank
+        @Size(min = 2, message = "Debe tener al menos 2 caracteres (letras)")
+        @Pattern(
+                regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$",
+        message = "Debe contener solo letras"
+        )
         String nombres,
-        @NotBlank(message = "El apellido no puede estar vacío")
+
+        @NotBlank
+        @Size(min = 2, message = "Debe tener al menos 2 caracteres (letras)")
+        @Pattern(
+                regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$",
+                message = "Debe contener solo letras"
+        )
         String apellidos,
+
         @NotNull(message = "Debe seleccionar el tipo de documento")
         TipoDocumento tipoDocumento,
         @NotBlank

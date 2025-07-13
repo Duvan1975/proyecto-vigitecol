@@ -45,8 +45,12 @@ public class EmpleadoController {
     public ResponseEntity<?> eliminarEmpleado(@PathVariable Long id) {
        return empleadoService.eliminarEmpleado(id);
     }
-    @GetMapping("/{id}")
-    public ResponseEntity<DatosRespuestaActualizarEmpleado> obtenerDatosEmpleado(@PathVariable Long id) {
-        return empleadoService.obtenerDatosEmpleado(id);
+    @GetMapping("/obteneractivos/{id}")
+    public ResponseEntity<DatosActualizarEmpleado> obtenerDatosEmpleado(@PathVariable Long id) {
+        return empleadoService.obtenerDatosEmpleadoActivo(id);
+    }
+    @GetMapping("/obtenerinactivos/{id}")
+    public ResponseEntity<DatosActualizarEmpleado> obtenerEmpleadoInactivo(@PathVariable Long id) {
+        return empleadoService.obtenerDatosEmpleadoInactivo(id);
     }
 }
