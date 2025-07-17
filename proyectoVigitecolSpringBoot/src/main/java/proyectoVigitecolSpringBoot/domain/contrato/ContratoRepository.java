@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import proyectoVigitecolSpringBoot.domain.empleado.Empleado;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ContratoRepository extends JpaRepository<Contrato, Long> {
@@ -47,4 +48,8 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
     @Query("SELECT c.empleado FROM Contrato c WHERE c.empleado.id = :empleadoId AND c.continua = true ORDER BY c.fechaIngreso DESC")
     Optional<Empleado> findEmpleadoActivoPorId(@Param("empleadoId") Long empleadoId);
 
+    @Query("SELECT c.empleado FROM Contrato c " +
+            "WHERE c.continua = true " +
+            "ORDER BY c.fechaIngreso DESC")
+    List<Empleado> buscarTodosEmpleadosActivos();
 }

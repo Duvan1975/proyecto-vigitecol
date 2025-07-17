@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import proyectoVigitecolSpringBoot.domain.empleado.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/empleados")
 @CrossOrigin(origins = "http://localhost:3000")
@@ -53,4 +55,9 @@ public class EmpleadoController {
     public ResponseEntity<DatosActualizarEmpleado> obtenerEmpleadoInactivo(@PathVariable Long id) {
         return empleadoService.obtenerDatosEmpleadoInactivo(id);
     }
+    @GetMapping("/buscar/activos")
+    public ResponseEntity<List<DatosActualizarEmpleado>> buscarActivosPorNombre(@RequestParam String filtro) {
+        return empleadoService.buscarEmpleadosActivosPorNombre(filtro);
+    }
+
 }

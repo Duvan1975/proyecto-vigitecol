@@ -12,6 +12,9 @@ export function Tabla({ mostrarInactivos = false }) {
     const [idBuscar, setIdBuscar] = useState("");
     const [resultadoBusqueda, setResultadoBusqueda] = useState(null);
 
+    //Estado para buscar por nombre
+    const [nombreBuscar, setNombreBuscar] = useState("");
+
     useEffect(() => {
         cargarEmpleados();
         // eslint-disable-next-line
@@ -46,19 +49,21 @@ export function Tabla({ mostrarInactivos = false }) {
             console.error("Error en la petición DELETE", error);
         }
     };
-    const buscarEmpleadoPorId = () => {
-        if (!idBuscar) {
+
+    //Búsqueda de empleados por nombre
+    const buscarEmpleadoPorNombre = () => {
+        if (!nombreBuscar || nombreBuscar.trim() === "") {
             Swal.fire({
                 icon: "warning",
-                title: "ID requerido",
-                text: "Por favor ingrese un ID válido.",
+                title: "Nombre requerido",
+                text: "Por favor ingrese un nombre válido.",
             });
             return;
         }
-        //Buscar empleado de acuerdo al listado (activo inactivo)
+        //Aquí mostramos el endpoint de búsqueda
         const endpoint = mostrarInactivos
             ? `http://localhost:8080/empleados/obtenerinactivos/${idBuscar}`
-            : `http://localhost:8080/empleados/obteneractivos/${idBuscar}`;
+            : `http://localhost:8080/empleados/buscar/activos?filtro=${nombreBuscar}`;
 
         fetch(endpoint)
             .then((res) => {
@@ -66,12 +71,16 @@ export function Tabla({ mostrarInactivos = false }) {
                 return res.json();
             })
             .then((data) => {
-                setResultadoBusqueda(data);
+                if (data.length === 0) {
+                    resultadoBusqueda(null);
+                } else {
+                    setResultadoBusqueda(data[0]); // Tratamos data como un array y tomamos la primera persona
+                }
                 // Mensaje de éxito muestra nombre y apellido de la persona encontrada
                 Swal.fire({
                     icon: "success",
                     title: "Persona encontrada",
-                    text: `Nombre: ${data.nombres} ${data.apellidos}`,
+                    text: `Nombre: ${data[0].nombres} ${data[0].apellidos}`,
                     timer: 3000,
                     showConfirmButton: false,
                 });
@@ -83,25 +92,27 @@ export function Tabla({ mostrarInactivos = false }) {
                 Swal.fire({
                     icon: "error",
                     title: "No encontrado",
-                    text: "No se encontró el empleado con ese ID.",
+                    text: "No se encontró el empleado con ese NOMBRE.",
                 });
 
                 setResultadoBusqueda(null);
             });
-    }
+    };
+
 
     return (
         <>
             <div className="mb-4">
                 <h5>Buscar Persona por ID</h5>
                 <input
-                    type="number"
-                    value={idBuscar}
-                    onChange={(e) => setIdBuscar(e.target.value)}
-                    placeholder="Ingrese el ID"
+                    type="text"
+                    value={nombreBuscar}
+                    onChange={(e) => setNombreBuscar(e.target.value)}
+                    placeholder="Ingrese el nombre"
                     className="form-control mb-2"
                 />
-                <button onClick={buscarEmpleadoPorId} className="btn btn-info">Buscar</button>
+                <button onClick={buscarEmpleadoPorNombre} 
+                className="btn btn-info">Buscar</button>
                 {resultadoBusqueda && (
                     <button
                         onClick={() => {

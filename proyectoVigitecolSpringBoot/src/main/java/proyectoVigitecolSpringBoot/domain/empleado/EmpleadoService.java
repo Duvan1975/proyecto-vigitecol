@@ -11,8 +11,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 import proyectoVigitecolSpringBoot.domain.contrato.Contrato;
 import proyectoVigitecolSpringBoot.domain.contrato.ContratoRepository;
 
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 public class EmpleadoService {
@@ -188,5 +192,44 @@ public class EmpleadoService {
                 empleado.getCargo()
         );
         return ResponseEntity.ok(datosEmpleado);
+    }
+    // Método para quitar acentos
+    private String quitarTildes(String texto) {
+        String textoNormalizado = Normalizer.normalize(texto, Normalizer.Form.NFD);
+        Pattern patron = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        return patron.matcher(textoNormalizado).replaceAll("");
+    }
+    public ResponseEntity<List<DatosActualizarEmpleado>> buscarEmpleadosActivosPorNombre(String filtro) {
+        var empleados = contratoRepository.buscarTodosEmpleadosActivos();
+
+        var palabras = filtro.toLowerCase().split("\\s+");
+
+        var empleadosFiltrados = empleados.stream()
+                .filter(empleado -> {
+                    String nombreCompleto = quitarTildes((empleado.getNombres() + " " + empleado.getApellidos()).toLowerCase());
+                    return Arrays.stream(palabras).allMatch(nombreCompleto::contains);
+                })
+                .map(empleado -> new DatosActualizarEmpleado(
+                        empleado.getId(),
+                        empleado.getNombres(),
+                        empleado.getApellidos(),
+                        empleado.getTipoDocumento(),
+                        empleado.getNumeroDocumento(),
+                        empleado.getFechaNacimiento(),
+                        empleado.getLugarNacimiento(),
+                        empleado.getCiudadExpedicion(),
+                        empleado.getEdad(),
+                        empleado.getLibretaMilitar(),
+                        empleado.getEstadoCivil(),
+                        empleado.getGenero(),
+                        empleado.getDireccion(),
+                        empleado.getTelefono(),
+                        empleado.getCorreo(),
+                        empleado.getTipoEmpleado(),
+                        empleado.getCargo()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(empleadosFiltrados);
     }
 }
