@@ -70,7 +70,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                 Swal.fire({
                     icon: "success",
                     title: "Actualización exitosa",
-                    text: "La persona fue actualizada correctamente."
+                    html:
+                        `Los datos de: <strong>${data.nombres} ${data.apellidos}</strong> fueron actualizados correctamente.`,
                 });
             })
             .catch((error) => {

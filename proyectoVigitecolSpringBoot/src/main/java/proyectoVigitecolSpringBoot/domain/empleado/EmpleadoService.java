@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -15,6 +16,7 @@ import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -81,6 +83,11 @@ public class EmpleadoService {
             empleado.setTipoDocumento(datos.tipoDocumento());
         }
         if (datos.numeroDocumento() != null && !datos.numeroDocumento().isBlank()) {
+            boolean documentoDuplicado = empleadoRepository.existsByNumeroDocumento(datos.numeroDocumento())
+                    && !datos.numeroDocumento().equalsIgnoreCase(empleado.getNumeroDocumento());
+            if (documentoDuplicado) {
+                throw new RuntimeException("El número de documento, ya existe");
+            }
             empleado.setNumeroDocumento(datos.numeroDocumento());
         }
         if (datos.fechaNacimiento() != null) {
@@ -108,7 +115,15 @@ public class EmpleadoService {
         if (datos.telefono() != null && !datos.telefono().isBlank()) {
             empleado.setTelefono(datos.telefono());
         }
+        // Validar que el correo no esté registrado en otro empleado
         if (datos.correo() != null && !datos.correo().isBlank()) {
+            boolean correoDuplicado = empleadoRepository.existsByCorreo(datos.correo())
+                    && !datos.correo().equalsIgnoreCase(empleado.getCorreo());
+
+            if (correoDuplicado) {
+                throw new RuntimeException("El correo ya existe");
+            }
+
             empleado.setCorreo(datos.correo());
         }
         if (datos.tipoEmpleado() != null && !datos.tipoEmpleado().toString().isBlank()) {
@@ -201,6 +216,70 @@ public class EmpleadoService {
     }
     public ResponseEntity<List<DatosActualizarEmpleado>> buscarEmpleadosActivosPorNombre(String filtro) {
         var empleados = contratoRepository.buscarTodosEmpleadosActivos();
+
+        var palabras = filtro.toLowerCase().split("\\s+");
+
+        var empleadosFiltrados = empleados.stream()
+                .filter(empleado -> {
+                    String nombreCompleto = quitarTildes((empleado.getNombres() + " " + empleado.getApellidos()).toLowerCase());
+                    return Arrays.stream(palabras).allMatch(nombreCompleto::contains);
+                })
+                .map(empleado -> new DatosActualizarEmpleado(
+                        empleado.getId(),
+                        empleado.getNombres(),
+                        empleado.getApellidos(),
+                        empleado.getTipoDocumento(),
+                        empleado.getNumeroDocumento(),
+                        empleado.getFechaNacimiento(),
+                        empleado.getLugarNacimiento(),
+                        empleado.getCiudadExpedicion(),
+                        empleado.getEdad(),
+                        empleado.getLibretaMilitar(),
+                        empleado.getEstadoCivil(),
+                        empleado.getGenero(),
+                        empleado.getDireccion(),
+                        empleado.getTelefono(),
+                        empleado.getCorreo(),
+                        empleado.getTipoEmpleado(),
+                        empleado.getCargo()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(empleadosFiltrados);
+    }
+    public ResponseEntity<List<DatosActualizarEmpleado>> buscarEmpleadoActivoPorNumeroDocumento(String numeroDocumento) {
+        var empleados = contratoRepository.buscarEmpleadoActivoPorNumeroDocumento(numeroDocumento);
+
+        if (empleados.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(Collections.emptyList());
+        }
+        var resultado = empleados.stream()
+                .map(empleado -> new DatosActualizarEmpleado(
+                        empleado.getId(),
+                        empleado.getNombres(),
+                        empleado.getApellidos(),
+                        empleado.getTipoDocumento(),
+                        empleado.getNumeroDocumento(),
+                        empleado.getFechaNacimiento(),
+                        empleado.getLugarNacimiento(),
+                        empleado.getCiudadExpedicion(),
+                        empleado.getEdad(),
+                        empleado.getLibretaMilitar(),
+                        empleado.getEstadoCivil(),
+                        empleado.getGenero(),
+                        empleado.getDireccion(),
+                        empleado.getTelefono(),
+                        empleado.getCorreo(),
+                        empleado.getTipoEmpleado(),
+                        empleado.getCargo()
+                )).toList();
+
+        return ResponseEntity.ok(resultado);
+    }
+    public ResponseEntity<List<DatosActualizarEmpleado>> buscarEmpleadosInactivosPorNombre(String filtro) {
+        var empleados = contratoRepository.buscarTodosEmpleadosInactivos();
 
         var palabras = filtro.toLowerCase().split("\\s+");
 

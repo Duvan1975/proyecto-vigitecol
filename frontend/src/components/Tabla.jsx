@@ -8,12 +8,15 @@ export function Tabla({ mostrarInactivos = false }) {
     const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState(null);
     const [mostrarModal, setMostrarModal] = useState(false);
 
-    //Estados para buscar por ID
-    const [idBuscar, setIdBuscar] = useState("");
-    const [resultadoBusqueda, setResultadoBusqueda] = useState(null);
-
     //Estado para buscar por nombre
     const [nombreBuscar, setNombreBuscar] = useState("");
+    const [resultadoBusqueda, setResultadoBusqueda] = useState([]);
+
+    //Estado para buscar por documento
+    const [documentoBuscar, setDocumentoBuscar] = useState("");
+
+    //Estado para controlar el tipo de busqueda
+    const [tipoBusqueda, setTipoBusqueda] = useState("nombre");
 
     useEffect(() => {
         cargarEmpleados();
@@ -62,7 +65,7 @@ export function Tabla({ mostrarInactivos = false }) {
         }
         //Aquí mostramos el endpoint de búsqueda
         const endpoint = mostrarInactivos
-            ? `http://localhost:8080/empleados/obtenerinactivos/${idBuscar}`
+            ? `http://localhost:8080/empleados/obtenerinactivos/${nombreBuscar}`
             : `http://localhost:8080/empleados/buscar/activos?filtro=${nombreBuscar}`;
 
         fetch(endpoint)
@@ -72,16 +75,16 @@ export function Tabla({ mostrarInactivos = false }) {
             })
             .then((data) => {
                 if (data.length === 0) {
-                    resultadoBusqueda(null);
+                    setResultadoBusqueda([]);
                 } else {
-                    setResultadoBusqueda(data[0]); // Tratamos data como un array y tomamos la primera persona
+                    setResultadoBusqueda(data); // Tratamos data como un array y tomamos la primera persona
                 }
                 // Mensaje de éxito muestra nombre y apellido de la persona encontrada
                 Swal.fire({
                     icon: "success",
-                    title: "Persona encontrada",
-                    text: `Nombre: ${data[0].nombres} ${data[0].apellidos}`,
-                    timer: 3000,
+                    title: "Empleado(s) encontrado(s)",
+                    text: `${data.length} coincidencias encontradas`,
+                    timer: 2000,
                     showConfirmButton: false,
                 });
             })
@@ -98,26 +101,95 @@ export function Tabla({ mostrarInactivos = false }) {
                 setResultadoBusqueda(null);
             });
     };
+    //Manejar busqueda controla el tipo de busqueda
+    const manejarBusqueda = () => {
+        if (tipoBusqueda === "nombre") {
+            buscarEmpleadoPorNombre();
+        } else {
+            buscarEmpleadoPorDocumento();
+        }
+    };
+    //Function busqueda de empleados por documento
+    const buscarEmpleadoPorDocumento = () => {
+        if (!documentoBuscar || documentoBuscar.trim() === "") {
+            Swal.fire({
+                icon: "warning",
+                title: "Número de Documento Requerido",
+                text: "Por favor ingrese un número válido.",
+            });
+            return;
+        }
+        fetch(`http://localhost:8080/empleados/buscar/activos/documento?numeroDocumento=${documentoBuscar}`)
+            .then((res) => {
+                if (!res.ok) throw new Error("Empleado NO encontrado");
+                return res.json();
+            })
+            .then((data) => {
+                if (!data || data.length === 0) {
+                    throw new Error("No se encontró el empleado con ese número de documento.");
+                }
 
+                setResultadoBusqueda(data);
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Empleado encontrado",
+                    text: `Nombre: ${data[0].nombres} ${data[0].apellidos}`,
+                    timer: 2500,
+                    showConfirmButton: false,
+                });
+            })
+            .catch((error) => {
+                console.error("Error en la búsqueda", error);
+
+                // Mensaje de error
+                Swal.fire({
+                    icon: "error",
+                    title: "No encontrado",
+                    text: error.message || "No se encontró el empleado con ese número de documento.",
+                });
+
+                setResultadoBusqueda([]);
+            });
+    };
 
     return (
         <>
             <div className="mb-4">
-                <h5>Buscar Persona por ID</h5>
-                <input
-                    type="text"
-                    value={nombreBuscar}
-                    onChange={(e) => setNombreBuscar(e.target.value)}
-                    placeholder="Ingrese el nombre"
-                    className="form-control mb-2"
-                />
-                <button onClick={buscarEmpleadoPorNombre} 
-                className="btn btn-info">Buscar</button>
+                <h5>Buscar Empleado por:</h5>
+                <div className="row">
+                    <div className="col-md-4">
+                        <select class="form-select"
+                            aria-label="Default select example"
+                            onChange={(e) => setTipoBusqueda(e.target.value)}
+                            value={tipoBusqueda}>
+
+                            <option value="nombre">Por Nombre</option>
+                            <option value="documento">Por Documento</option>
+                        </select>
+                    </div>
+                    <div className="col-md-6">
+                        <input
+                            type={tipoBusqueda === "nombre" ? "text" : "number"}
+                            value={tipoBusqueda === "nombre" ? nombreBuscar : documentoBuscar}
+                            onChange={(e) =>
+                                tipoBusqueda === "nombre"
+                                    ? setNombreBuscar(e.target.value)
+                                    : setDocumentoBuscar(e.target.value)
+                            }
+                            placeholder={`Ingrese ${tipoBusqueda}`}
+                            className="form-control mb-2"
+                        />
+                    </div>
+                </div>
+
+                <button onClick={manejarBusqueda}
+                    className="btn btn-info">Buscar</button>
                 {resultadoBusqueda && (
                     <button
                         onClick={() => {
-                            setResultadoBusqueda(null);
-                            setIdBuscar("");
+                            setResultadoBusqueda([]);
+                            setDocumentoBuscar("");
                             cargarEmpleados(); // Esto cargará el listado completo y actualizado
                         }}
                         className="btn btn-secondary"
@@ -129,7 +201,7 @@ export function Tabla({ mostrarInactivos = false }) {
 
             <table className={`table table-bordered border-primary table-striped table-hover 
                 ${mostrarInactivos ? "table-warning" : "table-light"} `} id="tabla">
-                <thead>
+                <thead className="table-primary">
                     <tr>
                         <th>Nombres</th>
                         <th>Apellidos</th>
@@ -143,52 +215,52 @@ export function Tabla({ mostrarInactivos = false }) {
                     </tr>
                 </thead>
                 <tbody>
-                    {resultadoBusqueda ? (
-                        <tr>
-                            <td>{resultadoBusqueda.nombres}</td>
-                            <td>{resultadoBusqueda.apellidos}</td>
-                            <td>{resultadoBusqueda.numeroDocumento}</td>
-                            <td>{resultadoBusqueda.edad}</td>
-                            <td>{resultadoBusqueda.estadoCivil}</td>
-                            <td>{resultadoBusqueda.telefono}</td>
-                            <td>{resultadoBusqueda.correo}</td>
-                            <td>{resultadoBusqueda.cargo}</td>
-                            <td>
-                                <button onClick={() => {
-                                    setEmpleadoSeleccionado(resultadoBusqueda);
-                                    setMostrarModal(true);
-                                }}
-                                    className="btn btn-sm btn-primary me-2"
-                                >Editar
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        Swal.fire({
-                                            title: '¿Estás seguro?',
-                                            text: "Esta acción eliminará la persona.",
-                                            icon: 'warning',
-                                            showCancelButton: true,
-                                            confirmButtonColor: '#3085d6',
-                                            cancelButtonColor: '#d33',
-                                            confirmButtonText: 'Sí, eliminar',
-                                            cancelButtonText: 'Cancelar'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                eliminarEmpleado(resultadoBusqueda.id);
-                                                Swal.fire(
-                                                    'Eliminado',
-                                                    'La persona ha sido eliminada.',
-                                                    'success'
-                                                );
-                                            }
-                                        });
+                    {resultadoBusqueda.length > 0 ? (
+                        resultadoBusqueda.map((emp, index) => (
+                            <tr key={index}>
+                                <td>{emp.nombres}</td>
+                                <td>{emp.apellidos}</td>
+                                <td>{emp.numeroDocumento}</td>
+                                <td>{emp.edad}</td>
+                                <td>{emp.estadoCivil}</td>
+                                <td>{emp.telefono}</td>
+                                <td>{emp.correo}</td>
+                                <td>{emp.cargo}</td>
+                                <td>
+                                    <button onClick={() => {
+                                        setEmpleadoSeleccionado(emp);
+                                        setMostrarModal(true);
                                     }}
-                                    className="btn btn-sm btn-danger"
-                                >
-                                    Eliminar
-                                </button>
-                            </td>
-                        </tr>
+                                        className="btn btn-sm btn-primary me-2"
+                                    >Editar</button>
+
+                                    <button
+                                        onClick={() => {
+                                            Swal.fire({
+                                                title: '¿Estás seguro?',
+                                                text: "Esta acción eliminará al empleado.",
+                                                icon: 'warning',
+                                                showCancelButton: true,
+                                                confirmButtonColor: '#3085d6',
+                                                cancelButtonColor: '#d33',
+                                                confirmButtonText: 'Sí, eliminar',
+                                                cancelButtonText: 'Cancelar'
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    eliminarEmpleado(emp.id);
+                                                    Swal.fire(
+                                                        'Eliminado',
+                                                        'La persona ha sido eliminada.',
+                                                        'success'
+                                                    );
+                                                }
+                                            });
+                                        }}
+                                        className="btn btn-sm btn-danger"
+                                    >Eliminar</button>
+                                </td>
+                            </tr>
+                        ))
                     ) : (
                         empleados.map((emp, index) => (
                             <tr key={index}>
@@ -246,6 +318,10 @@ export function Tabla({ mostrarInactivos = false }) {
                 visible={mostrarModal} //Controla si el modal debe mostrarse (true) o no (false).
                 onClose={() => setMostrarModal(false)} //Función que se ejecuta cuando el usuario cierra el modal.
                 onActualizado={(empleadoActualizado) => {
+
+                    setMostrarModal(false);
+                    setNombreBuscar("");
+                    setResultadoBusqueda(resultadoBusqueda.map(emp => emp.id === empleadoActualizado.id ? empleadoActualizado : emp));
                     setEmpleados(empleados.map(e => e.id === empleadoActualizado.id ? empleadoActualizado : e));
                 }}
             />

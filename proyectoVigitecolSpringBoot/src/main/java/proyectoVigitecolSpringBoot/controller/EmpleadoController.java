@@ -59,5 +59,13 @@ public class EmpleadoController {
     public ResponseEntity<List<DatosActualizarEmpleado>> buscarActivosPorNombre(@RequestParam String filtro) {
         return empleadoService.buscarEmpleadosActivosPorNombre(filtro);
     }
+    @GetMapping("/buscar/activos/documento")
+    public ResponseEntity<List<DatosActualizarEmpleado>> buscarActivosPorDocumento(@RequestParam String numeroDocumento) {
+        return empleadoService.buscarEmpleadoActivoPorNumeroDocumento(numeroDocumento);
+    }
+    @GetMapping("/buscar/inactivos")
+    public ResponseEntity<List<DatosActualizarEmpleado>> buscarInactivosPorNombre(@RequestParam String filtro) {
+        return empleadoService.buscarEmpleadosInactivosPorNombre(filtro);
+    }
 
 }

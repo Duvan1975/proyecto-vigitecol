@@ -39,17 +39,32 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
     """)
     Page<Empleado> findEmpleadosConContratoInactivo(Pageable pageable);
 
-    @Query("SELECT MAX(c.numeroContrato) FROM Contrato c WHERE c.empleado.id = :empleadoId")
+    @Query("SELECT MAX(c.numeroContrato) " +
+            "FROM Contrato c " +
+            "WHERE c.empleado.id = :empleadoId")
     Integer obtenerUltimoNumeroContratoPorEmpleado(@Param("empleadoId") Long empleadoId);
 
     @Query("SELECT c.empleado FROM Contrato c WHERE c.empleado.id = :empleadoId AND c.continua = false ORDER BY c.fechaIngreso DESC")
     Optional<Empleado> findEmpleadoInactivoPorId(@Param("empleadoId") Long empleadoId);
 
-    @Query("SELECT c.empleado FROM Contrato c WHERE c.empleado.id = :empleadoId AND c.continua = true ORDER BY c.fechaIngreso DESC")
+    @Query("SELECT c.empleado FROM Contrato c " +
+            "WHERE c.empleado.id = :empleadoId " +
+            "AND c.continua = true " +
+            "ORDER BY c.fechaIngreso DESC")
     Optional<Empleado> findEmpleadoActivoPorId(@Param("empleadoId") Long empleadoId);
 
     @Query("SELECT c.empleado FROM Contrato c " +
             "WHERE c.continua = true " +
             "ORDER BY c.fechaIngreso DESC")
     List<Empleado> buscarTodosEmpleadosActivos();
+
+    @Query("SELECT c.empleado FROM Contrato c " +
+            "WHERE c.empleado.numeroDocumento = :numeroDocumento " +
+            "AND c.continua = true")
+    List<Empleado> buscarEmpleadoActivoPorNumeroDocumento(@Param("numeroDocumento") String numeroDocumento);
+
+    @Query("SELECT c.empleado FROM Contrato c " +
+            "WHERE c.continua = false " +
+            "ORDER BY c.fechaIngreso DESC")
+    List<Empleado> buscarTodosEmpleadosInactivos();
 }
