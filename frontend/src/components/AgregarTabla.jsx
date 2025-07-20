@@ -50,18 +50,43 @@ export function AgregarTabla() {
             return response.json();
         })
         .then((data) => {
-            Swal.fire({
-                icon: 'success',
-                title: 'Registro exitoso',
-                text: 'La persona ha sido registrada correctamente.',
-            });
-        })
-        .catch((error) => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error en el formulario',
-                html: error.message,
-            });
-        });
+    Swal.fire({
+        icon: 'success',
+        title: 'Registro exitoso',
+        text: 'El empleado ha sido registrado correctamente.',
+    });
+
+    const contrato = {
+        numeroContrato: 0, // El backend asigna el número automáticamente
+        fechaIngreso: "2025-07-20", // Puedes tomarlo desde un input tipo date
+        fechaRetiro: null,
+        fechaRenuncia: null,
+        fechaOtroSi: null,
+        omiso: "",
+        continua: true,
+        vacacionesDesde: null,
+        vacacionesHasta: null,
+        empleadoId: data.id // Asegúrate que backend devuelva esto
+    };
+
+    return fetch(`http://localhost:8080/contratos/${data.id}`, {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json",
+        },
+        body: JSON.stringify(contrato),
+    });
+})
+.then((responseContrato) => {
+    if (!responseContrato.ok) {
+        throw new Error("Error al registrar el contrato");
+    }
+    Swal.fire({
+        icon: 'success',
+        title: 'Contrato registrado',
+        text: 'El contrato fue asignado al empleado.',
+    });
+})
+
 
 }

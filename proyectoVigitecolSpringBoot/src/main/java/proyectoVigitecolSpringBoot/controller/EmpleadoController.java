@@ -30,12 +30,12 @@ public class EmpleadoController {
     }
     @GetMapping("/activos")
     public ResponseEntity<Page<DatosListadoEmpleado>> listadoEmpleadosActivos(
-            @PageableDefault(size = 20)Pageable paginacion) {
+            @PageableDefault(size = 10, sort = "empleado.apellidos")Pageable paginacion) {
         return empleadoService.listarEmpleadosActivos(paginacion);
     }
     @GetMapping("/inactivos")
     public ResponseEntity<Page<DatosListadoEmpleado>> listadoEmpleadosInactivos(
-            @PageableDefault(size = 20)Pageable paginacion) {
+            @PageableDefault(size = 10, sort = "empleado.apellidos")Pageable paginacion) {
         return empleadoService.listarEmpleadosInactivos(paginacion);
     }
     @PutMapping
@@ -66,6 +66,10 @@ public class EmpleadoController {
     @GetMapping("/buscar/inactivos")
     public ResponseEntity<List<DatosActualizarEmpleado>> buscarInactivosPorNombre(@RequestParam String filtro) {
         return empleadoService.buscarEmpleadosInactivosPorNombre(filtro);
+    }
+    @GetMapping("/buscar/inactivos/documento")
+    public ResponseEntity<List<DatosActualizarEmpleado>> buscarInactivosPorDocumento(@RequestParam String numeroDocumento) {
+        return empleadoService.buscarEmpleadoInactivoPorNumeroDocumento(numeroDocumento);
     }
 
 }

@@ -2,6 +2,7 @@ import { CuadrosTexto } from "./CuadrosTexto";
 import { AgregarTabla } from "./AgregarTabla";
 
 export function Formulario() {
+
     return (
         <div>
             <h1 className='alinearTexto'>Formulario de Registro de Empleados <strong>Vigitecol Ltda.</strong></h1>
@@ -145,6 +146,45 @@ export function Formulario() {
                     idinput="cargo"
                     placeholderinput="Ingrese el cargo a ocupar"
                 />
+            </div>
+            <br></br>
+            <h3 className='alinearTexto'>Asignar Contrato</h3>
+
+            <div className='row'>
+                <CuadrosTexto
+    tamanoinput="col-md-3"
+    titulolabel="Fecha de Ingreso:"
+    tipoinput="date"
+    nombreinput="fechaIngreso"
+    idinput="fechaIngreso"
+    placeholderinput="Seleccione la fecha de ingreso"
+/>
+<CuadrosTexto
+    tamanoinput="col-md-3"
+    titulolabel="Fecha de Ingreso:"
+    tipoinput="date"
+    nombreinput="fechaIngreso"
+    idinput="fechaIngreso"
+    placeholderinput="Seleccione la fecha de ingreso"
+/>
+<CuadrosTexto
+    tamanoinput="col-md-3"
+    titulolabel="Fecha de Ingreso:"
+    tipoinput="date"
+    nombreinput="fechaIngreso"
+    idinput="fechaIngreso"
+    placeholderinput="Seleccione la fecha de ingreso"
+/>
+<CuadrosTexto
+    tamanoinput="col-md-3"
+    titulolabel="Fecha de Ingreso:"
+    tipoinput="date"
+    nombreinput="fechaIngreso"
+    idinput="fechaIngreso"
+    placeholderinput="Seleccione la fecha de ingreso"
+/>
+
+
             </div>
             <br></br>
             <button onClick={AgregarTabla}

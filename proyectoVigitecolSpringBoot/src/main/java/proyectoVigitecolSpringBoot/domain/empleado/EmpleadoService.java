@@ -250,10 +250,9 @@ public class EmpleadoService {
     public ResponseEntity<List<DatosActualizarEmpleado>> buscarEmpleadoActivoPorNumeroDocumento(String numeroDocumento) {
         var empleados = contratoRepository.buscarEmpleadoActivoPorNumeroDocumento(numeroDocumento);
 
+        // Si no se encuentra nada, devolvemos lista vacía con estado 200 OK
         if (empleados.isEmpty()) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(Collections.emptyList());
+            return ResponseEntity.ok(Collections.emptyList());
         }
         var resultado = empleados.stream()
                 .map(empleado -> new DatosActualizarEmpleado(
@@ -310,5 +309,35 @@ public class EmpleadoService {
                 .toList();
 
         return ResponseEntity.ok(empleadosFiltrados);
+    }
+    public ResponseEntity<List<DatosActualizarEmpleado>> buscarEmpleadoInactivoPorNumeroDocumento(String numeroDocumento) {
+        var empleados = contratoRepository.buscarEmpleadoInactivoPorNumeroDocumento(numeroDocumento);
+
+        // Si no se encuentra nada, devolvemos lista vacía con estado 200 OK
+        if (empleados.isEmpty()) {
+            return ResponseEntity.ok(Collections.emptyList());
+        }
+        var resultado = empleados.stream()
+                .map(empleado -> new DatosActualizarEmpleado(
+                        empleado.getId(),
+                        empleado.getNombres(),
+                        empleado.getApellidos(),
+                        empleado.getTipoDocumento(),
+                        empleado.getNumeroDocumento(),
+                        empleado.getFechaNacimiento(),
+                        empleado.getLugarNacimiento(),
+                        empleado.getCiudadExpedicion(),
+                        empleado.getEdad(),
+                        empleado.getLibretaMilitar(),
+                        empleado.getEstadoCivil(),
+                        empleado.getGenero(),
+                        empleado.getDireccion(),
+                        empleado.getTelefono(),
+                        empleado.getCorreo(),
+                        empleado.getTipoEmpleado(),
+                        empleado.getCargo()
+                )).toList();
+
+        return ResponseEntity.ok(resultado);
     }
 }

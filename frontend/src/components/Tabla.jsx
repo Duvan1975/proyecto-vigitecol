@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { ModalEditar } from "./ModalEditar";
 import Swal from "sweetalert2";
+import Paginacion from "./Paginacion";
 
 export function Tabla({ mostrarInactivos = false }) {
 
+    //Estados para seleccionar empleado mostrar Modal y actualizar
     const [empleados, setEmpleados] = useState([]);
     const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState(null);
     const [mostrarModal, setMostrarModal] = useState(false);
@@ -18,20 +20,32 @@ export function Tabla({ mostrarInactivos = false }) {
     //Estado para controlar el tipo de busqueda
     const [tipoBusqueda, setTipoBusqueda] = useState("nombre");
 
+    //Estados para controlar la paginación
+    const [paginaActual, setPaginaActual] = useState(0);
+    const [totalPaginas, setTotalPaginas] = useState(3);
+    const [totalElementos, setTotalElementos] = useState(0);
+    const [tamanoPagina, setTamanoPagina] = useState(0);
+
     useEffect(() => {
-        cargarEmpleados();
+        cargarEmpleados(paginaActual);
         // eslint-disable-next-line
-    }, [mostrarInactivos]);
+    }, [mostrarInactivos, paginaActual]);
 
     //Cargando el listado de Empleados activos y retirados
-    const cargarEmpleados = () => {
+    const cargarEmpleados = (pagina = 0) => {
         const url = mostrarInactivos
-            ? "http://localhost:8080/empleados/inactivos"
-            : "http://localhost:8080/empleados/activos";
+            ? `http://localhost:8080/empleados/inactivos?page=${pagina}`
+            : `http://localhost:8080/empleados/activos?page=${pagina}`;
 
         fetch(url)
             .then((response) => response.json())
-            .then((data) => setEmpleados(data.content))
+            .then((data) => {
+                setEmpleados(data.content);
+                setTotalPaginas(data.totalPages); //Muestra el total de las páginas
+                setPaginaActual(data.number); //Muestra el número actual de la página
+                setTotalElementos(data.totalElements); //Trae el número de elementos de la todas las páginas
+                setTamanoPagina(data.size); //Muestra la cantidad de elementos por página
+            })
             .catch((error) => console.error("Error al cargar empleados:", error));
     };
 
@@ -44,6 +58,7 @@ export function Tabla({ mostrarInactivos = false }) {
             if (response.ok) {
                 //Eliminar del estado para actualizar la tabla
                 setEmpleados(empleados.filter(empleado => empleado.id !== id));
+                cargarEmpleados(); // Esto cargará el listado completo y actualizado
             }
             else {
                 console.error("Error al eliminar empleado")
@@ -53,102 +68,81 @@ export function Tabla({ mostrarInactivos = false }) {
         }
     };
 
-    //Búsqueda de empleados por nombre
-    const buscarEmpleadoPorNombre = () => {
-        if (!nombreBuscar || nombreBuscar.trim() === "") {
-            Swal.fire({
-                icon: "warning",
-                title: "Nombre requerido",
-                text: "Por favor ingrese un nombre válido.",
-            });
-            return;
-        }
-        //Aquí mostramos el endpoint de búsqueda
-        const endpoint = mostrarInactivos
-            ? `http://localhost:8080/empleados/obtenerinactivos/${nombreBuscar}`
-            : `http://localhost:8080/empleados/buscar/activos?filtro=${nombreBuscar}`;
+    const manejarBusqueda = () => {
+        if (tipoBusqueda === "nombre") {
+            if (!nombreBuscar || nombreBuscar.trim() === "") {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Nombre requerido",
+                    text: "Por favor ingrese un nombre válido.",
+                });
+                return;
+            }
 
-        fetch(endpoint)
+            const url = mostrarInactivos
+                ? `http://localhost:8080/empleados/buscar/inactivos?filtro=${nombreBuscar}`
+                : `http://localhost:8080/empleados/buscar/activos?filtro=${nombreBuscar}`;
+
+            realizarBusqueda(url);
+        } else {
+            if (!documentoBuscar || documentoBuscar.trim() === "") {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Número de documento requerido",
+                    text: "Por favor ingrese un número válido.",
+                });
+                return;
+            }
+
+            const url = mostrarInactivos
+                ? `http://localhost:8080/empleados/buscar/inactivos/documento?numeroDocumento=${documentoBuscar}`
+                : `http://localhost:8080/empleados/buscar/activos/documento?numeroDocumento=${documentoBuscar}`;
+
+            realizarBusqueda(url);
+        }
+    };
+
+    const realizarBusqueda = (url) => {
+        fetch(url)
             .then((res) => {
-                if (!res.ok) throw new Error("Empleado no encontrado");
+                if (!res.ok) throw new Error("Error al buscar empleado");
                 return res.json();
             })
             .then((data) => {
                 if (data.length === 0) {
-                    setResultadoBusqueda([]);
-                } else {
-                    setResultadoBusqueda(data); // Tratamos data como un array y tomamos la primera persona
-                }
-                // Mensaje de éxito muestra nombre y apellido de la persona encontrada
-                Swal.fire({
-                    icon: "success",
-                    title: "Empleado(s) encontrado(s)",
-                    text: `${data.length} coincidencias encontradas`,
-                    timer: 2000,
-                    showConfirmButton: false,
-                });
-            })
-            .catch((error) => {
-                console.error("Error en la búsqueda", error);
+                    setResultadoBusqueda([]); // vaciamos resultados si no hay datos
 
-                // Mensaje de error
-                Swal.fire({
-                    icon: "error",
-                    title: "No encontrado",
-                    text: "No se encontró el empleado con ese NOMBRE.",
-                });
+                    Swal.fire({
+                        icon: "info",
+                        title: "Sin resultados",
+                        text: "No se encontró ningún empleado con ese dato.",
+                        timer: 2500,
+                        showConfirmButton: false,
+                    });
 
-                setResultadoBusqueda(null);
-            });
-    };
-    //Manejar busqueda controla el tipo de busqueda
-    const manejarBusqueda = () => {
-        if (tipoBusqueda === "nombre") {
-            buscarEmpleadoPorNombre();
-        } else {
-            buscarEmpleadoPorDocumento();
-        }
-    };
-    //Function busqueda de empleados por documento
-    const buscarEmpleadoPorDocumento = () => {
-        if (!documentoBuscar || documentoBuscar.trim() === "") {
-            Swal.fire({
-                icon: "warning",
-                title: "Número de Documento Requerido",
-                text: "Por favor ingrese un número válido.",
-            });
-            return;
-        }
-        fetch(`http://localhost:8080/empleados/buscar/activos/documento?numeroDocumento=${documentoBuscar}`)
-            .then((res) => {
-                if (!res.ok) throw new Error("Empleado NO encontrado");
-                return res.json();
-            })
-            .then((data) => {
-                if (!data || data.length === 0) {
-                    throw new Error("No se encontró el empleado con ese número de documento.");
+                    return; // salimos para no mostrar el mensaje de éxito
                 }
 
                 setResultadoBusqueda(data);
 
                 Swal.fire({
                     icon: "success",
-                    title: "Empleado encontrado",
-                    text: `Nombre: ${data[0].nombres} ${data[0].apellidos}`,
+                    title: "Empleado(s) encontrado(s)",
+                    text:
+                        data.length === 1
+                            ? `${data[0].nombres} ${data[0].apellidos}`
+                            : `${data.length} coincidencia(s) encontrada(s)`,
                     timer: 2500,
                     showConfirmButton: false,
                 });
             })
             .catch((error) => {
                 console.error("Error en la búsqueda", error);
-
-                // Mensaje de error
                 Swal.fire({
                     icon: "error",
-                    title: "No encontrado",
-                    text: error.message || "No se encontró el empleado con ese número de documento.",
+                    title: "Error",
+                    text: "Ocurrió un error al buscar el empleado.",
                 });
-
                 setResultadoBusqueda([]);
             });
     };
@@ -159,7 +153,7 @@ export function Tabla({ mostrarInactivos = false }) {
                 <h5>Buscar Empleado por:</h5>
                 <div className="row">
                     <div className="col-md-4">
-                        <select class="form-select"
+                        <select className="form-select"
                             aria-label="Default select example"
                             onChange={(e) => setTipoBusqueda(e.target.value)}
                             value={tipoBusqueda}>
@@ -190,6 +184,7 @@ export function Tabla({ mostrarInactivos = false }) {
                         onClick={() => {
                             setResultadoBusqueda([]);
                             setDocumentoBuscar("");
+                            setNombreBuscar("");
                             cargarEmpleados(); // Esto cargará el listado completo y actualizado
                         }}
                         className="btn btn-secondary"
@@ -197,7 +192,23 @@ export function Tabla({ mostrarInactivos = false }) {
                         Limpiar Búsqueda
                     </button>
                 )}
+                
             </div>
+            {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
+                    <Paginacion
+                        paginaActual={paginaActual}
+                        totalPaginas={totalPaginas}
+                        onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
+                    />
+                )};
+                {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
+                    <div className="mt-2 text-center">
+                        <small>
+                            Mostrando página {paginaActual + 1} de {totalPaginas} —{" "}
+                            {tamanoPagina} por página, total de registros: {totalElementos}
+                        </small>
+                    </div>
+                )};
 
             <table className={`table table-bordered border-primary table-striped table-hover 
                 ${mostrarInactivos ? "table-warning" : "table-light"} `} id="tabla">
@@ -262,8 +273,8 @@ export function Tabla({ mostrarInactivos = false }) {
                             </tr>
                         ))
                     ) : (
-                        empleados.map((emp, index) => (
-                            <tr key={index}>
+                        empleados.map((emp) => (
+                            <tr key={emp.id}>
                                 <td>{emp.nombres}</td>
                                 <td>{emp.apellidos}</td>
                                 <td>{emp.numeroDocumento}</td>
@@ -312,6 +323,22 @@ export function Tabla({ mostrarInactivos = false }) {
                     )}
                 </tbody>
             </table>
+
+            {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
+                <Paginacion
+                    paginaActual={paginaActual}
+                    totalPaginas={totalPaginas}
+                    onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
+                />
+            )};
+            {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
+                <div className="mt-2 text-center">
+                    <small>
+                        Mostrando página {paginaActual + 1} de {totalPaginas} —{" "}
+                        {tamanoPagina} por página, total de registros: {totalElementos}
+                    </small>
+                </div>
+            )};
 
             <ModalEditar
                 empleado={empleadoSeleccionado} // Le envía al modal los datos de la persona que se quiere editar.
