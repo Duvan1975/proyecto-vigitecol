@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
-export function AgregarTabla() {
+export async function AgregarTabla(contrato) {
 
-    const datos = {
+    const datosEmpleado = {
         nombres: document.getElementById('nombres').value,
         apellidos: document.getElementById('apellidos').value,
         tipoDocumento: document.getElementById('tipoDocumento').value,
@@ -19,74 +19,62 @@ export function AgregarTabla() {
         cargo: document.getElementById('cargo').value,
     };
 
-    fetch("http://localhost:8080/empleados", {
-        method: "POST",
-        headers: {
-            "Content-type": "application/json",
-        },
-        body: JSON.stringify(datos),
-    })
-        .then(async (response) => {
-            if (!response.ok) {
-                const errores = await response.json();
-                let mensaje;
+    try {
+        const responseEmpleado = await fetch("http://localhost:8080/empleados", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json",
+            },
+            body: JSON.stringify(datosEmpleado),
+        });
 
-                if (Array.isArray(errores)) {
-                    // Caso: errores de validación múltiples
-                    mensaje = errores.map(err => `<strong>${err.campo}</strong>: ${err.error}`).join('<br>');
-                } else if (errores.campo && errores.error) {
-                    // Caso: error individual con campo (por ejemplo enum mal enviado)
-                    mensaje = `<strong>${errores.campo}</strong>: ${errores.error}`;
-                } else if (errores.error) {
-                    // Caso: error general sin campo
-                    mensaje = errores.error;
-                } else {
-                    mensaje = 'Ocurrió un error desconocido';
-                }
+        if (!responseEmpleado.ok) {
+            const errores = await responseEmpleado.json();
+            let mensaje = "Error en el registro del empleado";
 
-                throw new Error(mensaje);
+            if (Array.isArray(errores)) {
+                // Caso: errores de validación múltiples
+                mensaje = errores.map(err => `<strong>${err.campo}</strong>: ${err.error}`).join('<br>');
+            } else if (errores.campo && errores.error) {
+                // Caso: error individual con campo (por ejemplo enum mal enviado)
+                mensaje = `<strong>${errores.campo}</strong>: ${errores.error}`;
+            } else if (errores.error) {
+                // Caso: error general sin campo
+                mensaje = errores.error;
+            } else {
+                mensaje = 'Ocurrió un error desconocido';
             }
+            throw new Error(mensaje);
+        }
 
-            return response.json();
-        })
-        .then((data) => {
-    Swal.fire({
-        icon: 'success',
-        title: 'Registro exitoso',
-        text: 'El empleado ha sido registrado correctamente.',
-    });
+        const empleadoData = await responseEmpleado.json();
+        const empleadoId = empleadoData.id || empleadoData.Id;
 
-    const contrato = {
-        numeroContrato: 0, // El backend asigna el número automáticamente
-        fechaIngreso: "2025-07-20", // Puedes tomarlo desde un input tipo date
-        fechaRetiro: null,
-        fechaRenuncia: null,
-        fechaOtroSi: null,
-        omiso: "",
-        continua: true,
-        vacacionesDesde: null,
-        vacacionesHasta: null,
-        empleadoId: data.id // Asegúrate que backend devuelva esto
-    };
+        const responseContratos = await fetch(`http://localhost:8080/contratos/${empleadoId}`, {
 
-    return fetch(`http://localhost:8080/contratos/${data.id}`, {
-        method: "POST",
-        headers: {
-            "Content-type": "application/json",
-        },
-        body: JSON.stringify(contrato),
-    });
-})
-.then((responseContrato) => {
-    if (!responseContrato.ok) {
-        throw new Error("Error al registrar el contrato");
+            method: "POST",
+            headers: {
+                "Content-type": "application/json",
+            },
+            body: JSON.stringify({
+                contrato
+            }),
+        });
+        if (!responseContratos.ok) {
+            throw new Error("Error al registrar el contrato");
+        }
+
+        Swal.fire({
+            icon: "success",
+            title: "Registro exitoso",
+            text: "Empleado y contratos registrados correctamente.",
+        });
+
+    } catch (error) {
+        Swal.fire({
+            icon: "error",
+            title: "Error en el formulario",
+            html: error.message,
+        });
     }
-    Swal.fire({
-        icon: 'success',
-        title: 'Contrato registrado',
-        text: 'El contrato fue asignado al empleado.',
-    });
-})
-
-
-}
+};
