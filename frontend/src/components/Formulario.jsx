@@ -1,4 +1,5 @@
 import { CuadrosTexto } from "./CuadrosTexto";
+import { CuadrosSelect } from "./CuadrosSelect";
 import { AgregarTabla } from "./AgregarTabla";
 import { useState } from "react";
 
@@ -20,11 +21,33 @@ export function Formulario() {
         correo: "",
         tipoEmpleado: "",
         cargo: ""
-    })
+    });
 
     const [contrato, setContrato] = useState({
         fechaIngreso: ""
     });
+    const limpiarFormulario = () => {
+        setEmpleado({
+            nombres: "",
+            apellidos: "",
+            tipoDocumento: "",
+            numeroDocumento: "",
+            fechaNacimiento: "",
+            lugarNacimiento: "",
+            ciudadExpedicion: "",
+            libretaMilitar: "",
+            estadoCivil: "",
+            genero: "",
+            direccion: "",
+            telefono: "",
+            correo: "",
+            tipoEmpleado: "",
+            cargo: "",
+        });
+        setContrato({
+            fechaIngreso: "",
+        });
+    }
 
     return (
         <div>
@@ -38,7 +61,7 @@ export function Formulario() {
                     idinput="nombres"
                     placeholderinput="Ingrese los nombres"
                     value={empleado.nombres}
-                    onChange={(e) => setEmpleado({ ...empleado, nombres: e.target.value})}
+                    onChange={(e) => setEmpleado({ ...empleado, nombres: e.target.value })}
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-4"
@@ -48,17 +71,21 @@ export function Formulario() {
                     idinput="apellidos"
                     placeholderinput="Ingrese los apellidos"
                     value={empleado.apellidos}
-                    onChange={(e) => setEmpleado({ ...empleado, apellidos: e.target.value})}
+                    onChange={(e) => setEmpleado({ ...empleado, apellidos: e.target.value })}
                 />
-                <CuadrosTexto
+                <CuadrosSelect
                     tamanoinput="col-md-4"
                     titulolabel="Tipo Documento:"
-                    tipoinput="text"
                     nombreinput="tipoDocumento"
                     idinput="tipoDocumento"
-                    placeholderinput="Seleccione el tipo de documento"
                     value={empleado.tipoDocumento}
-                    onChange={(e) => setEmpleado({ ...empleado, tipoDocumento: e.target.value})}
+                    onChange={(e) => setEmpleado({ ...empleado, tipoDocumento: e.target.value })}
+                    opciones={[
+                        { valor: "CC", texto: "CC" },
+                        { valor: "CE", texto: "CE" },
+                        { valor: "TI", texto: "TI" },
+                        { valor: "PPT", texto: "PPT" },
+                    ]}
                 />
             </div>
 
@@ -71,7 +98,7 @@ export function Formulario() {
                     idinput="numeroDocumento"
                     placeholderinput="Ingrese el número de documento"
                     value={empleado.numeroDocumento}
-                    onChange={(e) => setEmpleado({ ...empleado, numeroDocumento: e.target.value})}
+                    onChange={(e) => setEmpleado({ ...empleado, numeroDocumento: e.target.value })}
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-4"
@@ -81,7 +108,7 @@ export function Formulario() {
                     idinput="fechaNacimiento"
                     placeholderinput="Seleccione la fecha de nacimiento"
                     value={empleado.fechaNacimiento}
-                    onChange={(e) => setEmpleado({ ...empleado, fechaNacimiento: e.target.value})}
+                    onChange={(e) => setEmpleado({ ...empleado, fechaNacimiento: e.target.value })}
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-4"
@@ -91,7 +118,7 @@ export function Formulario() {
                     idinput="lugarNacimiento"
                     placeholderinput="Ingrese el lugar de nacimiento"
                     value={empleado.lugarNacimiento}
-                    onChange={(e) => setEmpleado({ ...empleado, lugarNacimiento: e.target.value})}
+                    onChange={(e) => setEmpleado({ ...empleado, lugarNacimiento: e.target.value })}
                 />
             </div>
 
@@ -104,40 +131,50 @@ export function Formulario() {
                     idinput="ciudadExpedicion"
                     placeholderinput="Ingrese la ciudad de expedición del documento"
                     value={empleado.ciudadExpedicion}
-                    onChange={(e) => setEmpleado({ ...empleado, ciudadExpedicion: e.target.value})}
+                    onChange={(e) => setEmpleado({ ...empleado, ciudadExpedicion: e.target.value })}
                 />
-                <CuadrosTexto
+                <CuadrosSelect
                     tamanoinput="col-md-4"
                     titulolabel="Libreta Militar:"
-                    tipoinput="text"
                     nombreinput="libretaMilitar"
                     idinput="libretaMilitar"
-                    placeholderinput="Seleccione su estado"
                     value={empleado.libretaMilitar}
-                    onChange={(e) => setEmpleado({ ...empleado, libretaMilitar: e.target.value})}
+                    onChange={(e) => setEmpleado({ ...empleado, libretaMilitar: e.target.value })}
+                    opciones={[
+                        { valor: "PRIMERA", texto: "PRIMERA" },
+                        { valor: "SEGUNDA", texto: "SEGUNDA" },
+                        { valor: "NO_TIENE", texto: "NO TIENE" },
+                    ]}
                 />
-                <CuadrosTexto
+                <CuadrosSelect
                     tamanoinput="col-md-4"
                     titulolabel="Estado Civil:"
-                    tipoinput="text"
                     nombreinput="estadoCivil"
                     idinput="estadoCivil"
-                    placeholderinput="Seleccione su estado civil"
                     value={empleado.estadoCivil}
-                    onChange={(e) => setEmpleado({ ...empleado, estadoCivil: e.target.value})}
+                    onChange={(e) => setEmpleado({ ...empleado, estadoCivil: e.target.value })}
+                    opciones={[
+                        { valor: "CASADO", texto: "CASADO" },
+                        { valor: "SOLTERO", texto: "SOLTERO" },
+                        { valor: "VIUDO", texto: "VIUDO" },
+                        { valor: "SEPARADO", texto: "SEPARADO" },
+                        { valor: "UNION_LIBRE", texto: "UNION LIBRE" },
+                    ]}
                 />
             </div>
 
             <div className='row'>
-                <CuadrosTexto
+                <CuadrosSelect
                     tamanoinput="col-md-4"
-                    titulolabel="Género:"
-                    tipoinput="text"
+                    titulolabel="GÉNERO:"
                     nombreinput="genero"
                     idinput="genero"
-                    placeholderinput="Seleccione el tipo de genero"
                     value={empleado.genero}
-                    onChange={(e) => setEmpleado({ ...empleado, genero: e.target.value})}
+                    onChange={(e) => setEmpleado({ ...empleado, genero: e.target.value })}
+                    opciones={[
+                        { valor: "MASCULINO", texto: "MASCULINO" },
+                        { valor: "FEMENINO", texto: "FEMENINO" },
+                    ]}
                 />
             </div>
 
@@ -152,7 +189,7 @@ export function Formulario() {
                     idinput="direccion"
                     placeholderinput="Ingrese la dirección"
                     value={empleado.direccion}
-                    onChange={(e) => setEmpleado({ ...empleado, direccion: e.target.value})}
+                    onChange={(e) => setEmpleado({ ...empleado, direccion: e.target.value })}
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-4"
@@ -162,7 +199,7 @@ export function Formulario() {
                     idinput="telefono"
                     placeholderinput="Ingrese el número telefónico"
                     value={empleado.telefono}
-                    onChange={(e) => setEmpleado({ ...empleado, telefono: e.target.value})}
+                    onChange={(e) => setEmpleado({ ...empleado, telefono: e.target.value })}
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-4"
@@ -172,22 +209,24 @@ export function Formulario() {
                     idinput="correo"
                     placeholderinput="Ingrese el correo electróncio"
                     value={empleado.correo}
-                    onChange={(e) => setEmpleado({ ...empleado, correo: e.target.value})}
+                    onChange={(e) => setEmpleado({ ...empleado, correo: e.target.value })}
                 />
             </div>
             <br></br>
             <h3 className='alinearTexto'>Asignar Cargo</h3>
 
             <div className='row'>
-                <CuadrosTexto
+                <CuadrosSelect
                     tamanoinput="col-md-4"
                     titulolabel="Tipo de Empleado:"
-                    tipoinput="text"
                     nombreinput="tipoEmpleado"
                     idinput="tipoEmpleado"
-                    placeholderinput="Seleccione el tipo de empleado"
                     value={empleado.tipoEmpleado}
-                    onChange={(e) => setEmpleado({ ...empleado, tipoEmpleado: e.target.value})}
+                    onChange={(e) => setEmpleado({ ...empleado, tipoEmpleado: e.target.value })}
+                    opciones={[
+                        { valor: "OPERATIVO", texto: "OPERATIVO" },
+                        { valor: "ADMINISTRATIVO", texto: "ADMINISTRATIVO" },
+                    ]}
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-4"
@@ -197,7 +236,7 @@ export function Formulario() {
                     idinput="cargo"
                     placeholderinput="Ingrese el cargo a ocupar"
                     value={empleado.cargo}
-                    onChange={(e) => setEmpleado({ ...empleado, cargo: e.target.value})}
+                    onChange={(e) => setEmpleado({ ...empleado, cargo: e.target.value })}
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-4"
@@ -206,15 +245,15 @@ export function Formulario() {
                     nombreinput="fechaIngreso"
                     idinput="fechaIngreso"
                     value={contrato.fechaIngreso}
-                    onChange={(e) => setContrato({ ...contrato, fechaIngreso: e.target.value})}
+                    onChange={(e) => setContrato({ ...contrato, fechaIngreso: e.target.value })}
                 />
-            
+
             </div>
 
             <br /><br />
             <div className='col-md-auto'>
                 <button
-                    onClick={() => AgregarTabla(contrato)}
+                    onClick={() => AgregarTabla(contrato, empleado, limpiarFormulario)}
                     className="botonregistrar btn btn-success"
                 >
                     Registrar

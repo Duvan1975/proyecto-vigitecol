@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ModalEditar } from "./ModalEditar";
+import { TablaContrato } from "./TablaContrato";
 import Swal from "sweetalert2";
 import Paginacion from "./Paginacion";
 
@@ -48,6 +49,7 @@ export function Tabla({ mostrarInactivos = false }) {
             })
             .catch((error) => console.error("Error al cargar empleados:", error));
     };
+
 
     const eliminarEmpleado = async (id) => {
         console.log("Id a eliminar:", id); //Prueba en consola
@@ -160,6 +162,8 @@ export function Tabla({ mostrarInactivos = false }) {
 
                             <option value="nombre">Por Nombre</option>
                             <option value="documento">Por Documento</option>
+                            <option value="conContrato">Por Contrato</option>
+
                         </select>
                     </div>
                     <div className="col-md-6">
@@ -192,145 +196,15 @@ export function Tabla({ mostrarInactivos = false }) {
                         Limpiar Búsqueda
                     </button>
                 )}
-                
+
             </div>
-            {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
-                    <Paginacion
-                        paginaActual={paginaActual}
-                        totalPaginas={totalPaginas}
-                        onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
-                    />
-                )};
-                {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
-                    <div className="mt-2 text-center">
-                        <small>
-                            Mostrando página {paginaActual + 1} de {totalPaginas} —{" "}
-                            {tamanoPagina} por página, total de registros: {totalElementos}
-                        </small>
-                    </div>
-                )};
-
-            <table className={`table table-bordered border-primary table-striped table-hover 
-                ${mostrarInactivos ? "table-warning" : "table-light"} `} id="tabla">
-                <thead className="table-primary">
-                    <tr>
-                        <th>Nombres</th>
-                        <th>Apellidos</th>
-                        <th>Número Documento</th>
-                        <th>Edad</th>
-                        <th>Estado Civil</th>
-                        <th>Teléfono</th>
-                        <th>Correo</th>
-                        <th>Cargo</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {resultadoBusqueda.length > 0 ? (
-                        resultadoBusqueda.map((emp, index) => (
-                            <tr key={index}>
-                                <td>{emp.nombres}</td>
-                                <td>{emp.apellidos}</td>
-                                <td>{emp.numeroDocumento}</td>
-                                <td>{emp.edad}</td>
-                                <td>{emp.estadoCivil}</td>
-                                <td>{emp.telefono}</td>
-                                <td>{emp.correo}</td>
-                                <td>{emp.cargo}</td>
-                                <td>
-                                    <button onClick={() => {
-                                        setEmpleadoSeleccionado(emp);
-                                        setMostrarModal(true);
-                                    }}
-                                        className="btn btn-sm btn-primary me-2"
-                                    >Editar</button>
-
-                                    <button
-                                        onClick={() => {
-                                            Swal.fire({
-                                                title: '¿Estás seguro?',
-                                                text: "Esta acción eliminará al empleado.",
-                                                icon: 'warning',
-                                                showCancelButton: true,
-                                                confirmButtonColor: '#3085d6',
-                                                cancelButtonColor: '#d33',
-                                                confirmButtonText: 'Sí, eliminar',
-                                                cancelButtonText: 'Cancelar'
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    eliminarEmpleado(emp.id);
-                                                    Swal.fire(
-                                                        'Eliminado',
-                                                        'La persona ha sido eliminada.',
-                                                        'success'
-                                                    );
-                                                }
-                                            });
-                                        }}
-                                        className="btn btn-sm btn-danger"
-                                    >Eliminar</button>
-                                </td>
-                            </tr>
-                        ))
-                    ) : (
-                        empleados.map((emp) => (
-                            <tr key={emp.id}>
-                                <td>{emp.nombres}</td>
-                                <td>{emp.apellidos}</td>
-                                <td>{emp.numeroDocumento}</td>
-                                <td>{emp.edad}</td>
-                                <td>{emp.estadoCivil}</td>
-                                <td>{emp.telefono}</td>
-                                <td>{emp.correo}</td>
-                                <td>{emp.cargo}</td>
-                                <td>
-                                    <button onClick={() => {
-                                        setEmpleadoSeleccionado(emp);
-                                        setMostrarModal(true);
-                                    }}
-                                        className="btn btn-sm btn-primary me-2"
-                                    >Editar
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            Swal.fire({
-                                                title: '¿Estás seguro?',
-                                                text: "Esta acción eliminará al empleado.",
-                                                icon: 'warning',
-                                                showCancelButton: true,
-                                                confirmButtonColor: '#3085d6',
-                                                cancelButtonColor: '#d33',
-                                                confirmButtonText: 'Sí, eliminar',
-                                                cancelButtonText: 'Cancelar'
-                                            }).then((result) => {
-                                                if (result.isConfirmed) {
-                                                    eliminarEmpleado(emp.id);
-                                                    Swal.fire(
-                                                        'Eliminado',
-                                                        'La persona ha sido eliminada.',
-                                                        'success'
-                                                    );
-                                                }
-                                            });
-                                        }}
-                                        className="btn btn-sm btn-danger"
-                                    >
-                                        Eliminar
-                                    </button>
-                                </td>
-                            </tr>
-                        ))
-                    )}
-                </tbody>
-            </table>
-
             {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
                 <Paginacion
                     paginaActual={paginaActual}
                     totalPaginas={totalPaginas}
                     onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
                 />
-            )};
+            )}
             {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
                 <div className="mt-2 text-center">
                     <small>
@@ -338,20 +212,168 @@ export function Tabla({ mostrarInactivos = false }) {
                         {tamanoPagina} por página, total de registros: {totalElementos}
                     </small>
                 </div>
-            )};
+            )}
+            {tipoBusqueda === "conContrato" && (
+                <div className="mt-4">
+                    <TablaContrato />
+                </div>
+            )}
+
+            {tipoBusqueda !== "conContrato" && (
+                <>
+                    <table className={`table table-bordered border-primary table-striped table-hover 
+                ${mostrarInactivos ? "table-warning" : "table-light"} `} id="tabla">
+                        <thead className="table-primary">
+                            <tr>
+                                <th>Nombres</th>
+                                <th>Apellidos</th>
+                                <th>Número Documento</th>
+                                <th>Edad</th>
+                                <th>Estado Civil</th>
+                                <th>Teléfono</th>
+                                <th>Correo</th>
+                                <th>Cargo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {resultadoBusqueda.length > 0 ? (
+                                resultadoBusqueda.map((emp, index) => (
+                                    <tr key={index}>
+                                        <td>{emp.nombres}</td>
+                                        <td>{emp.apellidos}</td>
+                                        <td>{emp.numeroDocumento}</td>
+                                        <td>{emp.edad}</td>
+                                        <td>{emp.estadoCivil}</td>
+                                        <td>{emp.telefono}</td>
+                                        <td>{emp.correo}</td>
+                                        <td>{emp.cargo}</td>
+                                        <td>
+                                            <button onClick={() => {
+                                                setEmpleadoSeleccionado(emp);
+                                                setMostrarModal(true);
+                                            }}
+                                                className="btn btn-sm btn-primary me-2"
+                                            >Editar</button>
+
+                                            <button
+                                                onClick={() => {
+                                                    Swal.fire({
+                                                        title: '¿Estás seguro?',
+                                                        text: "Esta acción eliminará al empleado.",
+                                                        icon: 'warning',
+                                                        showCancelButton: true,
+                                                        confirmButtonColor: '#3085d6',
+                                                        cancelButtonColor: '#d33',
+                                                        confirmButtonText: 'Sí, eliminar',
+                                                        cancelButtonText: 'Cancelar'
+                                                    }).then((result) => {
+                                                        if (result.isConfirmed) {
+                                                            eliminarEmpleado(emp.id);
+                                                            Swal.fire(
+                                                                'Eliminado',
+                                                                'La persona ha sido eliminada.',
+                                                                'success'
+                                                            );
+                                                        }
+                                                    });
+                                                }}
+                                                className="btn btn-sm btn-danger"
+                                            >Eliminar</button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                empleados.map((emp) => (
+                                    <tr key={emp.id}>
+                                        <td>{emp.nombres}</td>
+                                        <td>{emp.apellidos}</td>
+                                        <td>{emp.numeroDocumento}</td>
+                                        <td>{emp.edad}</td>
+                                        <td>{emp.estadoCivil}</td>
+                                        <td>{emp.telefono}</td>
+                                        <td>{emp.correo}</td>
+                                        <td>{emp.cargo}</td>
+                                        <td>
+                                            <button onClick={() => {
+                                                setEmpleadoSeleccionado(emp);
+                                                setMostrarModal(true);
+                                            }}
+                                                className="btn btn-sm btn-primary me-2"
+                                            >Editar
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    Swal.fire({
+                                                        title: '¿Estás seguro?',
+                                                        text: "Esta acción eliminará al empleado.",
+                                                        icon: 'warning',
+                                                        showCancelButton: true,
+                                                        confirmButtonColor: '#3085d6',
+                                                        cancelButtonColor: '#d33',
+                                                        confirmButtonText: 'Sí, eliminar',
+                                                        cancelButtonText: 'Cancelar'
+                                                    }).then((result) => {
+                                                        if (result.isConfirmed) {
+                                                            eliminarEmpleado(emp.id);
+                                                            Swal.fire(
+                                                                'Eliminado',
+                                                                'La persona ha sido eliminada.',
+                                                                'success'
+                                                            );
+                                                        }
+                                                    });
+                                                }}
+                                                className="btn btn-sm btn-danger"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </>
+            )}
+
+            {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
+                <Paginacion
+                    paginaActual={paginaActual}
+                    totalPaginas={totalPaginas}
+                    onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
+                />
+            )}
+            {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
+                <div className="mt-2 text-center">
+                    <small>
+                        Mostrando página {paginaActual + 1} de {totalPaginas} —{" "}
+                        {tamanoPagina} por página, total de registros: {totalElementos}
+                    </small>
+                </div>
+            )}
 
             <ModalEditar
-                empleado={empleadoSeleccionado} // Le envía al modal los datos de la persona que se quiere editar.
-                visible={mostrarModal} //Controla si el modal debe mostrarse (true) o no (false).
-                onClose={() => setMostrarModal(false)} //Función que se ejecuta cuando el usuario cierra el modal.
-                onActualizado={(empleadoActualizado) => {
-
+                empleado={empleadoSeleccionado}
+                visible={mostrarModal}
+                onClose={() => setMostrarModal(false)}
+                onActualizado={(accion, empleadoActualizado) => {
                     setMostrarModal(false);
                     setNombreBuscar("");
-                    setResultadoBusqueda(resultadoBusqueda.map(emp => emp.id === empleadoActualizado.id ? empleadoActualizado : emp));
-                    setEmpleados(empleados.map(e => e.id === empleadoActualizado.id ? empleadoActualizado : e));
+
+                    if (accion === "recargar") {
+                        cargarEmpleados(paginaActual); // Esta función ya la tienes definida
+                    } else {
+                        setResultadoBusqueda(resultadoBusqueda.map(emp =>
+                            emp.id === empleadoActualizado.id ? empleadoActualizado : emp
+                        ));
+                        setEmpleados(empleados.map(e =>
+                            e.id === empleadoActualizado.id ? empleadoActualizado : e
+                        ));
+                    }
                 }}
             />
+
         </>
     )
 };

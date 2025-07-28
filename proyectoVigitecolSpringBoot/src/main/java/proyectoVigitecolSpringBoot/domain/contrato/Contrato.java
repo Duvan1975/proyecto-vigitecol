@@ -23,7 +23,7 @@ public class Contrato {
     private LocalDate vacacionesDesde;
     private LocalDate vacacionesHasta;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "empleado_id")
 
     private Empleado empleado;
@@ -44,6 +44,34 @@ public class Contrato {
         this.vacacionesDesde = datos.vacacionesDesde();
         this.vacacionesHasta = datos.vacacionesHasta();
         this.empleado = empleado;
+    }
+
+    public void actualizarDatos(DatosActualizarContrato datos) {
+
+        if (datos.fechaIngreso() != null) {
+            this.fechaIngreso = datos.fechaIngreso();
+        }
+        if (datos.fechaRetiro() != null) {
+            this.fechaRetiro = datos.fechaRetiro();
+        }
+        if (datos.fechaRenuncia() != null) {
+            this.fechaRenuncia = datos.fechaRenuncia();
+        }
+        if (datos.fechaOtroSi() != null) {
+            this.fechaOtroSi = datos.fechaOtroSi();
+        }
+        if (datos.omiso() != null) {
+            this.omiso = datos.omiso();
+        }
+        if (this.continua != datos.continua()) {
+            this.continua = datos.continua();
+        }
+        if (datos.vacacionesDesde() != null) {
+            this.vacacionesDesde = datos.vacacionesDesde();
+        }
+        if (datos.vacacionesHasta() != null) {
+            this.vacacionesHasta = datos.vacacionesHasta();
+        }
     }
     //Getters and Setters
 

@@ -10,8 +10,12 @@ public record DatosListadoContrato(
         LocalDate fechaRenuncia,
         LocalDate fechaOtroSi,
         String omiso,
+        boolean continua,
         LocalDate vacacionesDesde,
-        LocalDate vacacionesHasta
+        LocalDate vacacionesHasta,
+        String nombreEmpleado,
+        String apellidoEmpleado,
+        String documentoEmpleado
 ) {
     public DatosListadoContrato(Contrato contrato) {
         this(
@@ -22,8 +26,12 @@ public record DatosListadoContrato(
                 contrato.getFechaRenuncia(),
                 contrato.getFechaOtroSi(),
                 contrato.getOmiso(),
+                contrato.getContinua(),
                 contrato.getVacacionesDesde(),
-                contrato.getVacacionesHasta()
+                contrato.getVacacionesHasta(),
+                contrato.getEmpleado().getNombres(),
+                contrato.getEmpleado().getApellidos(),
+                contrato.getEmpleado().getNumeroDocumento()
         );
     }
 }

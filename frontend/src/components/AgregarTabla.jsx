@@ -1,23 +1,5 @@
 import Swal from "sweetalert2";
-export async function AgregarTabla(contrato) {
-
-    const datosEmpleado = {
-        nombres: document.getElementById('nombres').value,
-        apellidos: document.getElementById('apellidos').value,
-        tipoDocumento: document.getElementById('tipoDocumento').value,
-        numeroDocumento: document.getElementById('numeroDocumento').value,
-        fechaNacimiento: document.getElementById('fechaNacimiento').value,
-        lugarNacimiento: document.getElementById('lugarNacimiento').value,
-        ciudadExpedicion: document.getElementById('ciudadExpedicion').value,
-        libretaMilitar: document.getElementById('libretaMilitar').value,
-        estadoCivil: document.getElementById('estadoCivil').value,
-        genero: document.getElementById('genero').value,
-        direccion: document.getElementById('direccion').value,
-        telefono: document.getElementById('telefono').value,
-        correo: document.getElementById('correo').value,
-        tipoEmpleado: document.getElementById('tipoEmpleado').value,
-        cargo: document.getElementById('cargo').value,
-    };
+export async function AgregarTabla(contrato, empleado, limpiarFormulario) {
 
     try {
         const responseEmpleado = await fetch("http://localhost:8080/empleados", {
@@ -25,7 +7,8 @@ export async function AgregarTabla(contrato) {
             headers: {
                 "Content-type": "application/json",
             },
-            body: JSON.stringify(datosEmpleado),
+            body: JSON.stringify(
+                empleado),
         });
 
         if (!responseEmpleado.ok) {
@@ -56,9 +39,9 @@ export async function AgregarTabla(contrato) {
             headers: {
                 "Content-type": "application/json",
             },
-            body: JSON.stringify({
+            body: JSON.stringify(
                 contrato
-            }),
+            ),
         });
         if (!responseContratos.ok) {
             throw new Error("Error al registrar el contrato");
@@ -68,6 +51,10 @@ export async function AgregarTabla(contrato) {
             icon: "success",
             title: "Registro exitoso",
             text: "Empleado y contratos registrados correctamente.",
+        }).then(() => {
+            if (typeof limpiarFormulario === "function") {
+                limpiarFormulario();
+            }
         });
 
     } catch (error) {
