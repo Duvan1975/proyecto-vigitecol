@@ -36,6 +36,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                 .then(data => {
                     const contratoPreparado = {
                         id: data.id ?? data.contratoId ?? null,
+                        numeroContrato: data.numeroContrato ?? null,
                         fechaIngreso: data.fechaIngreso ?? "",
                         fechaRetiro: data.fechaRetiro ?? "",
                         fechaRenuncia: data.fechaRenuncia ?? "",
@@ -147,7 +148,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             Swal.fire("Error", "Empleado no definido", "error");
             return;
         }
-
         const nuevoContrato = {
             fechaIngreso: "",
             fechaRetiro: "",
@@ -177,6 +177,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                     .then(data => {
                         const contratosPreparados = (Array.isArray(data) ? data : []).map(c => ({
                             id: c.id ?? c.contratoId ?? null,
+                            numeroContrato: c.numeroContrato ?? "",
                             fechaIngreso: c.fechaIngreso ?? "",
                             fechaRetiro: c.fechaRetiro ?? "",
                             fechaRenuncia: c.fechaRenuncia ?? "",
@@ -196,108 +197,238 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             });
     };
 
+    const eliminarContrato = (id) => {
+        Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Esta acción no se puede deshacer.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`http://localhost:8080/contratos/${id}`, {
+                    method: "DELETE",
+                })
+                    .then((res) => {
+                        if (!res.ok) throw new Error("Error al eliminar contrato");
+                        // Elimina el contrato del estado
+                        setContratos((prev) => prev.filter((contrato) => contrato.id !== id));
+                        Swal.fire("Eliminado", "El contrato ha sido eliminado", "success");
+                    })
+                    .catch((err) => {
+                        Swal.fire("Error", err.message, "error");
+                    });
+            }
+        });
+    };
+
 
     if (!visible) return null;
 
     return (
         <div className="modal" style={{ display: "block", backgroundColor: "#000000aa" }}>
-            <div className="modal-dialog">
-                <div className="modal-content p-4">
-                    <h4>Editar Empleado</h4>
-                    <input type="text"
-                        name="nombres"
-                        value={formulario.nombres}
-                        onChange={handleChange}
-                        placeholder="Nombres"
-                        className="form-control mb-2"
-                    />
-                    <input type="text"
-                        name="apellidos"
-                        value={formulario.apellidos}
-                        onChange={handleChange}
-                        className="form-control mb-2"
-                        placeholder="Apellidos"
-                    />
-                    <input type="text"
-                        name="tipoDocumento"
-                        value={formulario.tipoDocumento}
-                        onChange={handleChange}
-                        placeholder="Tipo de Documento"
-                    />
-                    <input type="number"
-                        name="numeroDocumento"
-                        value={formulario.numeroDocumento}
-                        onChange={handleChange}
-                        placeholder="Número de Documento"
-                    />
-                    <input type="date"
-                        name="fechaNacimiento"
-                        value={formulario.fechaNacimiento}
-                        onChange={handleChange}
-                        placeholder="Seleccione la fecha de nacimiento"
-                    />
-                    <input type="text"
-                        name="lugarNacimiento"
-                        value={formulario.lugarNacimiento}
-                        onChange={handleChange}
-                        placeholder="Lugar de Nacimiento"
-                    />
-                    <input type="text"
-                        name="ciudadExpedicion"
-                        value={formulario.ciudadExpedicion}
-                        onChange={handleChange}
-                        placeholder="Ciudad de Expedición"
-                    />
-                    <input type="text"
-                        name="libretaMilitar"
-                        value={formulario.libretaMilitar}
-                        onChange={handleChange}
-                        placeholder="Libreta Militar"
-                    />
-                    <input type="text"
-                        name="estadoCivil"
-                        value={formulario.estadoCivil}
-                        onChange={handleChange}
-                        placeholder="Estado Civilr"
-                    />
-                    <input type="text"
-                        name="genero"
-                        value={formulario.genero}
-                        onChange={handleChange}
-                        placeholder="Género"
-                    />
-                    <input type="text"
-                        name="direccion"
-                        value={formulario.direccion}
-                        onChange={handleChange}
-                        placeholder="Dirección"
-                    />
-                    <input type="number"
-                        name="telefono"
-                        value={formulario.telefono}
-                        onChange={handleChange}
-                        placeholder="Teléfono"
-                    />
-                    <input type="email"
-                        name="correo"
-                        value={formulario.correo}
-                        onChange={handleChange}
-                        placeholder="Correo Electrónico"
-                    />
-                    <input type="text"
-                        name="tipoEmpleado"
-                        value={formulario.tipoEmpleado}
-                        onChange={handleChange}
-                        placeholder="Tipo de Empleado"
-                    />
-                    <input type="text"
-                        name="cargo"
-                        value={formulario.cargo}
-                        onChange={handleChange}
-                        placeholder="Cargo"
-                    />
-                    <div className="mt-3">
-                        <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
+            <div className="modal-dialog modal-lg">
+                <div className="modal-content p-4" style={{ backgroundColor: "#f0f0f0" }}>
+                    <h4 className="alinearTexto">Editar Empleado</h4>
+
+                    <div className="row">
+                        <div className="col-md-4">
+                            <label htmlFor=""> <strong>Nombres:</strong></label>
+                            <input type="text"
+                                name="nombres"
+                                value={formulario.nombres}
+                                onChange={handleChange}
+                                placeholder="Nombres"
+                                className="form-control mb-2"
+                            />
+                        </div>
+                        <div className="col-md-4">
+                            <label htmlFor=""> <strong>Apellidos:</strong></label>
+                            <input type="text"
+                                name="apellidos"
+                                value={formulario.apellidos}
+                                onChange={handleChange}
+                                placeholder="Apellidos"
+                                className="form-control mb-2"
+                            />
+                        </div>
+                        <div className="col-md-4">
+                            <label htmlFor="tipoDocumento"><strong>Tipo de Documento:</strong></label>
+                            <select
+                                name="tipoDocumento"
+                                value={formulario.tipoDocumento}
+                                onChange={handleChange}
+                                className="form-control mb-2"
+                            >
+                                <option value="CC">CÉDULA DE CIUDADANÍA (CC)</option>
+                                <option value="CE">CÉDULA DE EXTRANJERÍA (CE)</option>
+                                <option value="TI">TARJETA DE IDENTIDAD (TI)</option>
+                                <option value="PPT">PERMISO DE PERMANENCIA (PPT)</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div className="row">
+                        <div className="col-md-4">
+                            <label htmlFor=""> <strong>Número de Documento:</strong></label>
+                            <input type="number"
+                                name="numeroDocumento"
+                                value={formulario.numeroDocumento}
+                                onChange={handleChange}
+                                placeholder="Número de Documento"
+                                className="form-control mb-2"
+                            />
+                        </div>
+                        <div className="col-md-4">
+                            <label htmlFor=""> <strong>Fecha de Nacimiento:</strong></label>
+                            <input type="date"
+                                name="fechaNacimiento"
+                                value={formulario.fechaNacimiento}
+                                onChange={handleChange}
+                                placeholder="Seleccione la fecha de nacimiento"
+                                className="form-control mb-2"
+                            />
+                        </div>
+                        <div className="col-md-4">
+                            <label htmlFor=""> <strong>Edad:</strong></label>
+                            <input type="number"
+                                name="edad"
+                                value={formulario.edad}
+                                onChange={handleChange}
+                                placeholder="Seleccione la fecha de nacimiento"
+                                className="form-control mb-2"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="row">
+                        <div className="col-md-4">
+                            <label htmlFor=""> <strong>Lugar de Nacimiento:</strong></label>
+                            <input type="text"
+                                name="lugarNacimiento"
+                                value={formulario.lugarNacimiento}
+                                onChange={handleChange}
+                                placeholder="Lugar de Nacimiento"
+                                className="form-control mb-2"
+                            />
+                        </div>
+                        <div className="col-md-4">
+                            <label htmlFor=""> <strong>Ciudad de Expedición:</strong></label>
+                            <input type="text"
+                                name="ciudadExpedicion"
+                                value={formulario.ciudadExpedicion}
+                                onChange={handleChange}
+                                placeholder="Ciudad de Expedición"
+                                className="form-control mb-2"
+                            />
+                        </div>
+                        <div className="col-md-4">
+                            <label htmlFor="tipoDocumento"><strong>Libreta Militar:</strong></label>
+                            <select
+                                name="libretaMilitar"
+                                value={formulario.libretaMilitar}
+                                onChange={handleChange}
+                                className="form-control mb-2"
+                            >
+                                <option value="PRIMERA">PRIMERA CLASE</option>
+                                <option value="SEGUNDA">SEGUNDA CLASE</option>
+                                <option value="NO_TIENE">NO TIENE</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="row">
+                        <div className="col-md-4">
+                            <label htmlFor="tipoDocumento"><strong>Estado Civil:</strong></label>
+                            <select
+                                name="estadoCivil"
+                                value={formulario.estadoCivil}
+                                onChange={handleChange}
+                                className="form-control mb-2"
+                            >
+                                <option value="CASADO">CASADO(A)</option>
+                                <option value="SOLTERO">SOLTERO(A)</option>
+                                <option value="VIUDO">VIUDO(A)</option>
+                                <option value="SEPARADO">SEPARADO(A)</option>
+                                <option value="UNION_LIBRE">UNIÓN LIBRE</option>
+                            </select>
+                        </div>
+                        <div className="col-md-4">
+                            <label htmlFor=""> <strong>Género:</strong></label>
+                            <select
+                                name="genero"
+                                value={formulario.genero}
+                                onChange={handleChange}
+                                className="form-control mb-2"
+                            >
+                                <option value="MASCULINO">MASCULINO</option>
+                                <option value="FEMENINO">FEMENINO</option>
+                            </select>
+                        </div>
+                        <div className="col-md-4">
+                            <label htmlFor=""> <strong>Dirección:</strong></label>
+                            <input type="text"
+                                name="direccion"
+                                value={formulario.direccion}
+                                onChange={handleChange}
+                                placeholder="Dirección"
+                                className="form-control mb-2"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="row">
+                        <div className="col-md-4">
+                            <label htmlFor=""> <strong>Teléfono:</strong></label>
+                            <input type="number"
+                                name="telefono"
+                                value={formulario.telefono}
+                                onChange={handleChange}
+                                placeholder="Teléfono"
+                                className="form-control mb-2"
+                            />
+                        </div>
+                        <div className="col-md-4">
+                            <label htmlFor=""> <strong>Correo Electrónico:</strong></label>
+                            <input type="email"
+                                name="correo"
+                                value={formulario.correo}
+                                onChange={handleChange}
+                                placeholder="Correo Electrónico"
+                                className="form-control mb-2"
+                            />
+                        </div>
+                        <div className="col-md-4">
+                            <label htmlFor=""> <strong>Tipo de Empleado:</strong></label>
+                            <select
+                                name="tipoEmpleado"
+                                value={formulario.tipoEmpleado}
+                                onChange={handleChange}
+                                className="form-control mb-2"
+                            >
+                                <option value="ADMINISTRATIVO">ADMINISTRATIVO</option>
+                                <option value="OPERATIVO">OPERATIVO</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="row">
+                        <div className="col-md-4">
+                            <label htmlFor=""> <strong>Cargo:</strong></label>
+                            <input type="text"
+                                name="cargo"
+                                value={formulario.cargo}
+                                onChange={handleChange}
+                                placeholder="Cargo"
+                                className="form-control mb-2"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="mt-1">
+                        <div className="d-flex justify-content-between align-items-center mt-2 mb-2 alinearTexto">
                             <h5 className="mb-0">Contratos Registrados</h5>
                             <div>
                                 <button
@@ -316,23 +447,15 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
                         <div className="collapse" id="tablaContratos">
 
-                            <div className="d-flex justify-content-end mb-2">
-                                <button
-                                    className="btn btn-outline-primary"
-                                    onClick={agregarContrato}
-                                >
-                                    Agregar Nuevo Contrato
-                                </button>
-
-                            </div>
                             <table className="table table-bordered">
 
                                 <tbody>
                                     {contratos.map((c, idx) => (
                                         <div key={c.id || idx} className="border rounded p-3 mb-3 bg-light">
-                                            <div className="row mb-2">
-                                                <div className="col-md-6">
-                                                    <label>Fecha de Ingreso:</label>
+                                            <div className="row">
+                                                <h5 className="mb-3">Contrato Número {c.numeroContrato || "N/D"}</h5>
+                                                <div className="col-md-3">
+                                                    <label><strong>Fecha de Ingreso:</strong></label>
                                                     <input
                                                         type="date"
                                                         className="form-control"
@@ -340,8 +463,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                         onChange={(e) => handleContratoChange(idx, "fechaIngreso", e.target.value)}
                                                     />
                                                 </div>
-                                                <div className="col-md-6">
-                                                    <label>Fecha de Retiro:</label>
+                                                <div className="col-md-3">
+                                                    <label><strong>Fecha de Retiro:</strong></label>
                                                     <input
                                                         type="date"
                                                         className="form-control"
@@ -349,11 +472,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                         onChange={(e) => handleContratoChange(idx, "fechaRetiro", e.target.value)}
                                                     />
                                                 </div>
-                                            </div>
-
-                                            <div className="row mb-2">
-                                                <div className="col-md-6">
-                                                    <label>Fecha de Renuncia:</label>
+                                                <div className="col-md-3">
+                                                    <label><strong>Fecha de Renuncia:</strong></label>
                                                     <input
                                                         type="date"
                                                         className="form-control"
@@ -361,8 +481,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                         onChange={(e) => handleContratoChange(idx, "fechaRenuncia", e.target.value)}
                                                     />
                                                 </div>
-                                                <div className="col-md-6">
-                                                    <label>Fecha Otro Sí:</label>
+                                                <div className="col-md-3">
+                                                    <label><strong>Otro Si:</strong></label>
                                                     <input
                                                         type="date"
                                                         className="form-control"
@@ -372,9 +492,9 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                 </div>
                                             </div>
 
-                                            <div className="row mb-2">
-                                                <div className="col-md-6">
-                                                    <label>Omiso:</label>
+                                            <div className="row">
+                                                <div className="col-md-8">
+                                                    <label><strong>Omiso:</strong></label>
                                                     <input
                                                         type="text"
                                                         className="form-control"
@@ -382,22 +502,22 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                         onChange={(e) => handleContratoChange(idx, "omiso", e.target.value)}
                                                     />
                                                 </div>
-                                                <div className="col-md-6 d-flex align-items-center pt-4">
-                                                    <div className="form-check">
-                                                        <input
-                                                            type="checkbox"
-                                                            className="form-check-input"
-                                                            checked={!!c.continua}
-                                                            onChange={(e) => handleContratoChange(idx, "continua", e.target.checked)}
-                                                        />
-                                                        <label className="form-check-label ms-2">¿Continúa?</label>
-                                                    </div>
+                                                <div className="col-md-4">
+                                                    <label><strong>¿Continúa?</strong></label>
+                                                    <select
+                                                        className="form-select"
+                                                        value={c.continua ? "true" : "false"}
+                                                        onChange={(e) => handleContratoChange(idx, "continua", e.target.value === "true")}
+                                                    >
+                                                        <option value="true">Sí</option>
+                                                        <option value="false">No</option>
+                                                    </select>
                                                 </div>
                                             </div>
 
-                                            <div className="row mb-3">
-                                                <div className="col-md-6">
-                                                    <label>Vacaciones Desde:</label>
+                                            <div className="row">
+                                                <div className="col-md-3">
+                                                    <label><strong>Vacaciones Desde:</strong></label>
                                                     <input
                                                         type="date"
                                                         className="form-control"
@@ -405,8 +525,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                         onChange={(e) => handleContratoChange(idx, "vacacionesDesde", e.target.value)}
                                                     />
                                                 </div>
-                                                <div className="col-md-6">
-                                                    <label>Vacaciones Hasta:</label>
+                                                <div className="col-md-3">
+                                                    <label><strong>Vacaciones Hasta:</strong></label>
                                                     <input
                                                         type="date"
                                                         className="form-control"
@@ -416,15 +536,37 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                 </div>
                                             </div>
 
-                                            <div className="text-end">
-                                                <button className="btn btn-success btn-sm" onClick={() => actualizarContrato(c)}>
+                                            <div className="text-end d-flex justify-content-end gap-2">
+                                                <button
+                                                    className="btn btn-success btn-sm"
+                                                    onClick={() => actualizarContrato(c)}
+                                                >
                                                     Guardar Contrato
                                                 </button>
+
+                                                {c.id && (
+                                                    <button
+                                                        className="btn btn-danger btn-sm"
+                                                        onClick={() => eliminarContrato(c.id)}
+                                                    >
+                                                        Eliminar
+                                                    </button>
+                                                )}
                                             </div>
+
                                         </div>
                                     ))}
                                 </tbody>
                             </table>
+                            <div className="d-flex justify-content-end mb-2">
+                                <button
+                                    className="btn btn-outline-primary"
+                                    onClick={agregarContrato}
+                                >
+                                    Agregar Nuevo Contrato
+                                </button>
+
+                            </div>
                         </div>
 
                         <button onClick={() => {

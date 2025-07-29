@@ -49,4 +49,9 @@ public class ContratoController {
         var contrato = contratoService.obtenerUltimoContratoPorEmpleado(empleadoId);
         return ResponseEntity.ok(contrato);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarContrato(@PathVariable Long id) {
+        contratoService.eliminarContrato(id);
+        return ResponseEntity.noContent().build(); // Devuelve 204 No Content
+    }
 }

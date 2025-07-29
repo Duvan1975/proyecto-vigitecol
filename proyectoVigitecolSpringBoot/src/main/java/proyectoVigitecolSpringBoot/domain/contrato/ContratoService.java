@@ -83,4 +83,11 @@ public class ContratoService {
                 .map(DatosListadoContrato::new)
                 .orElseThrow(() -> new RuntimeException("El empleado NO tiene contratos registrados"));
     }
+    public void eliminarContrato(Long id) {
+        if (!contratoRepository.existsById(id)) {
+            throw new EntityNotFoundException("Contrato no encontrado con ID: " + id);
+        }
+        contratoRepository.deleteById(id);
+    }
+
 }

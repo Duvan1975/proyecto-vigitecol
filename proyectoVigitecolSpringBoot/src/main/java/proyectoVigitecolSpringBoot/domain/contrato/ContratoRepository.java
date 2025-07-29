@@ -35,7 +35,8 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
         FROM Contrato c2
         WHERE c2.empleado.id = c.empleado.id
     )
-    AND c.continua = false ORDER BY c.empleado.apellidos ASC
+    AND c.continua = false 
+    ORDER BY c.empleado.apellidos ASC
     """)
     Page<Empleado> findEmpleadosConContratoInactivo(Pageable pageable);
 
@@ -74,5 +75,4 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
             "AND c.continua = false " +
             "ORDER BY c.fechaIngreso DESC")
     List<Empleado> buscarEmpleadoInactivoPorNumeroDocumento(@Param("numeroDocumento") String numeroDocumento);
-
 }
