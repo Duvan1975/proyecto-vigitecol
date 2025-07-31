@@ -15,4 +15,14 @@ public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
     boolean existsByNumeroDocumento(@NotBlank @Pattern(
             regexp = "\\d{7,15}",message = "Debe contener solo números entre 7 y 15 digitos") String s);
 
+    @Query("""
+    SELECT e
+    FROM Empleado e
+    WHERE e.id NOT IN (
+        SELECT DISTINCT c.empleado.id
+        FROM Contrato c
+    )
+    ORDER BY e.apellidos ASC
+""")
+    Page<Empleado> findEmpleadosSinContrato(Pageable pageable);
 }

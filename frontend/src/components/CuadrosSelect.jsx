@@ -9,7 +9,7 @@ export function CuadrosSelect({
 }) {
     return (
         <div className={tamanoinput}>
-            <label htmlFor={titulolabel}></label>
+            <label htmlFor={titulolabel}className="form-label"><strong>{titulolabel}</strong></label>
             <select name={nombreinput}
                 id={idinput}
                 className="form-control"

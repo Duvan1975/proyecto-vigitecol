@@ -340,4 +340,11 @@ public class EmpleadoService {
 
         return ResponseEntity.ok(resultado);
     }
+    //Listar empleados sin contrato
+    public ResponseEntity<Page<DatosListadoEmpleado>> listarEmpleadosSinContrato(Pageable pageable) {
+        Page<Empleado> empleados = empleadoRepository.findEmpleadosSinContrato(pageable);
+        Page<DatosListadoEmpleado> respuesta = empleados.map(DatosListadoEmpleado::new);
+        return ResponseEntity.ok(respuesta);
+    }
+
 }

@@ -1,6 +1,8 @@
 package proyectoVigitecolSpringBoot.infra;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,35 +37,41 @@ public class TratadorDeErrores {
             this(error.getField(), error.getDefaultMessage());
         }
     }
-    //Tratando errores de lectura
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> tratarErrorDeLectura(HttpMessageNotReadableException e) {
-        String mensaje = e.getMostSpecificCause().getMessage();
+        Throwable causa = e.getMostSpecificCause();
         Map<String, String> error = new HashMap<>();
 
-        // Lista de enums a validar
-        List<String> enums = List.of(
-                "LibretaMilitar",
-                "EstadoCivil",
-                "Genero",
-                "TipoDocumento",
-                "TipoEmpleado"
-        );
-        // Revisar si el mensaje contiene alguno de los enums
-        Optional<String> enumRelacionado = enums.stream()
-                .filter(mensaje::contains)
-                .findFirst();
-
-        if (enumRelacionado.isPresent()) {
-            error.put("campo", enumRelacionado.get().substring(0, 1).toLowerCase() + enumRelacionado.get().substring(1)); // nombre en camelCase
-            error.put("error", "Debe seleccionar una opción válida");
+        if (causa instanceof DateTimeParseException || causa.getMessage().contains("LocalDate")) {
+            error.put("error", "Error en el formato de fecha");
+            error.put("detalle", "Verifica que las fechas tengan el formato correcto (yyyy-MM-dd)");
         } else {
-            error.put("error", "Error en el formato del JSON");
-            error.put("detalle", mensaje);
+            // Validación para errores en enums
+            String mensaje = causa.getMessage();
+            List<String> enums = List.of(
+                    "LibretaMilitar",
+                    "EstadoCivil",
+                    "Genero",
+                    "TipoDocumento",
+                    "TipoEmpleado"
+            );
+
+            Optional<String> enumRelacionado = enums.stream()
+                    .filter(mensaje::contains)
+                    .findFirst();
+
+            if (enumRelacionado.isPresent()) {
+                error.put("campo", enumRelacionado.get().substring(0, 1).toLowerCase() + enumRelacionado.get().substring(1));
+                error.put("error", "Debe seleccionar una opción válida");
+            } else {
+                error.put("error", "Error en el formato del JSON");
+                error.put("detalle", mensaje);
+            }
         }
 
         return ResponseEntity.badRequest().body(error);
     }
+
     //Tratando error cuando enviamos un correo duplicado
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity tratarErrorRuntime(RuntimeException e){
@@ -70,6 +79,5 @@ public class TratadorDeErrores {
     }
 
     //Creamos el DTO para tratar este error
-
     private record DatosErrorGeneral(String error){}
 }

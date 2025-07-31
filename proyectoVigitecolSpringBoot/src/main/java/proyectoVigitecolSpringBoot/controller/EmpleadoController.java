@@ -71,5 +71,9 @@ public class EmpleadoController {
     public ResponseEntity<List<DatosActualizarEmpleado>> buscarInactivosPorDocumento(@RequestParam String numeroDocumento) {
         return empleadoService.buscarEmpleadoInactivoPorNumeroDocumento(numeroDocumento);
     }
-
+    @GetMapping("/sin-contrato")
+    public ResponseEntity<Page<DatosListadoEmpleado>> listarEmpleadosSinContrato(
+            @PageableDefault(size = 10, sort = "apellidos") Pageable paginacion) {
+        return empleadoService.listarEmpleadosSinContrato(paginacion);
+    }
 }

@@ -31,7 +31,6 @@ public class ContratoController {
             @PageableDefault(size = 10) Pageable paginacion) {
         return contratoService.listarContratos(paginacion);
     }
-
     @GetMapping("/por-empleado/{empleadoId}")
     public ResponseEntity<List<DatosListadoContrato>> obtenerContratosPorEmpleado(
             @PathVariable Long empleadoId) {

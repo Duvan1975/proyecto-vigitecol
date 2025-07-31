@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { ModalEditar } from "./ModalEditar";
 import { TablaContrato } from "./TablaContrato";
+import { TablaContratosPorEmpleado } from "./TablaContratosPorEmpleado";
 import Swal from "sweetalert2";
 import Paginacion from "./Paginacion";
 
-export function Tabla({ mostrarInactivos = false }) {
+export function Tabla({ mostrarInactivos = false, sinContrato = false }) {
 
     //Estados para seleccionar empleado mostrar Modal y actualizar
     const [empleados, setEmpleados] = useState([]);
@@ -27,29 +28,46 @@ export function Tabla({ mostrarInactivos = false }) {
     const [totalElementos, setTotalElementos] = useState(0);
     const [tamanoPagina, setTamanoPagina] = useState(0);
 
+    //Estados para cargar y controlar el historial de contratos
+    const [empleadoParaHistorial, setEmpleadoParaHistorial] = useState(null);
+    const [mostrarTablaContratos, setMostrarTablaContratos] = useState(false);
+    const [contadorActualizacion, setContadorActualizacion] = useState(0);
+
     useEffect(() => {
         cargarEmpleados(paginaActual);
         // eslint-disable-next-line
     }, [mostrarInactivos, paginaActual]);
 
+    useEffect(() => {
+        if (tipoBusqueda === "sinContrato") {
+            cargarEmpleados(paginaActual);
+        }
+        // eslint-disable-next-line
+    }, [tipoBusqueda, paginaActual]);
+
     //Cargando el listado de Empleados activos y retirados
     const cargarEmpleados = (pagina = 0) => {
-        const url = mostrarInactivos
-            ? `http://localhost:8080/empleados/inactivos?page=${pagina}`
-            : `http://localhost:8080/empleados/activos?page=${pagina}`;
+        let url;
+
+        if (sinContrato || tipoBusqueda === "sinContrato") {
+            url = `http://localhost:8080/empleados/sin-contrato?page=${pagina}`;
+        } else {
+            url = mostrarInactivos
+                ? `http://localhost:8080/empleados/inactivos?page=${pagina}`
+                : `http://localhost:8080/empleados/activos?page=${pagina}`;
+        }
 
         fetch(url)
             .then((response) => response.json())
             .then((data) => {
                 setEmpleados(data.content);
-                setTotalPaginas(data.totalPages); //Muestra el total de las páginas
-                setPaginaActual(data.number); //Muestra el número actual de la página
-                setTotalElementos(data.totalElements); //Trae el número de elementos de la todas las páginas
-                setTamanoPagina(data.size); //Muestra la cantidad de elementos por página
+                setTotalPaginas(data.totalPages);
+                setPaginaActual(data.number);
+                setTotalElementos(data.totalElements);
+                setTamanoPagina(data.size);
             })
             .catch((error) => console.error("Error al cargar empleados:", error));
     };
-
 
     const eliminarEmpleado = async (id) => {
         console.log("Id a eliminar:", id); //Prueba en consola
@@ -71,6 +89,9 @@ export function Tabla({ mostrarInactivos = false }) {
     };
 
     const manejarBusqueda = () => {
+        setMostrarTablaContratos(false);
+        setEmpleadoParaHistorial(null);
+
         if (tipoBusqueda === "nombre") {
             if (!nombreBuscar || nombreBuscar.trim() === "") {
                 Swal.fire({
@@ -80,6 +101,7 @@ export function Tabla({ mostrarInactivos = false }) {
                 });
                 return;
             }
+
 
             const url = mostrarInactivos
                 ? `http://localhost:8080/empleados/buscar/inactivos?filtro=${nombreBuscar}`
@@ -101,6 +123,17 @@ export function Tabla({ mostrarInactivos = false }) {
                 : `http://localhost:8080/empleados/buscar/activos/documento?numeroDocumento=${documentoBuscar}`;
 
             realizarBusqueda(url);
+        }
+        if (tipoBusqueda === "sinContrato") {
+            fetch("http://localhost:8080/empleados/sin-contrato")
+                .then(res => res.json())
+                .then(data => {
+                    setResultadoBusqueda(data.content || []);
+                })
+                .catch(error => {
+                    console.error("Error al buscar empleados sin contrato", error);
+                });
+            return;
         }
     };
 
@@ -149,6 +182,7 @@ export function Tabla({ mostrarInactivos = false }) {
             });
     };
 
+
     return (
         <>
             <div className="mb-4">
@@ -163,33 +197,41 @@ export function Tabla({ mostrarInactivos = false }) {
                             <option value="nombre">Por Nombre</option>
                             <option value="documento">Por Documento</option>
                             <option value="conContrato">Por Contrato</option>
+                            <option value="sinContrato">Sin Contrato</option>
 
                         </select>
                     </div>
-                    <div className="col-md-6">
-                        <input
-                            type={tipoBusqueda === "nombre" ? "text" : "number"}
-                            value={tipoBusqueda === "nombre" ? nombreBuscar : documentoBuscar}
-                            onChange={(e) =>
-                                tipoBusqueda === "nombre"
-                                    ? setNombreBuscar(e.target.value)
-                                    : setDocumentoBuscar(e.target.value)
-                            }
-                            placeholder={`Ingrese ${tipoBusqueda}`}
-                            className="form-control mb-2"
-                        />
-                    </div>
+                    {tipoBusqueda !== "sinContrato" && (
+                        <div className="col-md-6">
+                            <input
+                                type={tipoBusqueda === "nombre" ? "text" : "number"}
+                                value={tipoBusqueda === "nombre" ? nombreBuscar : documentoBuscar}
+                                onChange={(e) =>
+                                    tipoBusqueda === "nombre"
+                                        ? setNombreBuscar(e.target.value)
+                                        : setDocumentoBuscar(e.target.value)
+                                }
+                                placeholder={`Ingrese ${tipoBusqueda}`}
+                                className="form-control mb-2"
+                            />
+                        </div>
+                    )}
+
                 </div>
 
-                <button onClick={manejarBusqueda}
-                    className="btn btn-info">Buscar</button>
-                {resultadoBusqueda && (
+                {tipoBusqueda !== "sinContrato" && (
+                    <button onClick={manejarBusqueda}
+                        className="btn btn-info me-2">Buscar</button>
+                )}
+
+                {tipoBusqueda !== "sinContrato" && resultadoBusqueda && (
                     <button
                         onClick={() => {
                             setResultadoBusqueda([]);
                             setDocumentoBuscar("");
                             setNombreBuscar("");
                             cargarEmpleados(); // Esto cargará el listado completo y actualizado
+                            setMostrarTablaContratos(false);
                         }}
                         className="btn btn-secondary"
                     >
@@ -198,6 +240,14 @@ export function Tabla({ mostrarInactivos = false }) {
                 )}
 
             </div>
+            <h4 className="alinearTexto">
+                {tipoBusqueda === "sinContrato"
+                    ? "Listado de Empleados Sin Contrato"
+                    : mostrarInactivos
+                        ? "Listado de Empleados Retirados"
+                        : "Listado de Empleados Activos"}
+            </h4>
+
             {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
                 <Paginacion
                     paginaActual={paginaActual}
@@ -219,10 +269,17 @@ export function Tabla({ mostrarInactivos = false }) {
                 </div>
             )}
 
+
             {tipoBusqueda !== "conContrato" && (
                 <>
                     <table className={`table table-bordered border-primary table-striped table-hover 
-                ${mostrarInactivos ? "table-warning" : "table-light"} `} id="tabla">
+    ${tipoBusqueda === "sinContrato"
+                            ? "table-info"
+                            : mostrarInactivos
+                                ? "table-warning"
+                                : "table-light"
+                        }`} id="tabla">
+
                         <thead className="table-primary">
                             <tr>
                                 <th>Nombres</th>
@@ -249,14 +306,18 @@ export function Tabla({ mostrarInactivos = false }) {
                                         <td>{emp.correo}</td>
                                         <td>{emp.cargo}</td>
                                         <td>
-                                            <button onClick={() => {
-                                                setEmpleadoSeleccionado(emp);
-                                                setMostrarModal(true);
-                                            }}
-                                                className="btn btn-sm btn-primary me-2"
-                                            >Editar</button>
-
                                             <button
+                                                onClick={() => {
+                                                    setEmpleadoSeleccionado(emp);
+                                                    setMostrarModal(true);
+                                                }}
+                                                className="btn btn-sm btn-outline-primary me-2"
+                                                title="Editar"
+                                            >
+                                                <i className="bi bi-pencil-fill"></i>
+                                            </button>
+                                            {!mostrarInactivos && (
+                                                <button
                                                 onClick={() => {
                                                     Swal.fire({
                                                         title: '¿Estás seguro?',
@@ -278,8 +339,27 @@ export function Tabla({ mostrarInactivos = false }) {
                                                         }
                                                     });
                                                 }}
-                                                className="btn btn-sm btn-danger"
-                                            >Eliminar</button>
+                                                className="btn btn-sm btn-outline-danger me-2"
+                                                title="Desactivar"
+                                            >
+                                                <i className="bi bi-trash-fill"></i>
+                                            </button>
+                                            )}
+                                            
+
+                                            {resultadoBusqueda.length === 1 && (
+                                                <button
+                                                    onClick={() => {
+                                                        setEmpleadoParaHistorial(emp.id);
+                                                        setMostrarTablaContratos(true);  // activamos la tabla
+
+                                                    }}
+                                                    className="btn btn-sm btn-outline-secondary"
+                                                    title="Ver contratos"
+                                                >
+                                                    <i className="bi bi-eye-fill"></i>
+                                                </button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))
@@ -295,45 +375,61 @@ export function Tabla({ mostrarInactivos = false }) {
                                         <td>{emp.correo}</td>
                                         <td>{emp.cargo}</td>
                                         <td>
-                                            <button onClick={() => {
-                                                setEmpleadoSeleccionado(emp);
-                                                setMostrarModal(true);
-                                            }}
-                                                className="btn btn-sm btn-primary me-2"
-                                            >Editar
-                                            </button>
                                             <button
                                                 onClick={() => {
-                                                    Swal.fire({
-                                                        title: '¿Estás seguro?',
-                                                        text: "Esta acción eliminará al empleado.",
-                                                        icon: 'warning',
-                                                        showCancelButton: true,
-                                                        confirmButtonColor: '#3085d6',
-                                                        cancelButtonColor: '#d33',
-                                                        confirmButtonText: 'Sí, eliminar',
-                                                        cancelButtonText: 'Cancelar'
-                                                    }).then((result) => {
-                                                        if (result.isConfirmed) {
-                                                            eliminarEmpleado(emp.id);
-                                                            Swal.fire(
-                                                                'Eliminado',
-                                                                'La persona ha sido eliminada.',
-                                                                'success'
-                                                            );
-                                                        }
-                                                    });
+                                                    setEmpleadoSeleccionado(emp);
+                                                    setMostrarModal(true);
                                                 }}
-                                                className="btn btn-sm btn-danger"
+                                                className="btn btn-sm btn-outline-primary me-1"
+                                                title="Editar"
                                             >
-                                                Eliminar
+                                                <i className="bi bi-pencil-fill"></i>
                                             </button>
+
+                                            {!mostrarInactivos && tipoBusqueda !== "sinContrato" && (
+                                                <button
+                                                    onClick={() => {
+                                                        Swal.fire({
+                                                            title: '¿Estás seguro?',
+                                                            text: "Esta acción eliminará al empleado.",
+                                                            icon: 'warning',
+                                                            showCancelButton: true,
+                                                            confirmButtonColor: '#3085d6',
+                                                            cancelButtonColor: '#d33',
+                                                            confirmButtonText: 'Sí, eliminar',
+                                                            cancelButtonText: 'Cancelar'
+                                                        }).then((result) => {
+                                                            if (result.isConfirmed) {
+                                                                eliminarEmpleado(emp.id);
+                                                                Swal.fire(
+                                                                    'Eliminado',
+                                                                    'La persona ha sido eliminada.',
+                                                                    'success'
+                                                                );
+                                                            }
+                                                        });
+                                                    }}
+                                                    className="btn btn-sm btn-outline-danger"
+                                                    title="Desactivar"
+                                                >
+                                                    <i className="bi bi-trash-fill"></i>
+                                                </button>
+
+                                            )}
+
                                         </td>
                                     </tr>
                                 ))
                             )}
+
                         </tbody>
+
                     </table>
+                    {mostrarTablaContratos && empleadoParaHistorial && (
+                        <TablaContratosPorEmpleado empleadoId={empleadoParaHistorial}
+                            actualizar={contadorActualizacion}
+                            onClose={() => setMostrarTablaContratos(false)} />
+                    )}
                 </>
             )}
 
@@ -360,9 +456,10 @@ export function Tabla({ mostrarInactivos = false }) {
                 onActualizado={(accion, empleadoActualizado) => {
                     setMostrarModal(false);
                     setNombreBuscar("");
+                    setContadorActualizacion(prev => prev + 1);
 
                     if (accion === "recargar") {
-                        cargarEmpleados(paginaActual); // Esta función ya la tienes definida
+                        cargarEmpleados(paginaActual);
                     } else {
                         setResultadoBusqueda(resultadoBusqueda.map(emp =>
                             emp.id === empleadoActualizado.id ? empleadoActualizado : emp
@@ -373,7 +470,6 @@ export function Tabla({ mostrarInactivos = false }) {
                     }
                 }}
             />
-
         </>
     )
 };
