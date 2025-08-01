@@ -3,6 +3,8 @@ import Swal from "sweetalert2";
 
 export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
+    const [mostrarTodosContratos, setMostrarTodosContratos] = useState(false);
+
     //Estado para cargar contratos
     const [contratos, setContratos] = useState([]);
     const [formulario, setFormulario] = useState({
@@ -223,6 +225,29 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         });
     };
 
+    const cargarTodosContratos = () => {
+        fetch(`http://localhost:8080/contratos/por-empleado/${empleado.id}`)
+            .then(res => res.json())
+            .then(data => {
+                const contratosPreparados = data.map(c => ({
+                    id: c.id ?? c.contratoId ?? null,
+                    numeroContrato: c.numeroContrato ?? "",
+                    fechaIngreso: c.fechaIngreso ?? "",
+                    fechaRetiro: c.fechaRetiro ?? "",
+                    fechaRenuncia: c.fechaRenuncia ?? "",
+                    fechaOtroSi: c.fechaOtroSi ?? "",
+                    omiso: c.omiso ?? "",
+                    continua: typeof c.continua === "boolean" ? c.continua : true,
+                    vacacionesDesde: c.vacacionesDesde ?? "",
+                    vacacionesHasta: c.vacacionesHasta ?? ""
+                }));
+                setContratos(contratosPreparados);
+                setMostrarTodosContratos(true);
+            })
+            .catch(err => {
+                Swal.fire("Error", "No se pudieron cargar los contratos", "error");
+            });
+    };
 
     if (!visible) return null;
 
@@ -432,7 +457,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             <h5 className="mb-0">Contratos Registrados</h5>
                             <div>
                                 <button
-                                    className="btn btn-outline-secondary me-2"
+                                    className="btn btn-secondary me-2"
                                     type="button"
                                     data-bs-toggle="collapse"
                                     data-bs-target="#tablaContratos"
@@ -444,11 +469,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
                             </div>
                         </div>
-
                         <div className="collapse" id="tablaContratos">
-
                             <table className="table table-bordered">
-
                                 <tbody>
                                     {contratos.map((c, idx) => (
                                         <div key={c.id || idx} className="border rounded p-3 mb-3 bg-light">
@@ -535,7 +557,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     />
                                                 </div>
                                             </div>
-
                                             <div className="text-end d-flex justify-content-end gap-2">
                                                 <button
                                                     className="btn btn-success btn-sm"
@@ -553,22 +574,52 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     </button>
                                                 )}
                                             </div>
-
                                         </div>
                                     ))}
                                 </tbody>
                             </table>
-                            <div className="d-flex justify-content-end mb-2">
+                            <div className="d-flex justify-content-end">
                                 <button
-                                    className="btn btn-outline-primary"
+                                    className="btn btn-primary me-2"
                                     onClick={agregarContrato}
                                 >
                                     Agregar Nuevo Contrato
                                 </button>
-
+                                <button
+                                    className="btn btn-info"
+                                    onClick={() => {
+                                        if (!mostrarTodosContratos) {
+                                            cargarTodosContratos(); // ← muestra todos
+                                        } else {
+                                            // ← dejamos solo el contrato más reciente
+                                            fetch(`http://localhost:8080/contratos/ultimo-contrato/${empleado.id}`)
+                                                .then(res => res.json())
+                                                .then(data => {
+                                                    const contratoUnico = {
+                                                        id: data.id ?? data.contratoId ?? null,
+                                                        numeroContrato: data.numeroContrato ?? "",
+                                                        fechaIngreso: data.fechaIngreso ?? "",
+                                                        fechaRetiro: data.fechaRetiro ?? "",
+                                                        fechaRenuncia: data.fechaRenuncia ?? "",
+                                                        fechaOtroSi: data.fechaOtroSi ?? "",
+                                                        omiso: data.omiso ?? "",
+                                                        continua: typeof data.continua === "boolean" ? data.continua : true,
+                                                        vacacionesDesde: data.vacacionesDesde ?? "",
+                                                        vacacionesHasta: data.vacacionesHasta ?? ""
+                                                    };
+                                                    setContratos([contratoUnico]);
+                                                    setMostrarTodosContratos(false); // actualiza estado
+                                                })
+                                                .catch(err => {
+                                                    Swal.fire("Error", "No se pudo cargar el contrato más reciente", "error");
+                                                });
+                                        }
+                                    }}
+                                >
+                                    {mostrarTodosContratos ? "Ocultar contratos anteriores" : "Mostrar todos los contratos"}
+                                </button>
                             </div>
                         </div>
-
                         <button onClick={() => {
                             Swal.fire({
                                 title: "¿Quieres guardar los cambios?",

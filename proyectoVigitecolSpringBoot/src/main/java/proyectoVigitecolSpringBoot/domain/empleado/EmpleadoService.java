@@ -23,7 +23,8 @@ import java.util.regex.Pattern;
 @Service
 public class EmpleadoService {
 
-    @Autowired EmpleadoRepository empleadoRepository;
+    @Autowired
+    EmpleadoRepository empleadoRepository;
 
     @Autowired
     ContratoRepository contratoRepository;
@@ -58,16 +59,19 @@ public class EmpleadoService {
 
         return ResponseEntity.created(uri).body(datosRespuestaEmpleado);
     }
+
     public ResponseEntity<Page<DatosListadoEmpleado>> listarEmpleadosActivos(Pageable pageable) {
         Page<Empleado> empleados = contratoRepository.findEmpleadosConContratoActivo(pageable);
         Page<DatosListadoEmpleado> respuesta = empleados.map(DatosListadoEmpleado::new);
         return ResponseEntity.ok(respuesta);
     }
+
     public ResponseEntity<Page<DatosListadoEmpleado>> listarEmpleadosInactivos(Pageable pageable) {
         Page<Empleado> empleados = contratoRepository.findEmpleadosConContratoInactivo(pageable);
         Page<DatosListadoEmpleado> respuesta = empleados.map(DatosListadoEmpleado::new);
         return ResponseEntity.ok(respuesta);
     }
+
     @Transactional
     public ResponseEntity actualizarEmpleado(DatosActualizarEmpleado datos) {
         Empleado empleado = empleadoRepository.getReferenceById(datos.id());
@@ -145,6 +149,7 @@ public class EmpleadoService {
                 empleado.getCargo()
         ));
     }
+
     @Transactional
     public ResponseEntity eliminarEmpleado(Long id) {
         Empleado empleado = empleadoRepository.findById(id)
@@ -158,6 +163,7 @@ public class EmpleadoService {
 
         return ResponseEntity.noContent().build();
     }
+
     public ResponseEntity<DatosActualizarEmpleado> obtenerDatosEmpleadoActivo(Long id) {
         var empleado = contratoRepository.findEmpleadoActivoPorId(id)
                 .orElseThrow(() -> new EntityNotFoundException("Empleado Activo NO encontrado"));
@@ -183,6 +189,7 @@ public class EmpleadoService {
         );
         return ResponseEntity.ok(datosEmpleado);
     }
+
     public ResponseEntity<DatosActualizarEmpleado> obtenerDatosEmpleadoInactivo(Long id) {
         var empleado = contratoRepository.findEmpleadoInactivoPorId(id)
                 .orElseThrow(() -> new EntityNotFoundException("Empleado Inactivo NO encontrado"));
@@ -208,12 +215,14 @@ public class EmpleadoService {
         );
         return ResponseEntity.ok(datosEmpleado);
     }
+
     // Método para quitar acentos
     private String quitarTildes(String texto) {
         String textoNormalizado = Normalizer.normalize(texto, Normalizer.Form.NFD);
         Pattern patron = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         return patron.matcher(textoNormalizado).replaceAll("");
     }
+
     public ResponseEntity<List<DatosActualizarEmpleado>> buscarEmpleadosActivosPorNombre(String filtro) {
         var empleados = contratoRepository.buscarTodosEmpleadosActivos();
 
@@ -247,6 +256,7 @@ public class EmpleadoService {
 
         return ResponseEntity.ok(empleadosFiltrados);
     }
+
     public ResponseEntity<List<DatosActualizarEmpleado>> buscarEmpleadoActivoPorNumeroDocumento(String numeroDocumento) {
         var empleados = contratoRepository.buscarEmpleadoActivoPorNumeroDocumento(numeroDocumento);
 
@@ -277,6 +287,7 @@ public class EmpleadoService {
 
         return ResponseEntity.ok(resultado);
     }
+
     public ResponseEntity<List<DatosActualizarEmpleado>> buscarEmpleadosInactivosPorNombre(String filtro) {
         var empleados = contratoRepository.buscarTodosEmpleadosInactivos();
 
@@ -310,6 +321,7 @@ public class EmpleadoService {
 
         return ResponseEntity.ok(empleadosFiltrados);
     }
+
     public ResponseEntity<List<DatosActualizarEmpleado>> buscarEmpleadoInactivoPorNumeroDocumento(String numeroDocumento) {
         var empleados = contratoRepository.buscarEmpleadoInactivoPorNumeroDocumento(numeroDocumento);
 
@@ -340,6 +352,7 @@ public class EmpleadoService {
 
         return ResponseEntity.ok(resultado);
     }
+
     //Listar empleados sin contrato
     public ResponseEntity<Page<DatosListadoEmpleado>> listarEmpleadosSinContrato(Pageable pageable) {
         Page<Empleado> empleados = empleadoRepository.findEmpleadosSinContrato(pageable);
@@ -347,4 +360,9 @@ public class EmpleadoService {
         return ResponseEntity.ok(respuesta);
     }
 
+    public ResponseEntity<Page<DatosListadoEmpleado>> listarAdministrativosActivos(Pageable pageable) {
+        Page<Empleado> empleados = contratoRepository.findAdministrativosConContratoActivo(pageable);
+        Page<DatosListadoEmpleado> respuesta = empleados.map(DatosListadoEmpleado::new);
+        return ResponseEntity.ok(respuesta);
+    }
 }

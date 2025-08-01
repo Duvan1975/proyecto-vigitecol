@@ -51,7 +51,7 @@ export function Formulario() {
 
     return (
         <div>
-            <h1 className='alinearTexto'>Formulario de Registro de Empleados <strong>Vigitecol Ltda.</strong></h1>
+            <h3 className='alinearTexto'>Formulario de Registro de Empleados</h3>
             <div className='row'>
                 <CuadrosTexto
                     tamanoinput="col-md-4"
@@ -81,10 +81,10 @@ export function Formulario() {
                     value={empleado.tipoDocumento}
                     onChange={(e) => setEmpleado({ ...empleado, tipoDocumento: e.target.value })}
                     opciones={[
-                        { valor: "CC", texto: "CC" },
-                        { valor: "CE", texto: "CE" },
-                        { valor: "TI", texto: "TI" },
-                        { valor: "PPT", texto: "PPT" },
+                        { valor: "CC", texto: "CÉDULA DE CIUDADANÍA (CC)" },
+                        { valor: "CE", texto: "CÉDULA DE EXTRANJERÍA (CE)" },
+                        { valor: "TI", texto: "TARJETA DE IDENTIDAD (TI)" },
+                        { valor: "PPT", texto: "PERMISO DE PERMANENCIA (PPT)" },
                     ]}
                 />
             </div>
@@ -141,8 +141,8 @@ export function Formulario() {
                     value={empleado.libretaMilitar}
                     onChange={(e) => setEmpleado({ ...empleado, libretaMilitar: e.target.value })}
                     opciones={[
-                        { valor: "PRIMERA", texto: "PRIMERA" },
-                        { valor: "SEGUNDA", texto: "SEGUNDA" },
+                        { valor: "PRIMERA", texto: "PRIMERA CLASE" },
+                        { valor: "SEGUNDA", texto: "SEGUNDA CLASE" },
                         { valor: "NO_TIENE", texto: "NO TIENE" },
                     ]}
                 />
@@ -154,11 +154,11 @@ export function Formulario() {
                     value={empleado.estadoCivil}
                     onChange={(e) => setEmpleado({ ...empleado, estadoCivil: e.target.value })}
                     opciones={[
-                        { valor: "CASADO", texto: "CASADO" },
-                        { valor: "SOLTERO", texto: "SOLTERO" },
-                        { valor: "VIUDO", texto: "VIUDO" },
-                        { valor: "SEPARADO", texto: "SEPARADO" },
-                        { valor: "UNION_LIBRE", texto: "UNION LIBRE" },
+                        { valor: "CASADO", texto: "CASADO(A)" },
+                        { valor: "SOLTERO", texto: "SOLTERO(A)" },
+                        { valor: "VIUDO", texto: "VIUDO(A)" },
+                        { valor: "SEPARADO", texto: "SEPARADO(A)" },
+                        { valor: "UNION_LIBRE", texto: "UNIÓN LIBRE" },
                     ]}
                 />
             </div>
@@ -250,7 +250,7 @@ export function Formulario() {
 
             </div>
 
-            <br /><br />
+            <br />
             <div className='col-md-auto'>
                 <button
                     onClick={() => AgregarTabla(contrato, empleado, limpiarFormulario)}

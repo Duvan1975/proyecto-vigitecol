@@ -5,7 +5,7 @@ import { TablaContratosPorEmpleado } from "./TablaContratosPorEmpleado";
 import Swal from "sweetalert2";
 import Paginacion from "./Paginacion";
 
-export function Tabla({ mostrarInactivos = false, sinContrato = false }) {
+export function Tabla({ mostrarInactivos = false, mostrarAdministrativos = false, sinContrato = false }) {
 
     //Estados para seleccionar empleado mostrar Modal y actualizar
     const [empleados, setEmpleados] = useState([]);
@@ -36,7 +36,7 @@ export function Tabla({ mostrarInactivos = false, sinContrato = false }) {
     useEffect(() => {
         cargarEmpleados(paginaActual);
         // eslint-disable-next-line
-    }, [mostrarInactivos, paginaActual]);
+    }, [mostrarInactivos, mostrarAdministrativos, paginaActual]);
 
     useEffect(() => {
         if (tipoBusqueda === "sinContrato") {
@@ -45,29 +45,31 @@ export function Tabla({ mostrarInactivos = false, sinContrato = false }) {
         // eslint-disable-next-line
     }, [tipoBusqueda, paginaActual]);
 
-    //Cargando el listado de Empleados activos y retirados
+    //Cargando el listado de Empleados activos retirados y administrativos
     const cargarEmpleados = (pagina = 0) => {
-        let url;
+    let url;
 
-        if (sinContrato || tipoBusqueda === "sinContrato") {
-            url = `http://localhost:8080/empleados/sin-contrato?page=${pagina}`;
-        } else {
-            url = mostrarInactivos
-                ? `http://localhost:8080/empleados/inactivos?page=${pagina}`
-                : `http://localhost:8080/empleados/activos?page=${pagina}`;
-        }
+    if (sinContrato || tipoBusqueda === "sinContrato") {
+        url = `http://localhost:8080/empleados/sin-contrato?page=${pagina}`;
+    } else if (mostrarAdministrativos) {
+        url = `http://localhost:8080/empleados/administrativos/activos?page=${pagina}`;
+    } else {
+        url = mostrarInactivos
+            ? `http://localhost:8080/empleados/inactivos?page=${pagina}`
+            : `http://localhost:8080/empleados/activos?page=${pagina}`;
+    }
 
-        fetch(url)
-            .then((response) => response.json())
-            .then((data) => {
-                setEmpleados(data.content);
-                setTotalPaginas(data.totalPages);
-                setPaginaActual(data.number);
-                setTotalElementos(data.totalElements);
-                setTamanoPagina(data.size);
-            })
-            .catch((error) => console.error("Error al cargar empleados:", error));
-    };
+    fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+            setEmpleados(data.content);
+            setTotalPaginas(data.totalPages);
+            setPaginaActual(data.number);
+            setTotalElementos(data.totalElements);
+            setTamanoPagina(data.size);
+        })
+        .catch((error) => console.error("Error al cargar empleados:", error));
+};
 
     const eliminarEmpleado = async (id) => {
         console.log("Id a eliminar:", id); //Prueba en consola
@@ -101,8 +103,6 @@ export function Tabla({ mostrarInactivos = false, sinContrato = false }) {
                 });
                 return;
             }
-
-
             const url = mostrarInactivos
                 ? `http://localhost:8080/empleados/buscar/inactivos?filtro=${nombreBuscar}`
                 : `http://localhost:8080/empleados/buscar/activos?filtro=${nombreBuscar}`;
@@ -182,27 +182,31 @@ export function Tabla({ mostrarInactivos = false, sinContrato = false }) {
             });
     };
 
-
     return (
         <>
             <div className="mb-4">
                 <h5>Buscar Empleado por:</h5>
-                <div className="row">
-                    <div className="col-md-4">
-                        <select className="form-select"
-                            aria-label="Default select example"
+                <div className="row align-items-end gx-2">
+                    <div className="col-md-3">
+                        <label className="form-label">Tipo de búsqueda</label>
+                        <select
+                            className="form-select"
+                            aria-label="Tipo de búsqueda"
                             onChange={(e) => setTipoBusqueda(e.target.value)}
-                            value={tipoBusqueda}>
-
+                            value={tipoBusqueda}
+                        >
                             <option value="nombre">Por Nombre</option>
                             <option value="documento">Por Documento</option>
                             <option value="conContrato">Por Contrato</option>
                             <option value="sinContrato">Sin Contrato</option>
-
                         </select>
                     </div>
+
                     {tipoBusqueda !== "sinContrato" && (
-                        <div className="col-md-6">
+                        <div className="col-md-5">
+                            <label className="form-label">
+                                {tipoBusqueda === "nombre" ? "Nombre" : "Documento"}
+                            </label>
                             <input
                                 type={tipoBusqueda === "nombre" ? "text" : "number"}
                                 value={tipoBusqueda === "nombre" ? nombreBuscar : documentoBuscar}
@@ -212,41 +216,49 @@ export function Tabla({ mostrarInactivos = false, sinContrato = false }) {
                                         : setDocumentoBuscar(e.target.value)
                                 }
                                 placeholder={`Ingrese ${tipoBusqueda}`}
-                                className="form-control mb-2"
+                                className="form-control"
                             />
                         </div>
                     )}
 
+                    {/* Botones alineados a la derecha */}
+                    <div className="col-md-4">
+                        {tipoBusqueda !== "sinContrato" && (
+                            <button
+                                onClick={manejarBusqueda}
+                                className="btn btn-info me-2"
+                            >
+                                Buscar
+                            </button>
+                        )}
+
+                        {tipoBusqueda !== "sinContrato" && resultadoBusqueda && (
+                            <button
+                                onClick={() => {
+                                    setResultadoBusqueda([]);
+                                    setDocumentoBuscar("");
+                                    setNombreBuscar("");
+                                    cargarEmpleados();
+                                    setMostrarTablaContratos(false);
+                                }}
+                                className="btn btn-secondary"
+                            >
+                                Limpiar
+                            </button>
+                        )}
+                    </div>
                 </div>
-
-                {tipoBusqueda !== "sinContrato" && (
-                    <button onClick={manejarBusqueda}
-                        className="btn btn-info me-2">Buscar</button>
-                )}
-
-                {tipoBusqueda !== "sinContrato" && resultadoBusqueda && (
-                    <button
-                        onClick={() => {
-                            setResultadoBusqueda([]);
-                            setDocumentoBuscar("");
-                            setNombreBuscar("");
-                            cargarEmpleados(); // Esto cargará el listado completo y actualizado
-                            setMostrarTablaContratos(false);
-                        }}
-                        className="btn btn-secondary"
-                    >
-                        Limpiar Búsqueda
-                    </button>
-                )}
-
             </div>
             <h4 className="alinearTexto">
-                {tipoBusqueda === "sinContrato"
-                    ? "Listado de Empleados Sin Contrato"
-                    : mostrarInactivos
-                        ? "Listado de Empleados Retirados"
-                        : "Listado de Empleados Activos"}
-            </h4>
+    {tipoBusqueda === "sinContrato"
+        ? "Listado de Empleados Sin Contrato"
+        : mostrarAdministrativos
+        ? "Listado de Empleados Administrativos Activos"
+        : mostrarInactivos
+        ? "Listado de Empleados Retirados"
+        : "Listado de Empleados Activos"}
+</h4>
+
 
             {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
                 <Paginacion
@@ -268,8 +280,6 @@ export function Tabla({ mostrarInactivos = false, sinContrato = false }) {
                     <TablaContrato />
                 </div>
             )}
-
-
             {tipoBusqueda !== "conContrato" && (
                 <>
                     <table className={`table table-bordered border-primary table-striped table-hover 
@@ -306,60 +316,58 @@ export function Tabla({ mostrarInactivos = false, sinContrato = false }) {
                                         <td>{emp.correo}</td>
                                         <td>{emp.cargo}</td>
                                         <td>
-                                            <button
-                                                onClick={() => {
-                                                    setEmpleadoSeleccionado(emp);
-                                                    setMostrarModal(true);
-                                                }}
-                                                className="btn btn-sm btn-outline-primary me-2"
-                                                title="Editar"
-                                            >
-                                                <i className="bi bi-pencil-fill"></i>
-                                            </button>
-                                            {!mostrarInactivos && (
+                                            <div className="d-flex justify-content-center gap-2">
                                                 <button
-                                                onClick={() => {
-                                                    Swal.fire({
-                                                        title: '¿Estás seguro?',
-                                                        text: "Esta acción eliminará al empleado.",
-                                                        icon: 'warning',
-                                                        showCancelButton: true,
-                                                        confirmButtonColor: '#3085d6',
-                                                        cancelButtonColor: '#d33',
-                                                        confirmButtonText: 'Sí, eliminar',
-                                                        cancelButtonText: 'Cancelar'
-                                                    }).then((result) => {
-                                                        if (result.isConfirmed) {
-                                                            eliminarEmpleado(emp.id);
-                                                            Swal.fire(
-                                                                'Eliminado',
-                                                                'La persona ha sido eliminada.',
-                                                                'success'
-                                                            );
-                                                        }
-                                                    });
-                                                }}
-                                                className="btn btn-sm btn-outline-danger me-2"
-                                                title="Desactivar"
-                                            >
-                                                <i className="bi bi-trash-fill"></i>
-                                            </button>
-                                            )}
-                                            
-
-                                            {resultadoBusqueda.length === 1 && (
+                                                    onClick={() => {
+                                                        setEmpleadoSeleccionado(emp);
+                                                        setMostrarModal(true);
+                                                    }}
+                                                    className="btn btn-sm btn-outline-primary me-2"
+                                                    title="Editar"
+                                                >
+                                                    <i className="bi bi-pencil-fill"></i>
+                                                </button>
+                                                {!mostrarInactivos && (
+                                                    <button
+                                                        onClick={() => {
+                                                            Swal.fire({
+                                                                title: '¿Estás seguro?',
+                                                                text: "Esta acción eliminará al empleado.",
+                                                                icon: 'warning',
+                                                                showCancelButton: true,
+                                                                confirmButtonColor: '#3085d6',
+                                                                cancelButtonColor: '#d33',
+                                                                confirmButtonText: 'Sí, eliminar',
+                                                                cancelButtonText: 'Cancelar'
+                                                            }).then((result) => {
+                                                                if (result.isConfirmed) {
+                                                                    eliminarEmpleado(emp.id);
+                                                                    Swal.fire(
+                                                                        'Eliminado',
+                                                                        'La persona ha sido eliminada.',
+                                                                        'success'
+                                                                    );
+                                                                }
+                                                            });
+                                                        }}
+                                                        className="btn btn-sm btn-outline-danger me-2"
+                                                        title="Desactivar"
+                                                    >
+                                                        <i className="bi bi-trash-fill"></i>
+                                                    </button>
+                                                )}
                                                 <button
                                                     onClick={() => {
                                                         setEmpleadoParaHistorial(emp.id);
                                                         setMostrarTablaContratos(true);  // activamos la tabla
-
                                                     }}
                                                     className="btn btn-sm btn-outline-secondary"
                                                     title="Ver contratos"
                                                 >
                                                     <i className="bi bi-eye-fill"></i>
                                                 </button>
-                                            )}
+                                            </div>
+
                                         </td>
                                     </tr>
                                 ))
@@ -375,61 +383,67 @@ export function Tabla({ mostrarInactivos = false, sinContrato = false }) {
                                         <td>{emp.correo}</td>
                                         <td>{emp.cargo}</td>
                                         <td>
-                                            <button
-                                                onClick={() => {
-                                                    setEmpleadoSeleccionado(emp);
-                                                    setMostrarModal(true);
-                                                }}
-                                                className="btn btn-sm btn-outline-primary me-1"
-                                                title="Editar"
-                                            >
-                                                <i className="bi bi-pencil-fill"></i>
-                                            </button>
-
-                                            {!mostrarInactivos && tipoBusqueda !== "sinContrato" && (
+                                            <div className="d-flex justify-content-center gap-2">
                                                 <button
                                                     onClick={() => {
-                                                        Swal.fire({
-                                                            title: '¿Estás seguro?',
-                                                            text: "Esta acción eliminará al empleado.",
-                                                            icon: 'warning',
-                                                            showCancelButton: true,
-                                                            confirmButtonColor: '#3085d6',
-                                                            cancelButtonColor: '#d33',
-                                                            confirmButtonText: 'Sí, eliminar',
-                                                            cancelButtonText: 'Cancelar'
-                                                        }).then((result) => {
-                                                            if (result.isConfirmed) {
-                                                                eliminarEmpleado(emp.id);
-                                                                Swal.fire(
-                                                                    'Eliminado',
-                                                                    'La persona ha sido eliminada.',
-                                                                    'success'
-                                                                );
-                                                            }
-                                                        });
+                                                        setEmpleadoSeleccionado(emp);
+                                                        setMostrarModal(true);
                                                     }}
-                                                    className="btn btn-sm btn-outline-danger"
-                                                    title="Desactivar"
+                                                    className="btn btn-sm btn-outline-primary me-1"
+                                                    title="Editar"
                                                 >
-                                                    <i className="bi bi-trash-fill"></i>
+                                                    <i className="bi bi-pencil-fill"></i>
                                                 </button>
 
-                                            )}
+                                                <button
+                                                    onClick={() => {
+                                                        setEmpleadoParaHistorial(emp.id);
+                                                        setMostrarTablaContratos(true);  // activamos la tabla
 
+                                                    }}
+                                                    className="btn btn-sm btn-outline-secondary"
+                                                    title="Ver contratos"
+                                                >
+                                                    <i className="bi bi-eye-fill"></i>
+                                                </button>
+
+                                                {!mostrarInactivos && tipoBusqueda !== "sinContrato" && (
+                                                    <button
+                                                        onClick={() => {
+                                                            Swal.fire({
+                                                                title: '¿Estás seguro?',
+                                                                text: "Esta acción eliminará al empleado.",
+                                                                icon: 'warning',
+                                                                showCancelButton: true,
+                                                                confirmButtonColor: '#3085d6',
+                                                                cancelButtonColor: '#d33',
+                                                                confirmButtonText: 'Sí, eliminar',
+                                                                cancelButtonText: 'Cancelar'
+                                                            }).then((result) => {
+                                                                if (result.isConfirmed) {
+                                                                    eliminarEmpleado(emp.id);
+                                                                    Swal.fire(
+                                                                        'Eliminado',
+                                                                        'La persona ha sido eliminada.',
+                                                                        'success'
+                                                                    );
+                                                                }
+                                                            });
+                                                        }}
+                                                        className="btn btn-sm btn-outline-danger"
+                                                        title="Desactivar"
+                                                    >
+                                                        <i className="bi bi-trash-fill"></i>
+                                                    </button>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
                             )}
-
                         </tbody>
-
                     </table>
-                    {mostrarTablaContratos && empleadoParaHistorial && (
-                        <TablaContratosPorEmpleado empleadoId={empleadoParaHistorial}
-                            actualizar={contadorActualizacion}
-                            onClose={() => setMostrarTablaContratos(false)} />
-                    )}
+
                 </>
             )}
 
@@ -447,6 +461,11 @@ export function Tabla({ mostrarInactivos = false, sinContrato = false }) {
                         {tamanoPagina} por página, total de registros: {totalElementos}
                     </small>
                 </div>
+            )}
+            {mostrarTablaContratos && empleadoParaHistorial && (
+                <TablaContratosPorEmpleado empleadoId={empleadoParaHistorial}
+                    actualizar={contadorActualizacion}
+                    onClose={() => setMostrarTablaContratos(false)} />
             )}
 
             <ModalEditar

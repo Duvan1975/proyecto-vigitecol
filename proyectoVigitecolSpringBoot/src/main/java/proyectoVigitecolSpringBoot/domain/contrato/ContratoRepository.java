@@ -16,28 +16,28 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
     Optional<Contrato> findTopByEmpleadoIdAndContinuaFalseOrderByFechaIngresoDesc(Long empleadoId);
 
     @Query("""
-    SELECT c.empleado
-    FROM Contrato c
-    WHERE c.numeroContrato = (
-        SELECT MAX(c2.numeroContrato)
-        FROM Contrato c2
-        WHERE c2.empleado.id = c.empleado.id
-    )
-    AND c.continua = true ORDER BY c.empleado.apellidos ASC
-    """)
+            SELECT c.empleado
+            FROM Contrato c
+            WHERE c.numeroContrato = (
+                SELECT MAX(c2.numeroContrato)
+                FROM Contrato c2
+                WHERE c2.empleado.id = c.empleado.id
+            )
+            AND c.continua = true ORDER BY c.empleado.apellidos ASC
+            """)
     Page<Empleado> findEmpleadosConContratoActivo(Pageable pageable);
 
     @Query("""
-    SELECT c.empleado
-    FROM Contrato c
-    WHERE c.numeroContrato = (
-        SELECT MAX(c2.numeroContrato)
-        FROM Contrato c2
-        WHERE c2.empleado.id = c.empleado.id
-    )
-    AND c.continua = false 
-    ORDER BY c.empleado.apellidos ASC
-    """)
+            SELECT c.empleado
+            FROM Contrato c
+            WHERE c.numeroContrato = (
+                SELECT MAX(c2.numeroContrato)
+                FROM Contrato c2
+                WHERE c2.empleado.id = c.empleado.id
+            )
+            AND c.continua = false 
+            ORDER BY c.empleado.apellidos ASC
+            """)
     Page<Empleado> findEmpleadosConContratoInactivo(Pageable pageable);
 
     @Query("SELECT MAX(c.numeroContrato) " +
@@ -75,4 +75,19 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
             "AND c.continua = false " +
             "ORDER BY c.fechaIngreso DESC")
     List<Empleado> buscarEmpleadoInactivoPorNumeroDocumento(@Param("numeroDocumento") String numeroDocumento);
+
+    @Query("""
+                SELECT c.empleado
+                FROM Contrato c
+                WHERE c.numeroContrato = (
+                    SELECT MAX(c2.numeroContrato)
+                    FROM Contrato c2
+                    WHERE c2.empleado.id = c.empleado.id
+                )
+                AND c.continua = true
+                AND c.empleado.tipoEmpleado = 'ADMINISTRATIVO'
+                ORDER BY c.empleado.apellidos ASC
+            """)
+    Page<Empleado> findAdministrativosConContratoActivo(Pageable pageable);
+
 }

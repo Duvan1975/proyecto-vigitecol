@@ -76,4 +76,9 @@ public class EmpleadoController {
             @PageableDefault(size = 10, sort = "apellidos") Pageable paginacion) {
         return empleadoService.listarEmpleadosSinContrato(paginacion);
     }
+    @GetMapping("/administrativos/activos")
+    public ResponseEntity<Page<DatosListadoEmpleado>> listadoAdministrativosActivos(
+            @PageableDefault(size = 10, sort = "empleado.apellidos") Pageable paginacion) {
+        return empleadoService.listarAdministrativosActivos(paginacion);
+    }
 }
