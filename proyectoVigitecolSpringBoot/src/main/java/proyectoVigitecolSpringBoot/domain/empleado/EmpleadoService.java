@@ -365,4 +365,28 @@ public class EmpleadoService {
         Page<DatosListadoEmpleado> respuesta = empleados.map(DatosListadoEmpleado::new);
         return ResponseEntity.ok(respuesta);
     }
+
+    public ResponseEntity<Page<DatosListadoEmpleado>> listarOperativosActivos(Pageable pageable) {
+        Page<Empleado> empleados = contratoRepository.findOperativosConContratoActivo(pageable);
+        Page<DatosListadoEmpleado> respuesta = empleados.map(DatosListadoEmpleado::new);
+        return ResponseEntity.ok(respuesta);
+    }
+
+    public ResponseEntity<Page<DatosListadoEmpleado>> listarSupervisoresActivos(Pageable pageable) {
+        Page<Empleado> empleados = contratoRepository.findSupervisoresConContratoActivo(pageable);
+        Page<DatosListadoEmpleado> respuesta = empleados.map(DatosListadoEmpleado::new);
+        return ResponseEntity.ok(respuesta);
+    }
+
+    public ResponseEntity<Page<DatosListadoEmpleado>> listarEmpleadosActivosMayoresDe50(Pageable pageable) {
+        Page<Empleado> empleados = contratoRepository.findEmpleadosConContratoActivoMayoresDe50(pageable);
+        Page<DatosListadoEmpleado> respuesta = empleados.map(DatosListadoEmpleado::new);
+        return ResponseEntity.ok(respuesta);
+    }
+
+    public Page<DatosListadoEmpleado> listarEmpleadosActivosPorEstadoCivil(EstadoCivil estadoCivil, Pageable pageable) {
+        Page<Empleado> empleados = contratoRepository.findEmpleadosPorEstadoCivilConContratoActivo(estadoCivil, pageable);
+        return empleados.map(DatosListadoEmpleado::new);
+    }
+
 }

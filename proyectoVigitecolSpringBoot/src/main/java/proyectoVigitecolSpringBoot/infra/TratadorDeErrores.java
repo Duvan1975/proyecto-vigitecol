@@ -9,6 +9,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.format.DateTimeParseException;
 import java.util.HashMap;
@@ -80,4 +81,20 @@ public class TratadorDeErrores {
 
     //Creamos el DTO para tratar este error
     private record DatosErrorGeneral(String error){}
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, String>> tratarErrorTipoParametro(MethodArgumentTypeMismatchException e) {
+        Map<String, String> error = new HashMap<>();
+
+        if (e.getRequiredType() != null && e.getRequiredType().isEnum()) {
+            String campo = e.getName();
+            error.put("campo", campo);
+            error.put("error", "Debe seleccionar una opción válida para " + campo);
+        } else {
+            error.put("error", "Parámetro inválido");
+            error.put("detalle", e.getMessage());
+        }
+
+        return ResponseEntity.badRequest().body(error);
+    }
 }

@@ -81,4 +81,28 @@ public class EmpleadoController {
             @PageableDefault(size = 10, sort = "empleado.apellidos") Pageable paginacion) {
         return empleadoService.listarAdministrativosActivos(paginacion);
     }
+    @GetMapping("/operativos/activos")
+    public ResponseEntity<Page<DatosListadoEmpleado>> listadoOperativosActivos(
+            @PageableDefault(size = 10, sort = "empleado.apellidos") Pageable paginacion) {
+        return empleadoService.listarOperativosActivos(paginacion);
+    }
+    @GetMapping("/supervisores/activos")
+    public ResponseEntity<Page<DatosListadoEmpleado>> listadoSupervisoresActivos(
+            @PageableDefault(size = 10, sort = "empleado.apellidos") Pageable paginacion) {
+        return empleadoService.listarSupervisoresActivos(paginacion);
+    }
+    @GetMapping("/activos/mayores-de-50")
+    public ResponseEntity<Page<DatosListadoEmpleado>> listadoEmpleadosActivosMayoresDe50(
+            @PageableDefault(size = 10, sort = "empleado.edad") Pageable paginacion) {
+        return empleadoService.listarEmpleadosActivosMayoresDe50(paginacion);
+    }
+    @GetMapping("/estado-civil")
+    public ResponseEntity<Page<DatosListadoEmpleado>> listadoEmpleadosActivosPorEstadoCivil(
+            @RequestParam EstadoCivil estadoCivil,
+            @PageableDefault(size = 10, sort = "empleado.apellidos") Pageable pageable) {
+
+        Page<DatosListadoEmpleado> empleados = empleadoService.listarEmpleadosActivosPorEstadoCivil(estadoCivil, pageable);
+        return ResponseEntity.ok(empleados);
+    }
+
 }

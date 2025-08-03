@@ -32,11 +32,23 @@ export function Menu() {
                     onClick={() => setVista("administrativos")}
                 >ADMINISTRATIVOS
                 </button>
+                <button type="button"
+                    className="btn btn-info me-2"
+                    onClick={() => setVista("operativos")}
+                >OPERATIVOS
+                </button>
+                <button type="button"
+                    className="btn btn-primary"
+                    onClick={() => setVista("supervisores")}
+                ><strong>SUPERVISORES</strong>
+                </button>
             </div>
             {vista === "formulario" && <Formulario />}
             {vista === "tabla" && <Tabla mostrarInactivos={false} />}
             {vista === "inactivas" && <Tabla mostrarInactivos={true} />}
             {vista === "administrativos" && <Tabla mostrarAdministrativos={true} />}
+            {vista === "operativos" && <Tabla mostrarOperativos={true} />}
+            {vista === "supervisores" && <Tabla mostrarSupervisores={true} />}
         </div>
     )
 };

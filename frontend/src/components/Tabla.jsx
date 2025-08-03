@@ -5,7 +5,13 @@ import { TablaContratosPorEmpleado } from "./TablaContratosPorEmpleado";
 import Swal from "sweetalert2";
 import Paginacion from "./Paginacion";
 
-export function Tabla({ mostrarInactivos = false, mostrarAdministrativos = false, sinContrato = false }) {
+export function Tabla({
+    mostrarInactivos = false,
+    mostrarAdministrativos = false,
+    mostrarOperativos = false,
+    sinContrato = false,
+    mostrarSupervisores = false,
+}) {
 
     //Estados para seleccionar empleado mostrar Modal y actualizar
     const [empleados, setEmpleados] = useState([]);
@@ -33,43 +39,58 @@ export function Tabla({ mostrarInactivos = false, mostrarAdministrativos = false
     const [mostrarTablaContratos, setMostrarTablaContratos] = useState(false);
     const [contadorActualizacion, setContadorActualizacion] = useState(0);
 
+    //Estado para la búsqueda por Estado Civil
+    const [estadoCivilBuscar, setEstadoCivilBuscar] = useState("");
+
     useEffect(() => {
         cargarEmpleados(paginaActual);
         // eslint-disable-next-line
-    }, [mostrarInactivos, mostrarAdministrativos, paginaActual]);
+    }, [mostrarInactivos,
+        mostrarAdministrativos,
+        mostrarOperativos,
+        mostrarSupervisores,
+        paginaActual]);
 
     useEffect(() => {
-        if (tipoBusqueda === "sinContrato") {
+        if (tipoBusqueda === "sinContrato" ||
+            tipoBusqueda === "personalMayorDe50") {
             cargarEmpleados(paginaActual);
         }
         // eslint-disable-next-line
     }, [tipoBusqueda, paginaActual]);
 
-    //Cargando el listado de Empleados activos retirados y administrativos
+
+    //Cargando el listado de Empleados activos, retirados, operativos, supervisores y administrativos
     const cargarEmpleados = (pagina = 0) => {
-    let url;
+        let url;
 
-    if (sinContrato || tipoBusqueda === "sinContrato") {
-        url = `http://localhost:8080/empleados/sin-contrato?page=${pagina}`;
-    } else if (mostrarAdministrativos) {
-        url = `http://localhost:8080/empleados/administrativos/activos?page=${pagina}`;
-    } else {
-        url = mostrarInactivos
-            ? `http://localhost:8080/empleados/inactivos?page=${pagina}`
-            : `http://localhost:8080/empleados/activos?page=${pagina}`;
-    }
+        if (sinContrato || tipoBusqueda === "sinContrato") {
+            url = `http://localhost:8080/empleados/sin-contrato?page=${pagina}`;
+        } else if (tipoBusqueda === "personalMayorDe50") {
+            url = `http://localhost:8080/empleados/activos/mayores-de-50?page=${pagina}`;
+        } else if (mostrarAdministrativos) {
+            url = `http://localhost:8080/empleados/administrativos/activos?page=${pagina}`;
+        } else if (mostrarOperativos) {
+            url = `http://localhost:8080/empleados/operativos/activos?page=${pagina}`;
+        } else if (mostrarSupervisores) {
+            url = `http://localhost:8080/empleados/supervisores/activos?page=${pagina}`;
+        } else {
+            url = mostrarInactivos
+                ? `http://localhost:8080/empleados/inactivos?page=${pagina}`
+                : `http://localhost:8080/empleados/activos?page=${pagina}`;
+        }
 
-    fetch(url)
-        .then((response) => response.json())
-        .then((data) => {
-            setEmpleados(data.content);
-            setTotalPaginas(data.totalPages);
-            setPaginaActual(data.number);
-            setTotalElementos(data.totalElements);
-            setTamanoPagina(data.size);
-        })
-        .catch((error) => console.error("Error al cargar empleados:", error));
-};
+        fetch(url)
+            .then((response) => response.json())
+            .then((data) => {
+                setEmpleados(data.content);
+                setTotalPaginas(data.totalPages);
+                setPaginaActual(data.number);
+                setTotalElementos(data.totalElements);
+                setTamanoPagina(data.size);
+            })
+            .catch((error) => console.error("Error al cargar empleados:", error));
+    };
 
     const eliminarEmpleado = async (id) => {
         console.log("Id a eliminar:", id); //Prueba en consola
@@ -135,6 +156,24 @@ export function Tabla({ mostrarInactivos = false, mostrarAdministrativos = false
                 });
             return;
         }
+        if (tipoBusqueda === "estadoCivilBuscar") {
+  if (!estadoCivilBuscar) {
+    Swal.fire({
+      icon: "warning",
+      title: "Estado civil requerido",
+      text: "Por favor seleccione una opción válida.",
+    });
+    return;
+  }
+
+  const url = mostrarInactivos
+    ? `http://localhost:8080/empleados/estado-civil/inactivos?estadoCivil=${estadoCivilBuscar}`
+    : `http://localhost:8080/empleados/estado-civil?estadoCivil=${estadoCivilBuscar}`;
+
+  realizarBusqueda(url);
+  return;
+}
+
     };
 
     const realizarBusqueda = (url) => {
@@ -199,6 +238,8 @@ export function Tabla({ mostrarInactivos = false, mostrarAdministrativos = false
                             <option value="documento">Por Documento</option>
                             <option value="conContrato">Por Contrato</option>
                             <option value="sinContrato">Sin Contrato</option>
+                            <option value="personalMayorDe50">Mayores de 50 años</option>
+                            <option value="estadoCivilBuscar">Estado Civil</option>
                         </select>
                     </div>
 
@@ -220,8 +261,25 @@ export function Tabla({ mostrarInactivos = false, mostrarAdministrativos = false
                             />
                         </div>
                     )}
+                    {tipoBusqueda === "estadoCivilBuscar" && (
+  <div className="col-md-5">
+    <label className="form-label">Seleccione Estado Civil</label>
+    <select
+      className="form-select"
+      value={estadoCivilBuscar}
+      onChange={(e) => setEstadoCivilBuscar(e.target.value)}
+    >
+      <option value="">Seleccione...</option>
+      <option value="CASADO">Soltero</option>
+      <option value="SOLTERO">Casado</option>
+      <option value="VIUDO">Divorciado</option>
+      <option value="SEPARADO">Viudo</option>
+      <option value="UNION_LIBRE">Viudo</option>
+    </select>
+  </div>
+)}
 
-                    {/* Botones alineados a la derecha */}
+
                     <div className="col-md-4">
                         {tipoBusqueda !== "sinContrato" && (
                             <button
@@ -250,14 +308,20 @@ export function Tabla({ mostrarInactivos = false, mostrarAdministrativos = false
                 </div>
             </div>
             <h4 className="alinearTexto">
-    {tipoBusqueda === "sinContrato"
-        ? "Listado de Empleados Sin Contrato"
-        : mostrarAdministrativos
-        ? "Listado de Empleados Administrativos Activos"
-        : mostrarInactivos
-        ? "Listado de Empleados Retirados"
-        : "Listado de Empleados Activos"}
-</h4>
+                {tipoBusqueda === "sinContrato"
+                    ? "Listado de Empleados Sin Contrato"
+                    : tipoBusqueda === "personalMayorDe50"
+                        ? "Personal Mayor de 50 Años"
+                        : mostrarAdministrativos
+                            ? "Listado de Empleados ADMINISTRATIVOS"
+                            : mostrarOperativos
+                                ? "Listado de Personal OPERATIVO"
+                                : mostrarSupervisores
+                                    ? "Listado de SUPERVISORES"
+                                    : mostrarInactivos
+                                        ? "Listado de Empleados Retirados"
+                                        : "Listado de Empleados Activos"}
+            </h4>
 
 
             {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
