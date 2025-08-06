@@ -384,8 +384,23 @@ public class EmpleadoService {
         return ResponseEntity.ok(respuesta);
     }
 
-    public Page<DatosListadoEmpleado> listarEmpleadosActivosPorEstadoCivil(EstadoCivil estadoCivil, Pageable pageable) {
-        Page<Empleado> empleados = contratoRepository.findEmpleadosPorEstadoCivilConContratoActivo(estadoCivil, pageable);
+    public Page<DatosListadoEmpleado> listarEmpleadosActivosPorEstadoCivil(
+            EstadoCivil estadoCivil,
+            TipoEmpleado tipoEmpleado,
+            Pageable pageable) {
+
+        Page<Empleado> empleados = contratoRepository
+                .findEmpleadosPorEstadoCivilConContratoActivo(estadoCivil, tipoEmpleado, pageable);
+        return empleados.map(DatosListadoEmpleado::new);
+    }
+
+    public Page<DatosListadoEmpleado> listarEmpleadosActivosPorGenero(
+            Genero genero,
+            TipoEmpleado tipoEmpleado,
+            Pageable pageable) {
+
+        Page<Empleado> empleados = contratoRepository
+                .findEmpleadosPorGeneroConContratoActivo(genero, tipoEmpleado, pageable);
         return empleados.map(DatosListadoEmpleado::new);
     }
 

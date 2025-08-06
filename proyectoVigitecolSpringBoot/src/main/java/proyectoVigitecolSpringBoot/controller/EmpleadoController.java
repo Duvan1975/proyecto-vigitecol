@@ -99,9 +99,22 @@ public class EmpleadoController {
     @GetMapping("/estado-civil")
     public ResponseEntity<Page<DatosListadoEmpleado>> listadoEmpleadosActivosPorEstadoCivil(
             @RequestParam EstadoCivil estadoCivil,
+            @RequestParam(required = false) TipoEmpleado tipoEmpleado, // Nuevo parámetro
             @PageableDefault(size = 10, sort = "empleado.apellidos") Pageable pageable) {
 
-        Page<DatosListadoEmpleado> empleados = empleadoService.listarEmpleadosActivosPorEstadoCivil(estadoCivil, pageable);
+        Page<DatosListadoEmpleado> empleados = empleadoService
+                .listarEmpleadosActivosPorEstadoCivil(estadoCivil, tipoEmpleado, pageable);
+        return ResponseEntity.ok(empleados);
+    }
+
+    @GetMapping("/genero")
+    public ResponseEntity<Page<DatosListadoEmpleado>> listadoEmpleadosActivosPorGenero(
+            @RequestParam Genero genero,
+            @RequestParam(required = false) TipoEmpleado tipoEmpleado, // Nuevo parámetro
+            @PageableDefault(size = 10, sort = "empleado.apellidos") Pageable pageable) {
+
+        Page<DatosListadoEmpleado> empleados = empleadoService
+                .listarEmpleadosActivosPorGenero(genero, tipoEmpleado, pageable);
         return ResponseEntity.ok(empleados);
     }
 

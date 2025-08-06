@@ -39,8 +39,9 @@ export function Tabla({
     const [mostrarTablaContratos, setMostrarTablaContratos] = useState(false);
     const [contadorActualizacion, setContadorActualizacion] = useState(0);
 
-    //Estado para buscar por estado civil
+    //Estados de búsqueda
     const [estadoCivilBuscar, setEstadoCivilBuscar] = useState("");
+    const [generoBuscar, setGeneroBuscar] = useState("");
 
     useEffect(() => {
         cargarEmpleados(paginaActual);
@@ -50,12 +51,14 @@ export function Tabla({
         mostrarOperativos,
         mostrarSupervisores,
         estadoCivilBuscar,
+        generoBuscar,
         paginaActual]);
 
     useEffect(() => {
         if (tipoBusqueda === "sinContrato" ||
             tipoBusqueda === "personalMayorDe50" ||
-            tipoBusqueda === "estadoCivil") {
+            tipoBusqueda === "estadoCivil" ||
+            tipoBusqueda === "genero") {
             cargarEmpleados(paginaActual);
         }
         // eslint-disable-next-line
@@ -68,8 +71,27 @@ export function Tabla({
 
         if (sinContrato || tipoBusqueda === "sinContrato") {
             url = `http://localhost:8080/empleados/sin-contrato?page=${pagina}`;
+
         } else if (tipoBusqueda === "estadoCivil" && estadoCivilBuscar) {
             url = `http://localhost:8080/empleados/estado-civil?estadoCivil=${estadoCivilBuscar}&page=${pagina}`;
+
+            // Agregar filtro por tipo de empleado si está activo
+            if (mostrarAdministrativos) {
+                url += `&tipoEmpleado=ADMINISTRATIVO`;
+            } else if (mostrarOperativos) {
+                url += `&tipoEmpleado=OPERATIVO`;
+            }
+
+        } else if (tipoBusqueda === "genero" && generoBuscar) {
+            url = `http://localhost:8080/empleados/genero?genero=${generoBuscar}&page=${pagina}`;
+
+            // Agregar filtro por tipo de empleado si está activo
+            if (mostrarAdministrativos) {
+                url += `&tipoEmpleado=ADMINISTRATIVO`;
+            } else if (mostrarOperativos) {
+                url += `&tipoEmpleado=OPERATIVO`;
+            }
+
         } else if (tipoBusqueda === "personalMayorDe50") {
             url = `http://localhost:8080/empleados/activos/mayores-de-50?page=${pagina}`;
         } else if (mostrarAdministrativos) {
@@ -87,6 +109,12 @@ export function Tabla({
         fetch(url)
             .then((response) => response.json())
             .then((data) => {
+                if (data.content.length > data.totalElements) {
+                    console.warn('Discrepancia detectada!', {
+                        contentLength: data.content.length,
+                        totalElements: data.totalElements
+                    });
+                }
                 setEmpleados(data.content);
                 setTotalPaginas(data.totalPages);
                 setPaginaActual(data.number);
@@ -115,7 +143,104 @@ export function Tabla({
         }
     };
 
+    const realizarBusquedaFiltrada = async (tipo, valor, nombreFiltro) => {
+        if (!valor) {
+            Swal.fire({
+                icon: "warning",
+                title: `${nombreFiltro} requerido`,
+                text: `Por favor seleccione un ${nombreFiltro.toLowerCase()}.`,
+            });
+            return false;
+        }
+
+        let url = `http://localhost:8080/empleados/${tipo}?${tipo}=${valor}`;
+
+        fetch(url)
+            .then((response) => response.json())
+            .then((data) => {
+
+                setResultadoBusqueda(data.content);
+                setTotalPaginas(data.totalPages);
+                setPaginaActual(data.number);
+                setTotalElementos(data.totalElements);
+                setTamanoPagina(data.size);
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Búsqueda completada",
+                    text: `Se encontraron ${data.totalElements} empleados por ${tipo}`,
+                    timer: 2500,
+                    showConfirmButton: false,
+                });
+            })
+            .catch((error) => {
+                console.error("Error al buscar por estado civil:", error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Ocurrió un error al buscar por estado civil",
+                });
+            });
+
+        return true;
+    };
+
     const manejarBusqueda = () => {
+        setMostrarTablaContratos(false);
+        setEmpleadoParaHistorial(null);
+
+        if (tipoBusqueda === "nombre") {
+            if (!nombreBuscar || nombreBuscar.trim() === "") {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Nombre requerido",
+                    text: "Por favor ingrese un nombre válido.",
+                });
+                return;
+            }
+            const url = mostrarInactivos
+                ? `http://localhost:8080/empleados/buscar/inactivos?filtro=${nombreBuscar}`
+                : `http://localhost:8080/empleados/buscar/activos?filtro=${nombreBuscar}`;
+
+            realizarBusqueda(url);
+        } else {
+            if (!documentoBuscar || documentoBuscar.trim() === "") {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Número de documento requerido",
+                    text: "Por favor ingrese un número válido.",
+                });
+                return;
+            }
+
+            const url = mostrarInactivos
+                ? `http://localhost:8080/empleados/buscar/inactivos/documento?numeroDocumento=${documentoBuscar}`
+                : `http://localhost:8080/empleados/buscar/activos/documento?numeroDocumento=${documentoBuscar}`;
+
+            realizarBusqueda(url);
+        }
+        if (tipoBusqueda === "sinContrato") {
+            fetch("http://localhost:8080/empleados/sin-contrato")
+                .then(res => res.json())
+                .then(data => {
+                    setResultadoBusqueda(data.content || []);
+                })
+                .catch(error => {
+                    console.error("Error al buscar empleados sin contrato", error);
+                });
+            return;
+        }
+        else if (tipoBusqueda === "estadoCivil") {
+            realizarBusquedaFiltrada("estado-civil", estadoCivilBuscar, "Estado civil");
+        } else if (tipoBusqueda === "genero") {
+            realizarBusquedaFiltrada("genero", generoBuscar, "Género");
+        }
+
+
+    };
+
+
+    /*const manejarBusqueda = () => {
         setMostrarTablaContratos(false);
         setEmpleadoParaHistorial(null);
 
@@ -160,6 +285,18 @@ export function Tabla({
 
             const url = `http://localhost:8080/empleados/estado-civil?estadoCivil=${estadoCivilBuscar}`;
 
+        } else if (tipoBusqueda === "genero") {
+            if (!generoBuscar) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Género requerido",
+                    text: "Por favor seleccione un género.",
+                });
+                return;
+            }
+
+            const url = `http://localhost:8080/empleados/genero?genero=${generoBuscar}`;
+
             fetch(url)
                 .then((response) => response.json())
                 .then((data) => {
@@ -186,7 +323,7 @@ export function Tabla({
                     });
                 });
         }
-    };
+    };*/
 
     const realizarBusqueda = (url) => {
         fetch(url)
@@ -252,12 +389,14 @@ export function Tabla({
                             <option value="sinContrato">Sin Contrato</option>
                             <option value="personalMayorDe50">Mayores de 50 años</option>
                             <option value="estadoCivil">Estado Civil</option>
+                            <option value="genero">Género</option>
                         </select>
                     </div>
 
                     {tipoBusqueda !== "sinContrato" &&
                         tipoBusqueda !== "estadoCivil" &&
-                        tipoBusqueda !== "personalMayorDe50" && (
+                        tipoBusqueda !== "personalMayorDe50" &&
+                        tipoBusqueda !== "genero" && (
                             <div className="col-md-5">
                                 <label className="form-label">
                                     {tipoBusqueda === "nombre" ? "Nombre" : "Documento"}
@@ -285,11 +424,27 @@ export function Tabla({
                                 onChange={(e) => setEstadoCivilBuscar(e.target.value)}
                             >
                                 <option value="">Seleccione un estado civil</option>
-                                <option value="CASADO">CASADO</option>
-                                <option value="SOLTERO">SOLTERO</option>
-                                <option value="VIUDO">Viudo</option>
-                                <option value="SEPARADO">Separado</option>
-                                <option value="UNION_LIBRE">Unión libre</option>
+                                <option value="CASADO">CASADO(A)</option>
+                                <option value="SOLTERO">SOLTERO(A)</option>
+                                <option value="VIUDO">VIUDO(A)</option>
+                                <option value="SEPARADO">SEPARADO(A)</option>
+                                <option value="UNION_LIBRE">UNIÓN LIBRE</option>
+                            </select>
+                        </div>
+                    )}
+
+                    {tipoBusqueda === "genero" && (
+                        <div className="col-md-5">
+                            <label className="form-label">GÉNERO</label>
+                            <select
+                                className="form-select"
+                                value={generoBuscar}
+                                onChange={(e) => setGeneroBuscar(e.target.value)}
+                            >
+                                <option value="">Seleccione el género</option>
+                                <option value="MASCULINO">MASCULINO</option>
+                                <option value="FEMENINO">FEMENINO</option>
+
                             </select>
                         </div>
                     )}
@@ -298,6 +453,7 @@ export function Tabla({
                         {tipoBusqueda !== "sinContrato"
                             && tipoBusqueda !== "estadoCivil"
                             && tipoBusqueda !== "personalMayorDe50"
+                            && tipoBusqueda !== "genero"
                             && (
                                 <button
                                     onClick={manejarBusqueda}
@@ -307,13 +463,14 @@ export function Tabla({
                                 </button>
                             )}
 
-                        {tipoBusqueda !== "sinContrato" && resultadoBusqueda && (
+                        {tipoBusqueda !== "sinContrato" && resultadoBusqueda && tipoBusqueda !== "personalMayorDe50" && (
                             <button
                                 onClick={() => {
                                     setResultadoBusqueda([]);
                                     setDocumentoBuscar("");
                                     setNombreBuscar("");
                                     setEstadoCivilBuscar("");
+                                    setGeneroBuscar("");
                                     cargarEmpleados();
                                     setMostrarTablaContratos(false);
                                 }}
@@ -332,15 +489,17 @@ export function Tabla({
                         ? "Personal Mayor de 50 Años"
                         : tipoBusqueda === "estadoCivil"
                             ? `Empleados con estado civil: ${estadoCivilBuscar}`
-                            : mostrarAdministrativos
-                                ? "Listado de Empleados ADMINISTRATIVOS"
-                                : mostrarOperativos
-                                    ? "Listado de Personal OPERATIVO"
-                                    : mostrarSupervisores
-                                        ? "Listado de SUPERVISORES"
-                                        : mostrarInactivos
-                                            ? "Listado de Empleados Retirados"
-                                            : "Listado de Empleados Activos"}
+                            : tipoBusqueda === "genero"
+                                ? `Personal por género: ${generoBuscar}`
+                                : mostrarAdministrativos
+                                    ? "Listado de Empleados ADMINISTRATIVOS"
+                                    : mostrarOperativos
+                                        ? "Listado de Personal OPERATIVO"
+                                        : mostrarSupervisores
+                                            ? "Listado de SUPERVISORES"
+                                            : mostrarInactivos
+                                                ? "Listado de Empleados Retirados"
+                                                : "Listado de Empleados Activos"}
             </h4>
 
             {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (

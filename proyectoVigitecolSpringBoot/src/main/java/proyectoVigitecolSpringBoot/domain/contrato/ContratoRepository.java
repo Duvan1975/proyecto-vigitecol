@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import proyectoVigitecolSpringBoot.domain.empleado.Empleado;
 import proyectoVigitecolSpringBoot.domain.empleado.EstadoCivil;
+import proyectoVigitecolSpringBoot.domain.empleado.Genero;
+import proyectoVigitecolSpringBoot.domain.empleado.TipoEmpleado;
 
 import java.util.List;
 import java.util.Optional;
@@ -120,16 +122,38 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
     Page<Empleado> findEmpleadosConContratoActivoMayoresDe50(Pageable pageable);
 
     @Query("""
-                SELECT c.empleado
-                FROM Contrato c
-                WHERE c.numeroContrato = (
-                    SELECT MAX(c2.numeroContrato)
-                    FROM Contrato c2
-                    WHERE c2.empleado.id = c.empleado.id
-                )
-                AND c.continua = true
-                AND c.empleado.estadoCivil = :estadoCivil
-                ORDER BY c.empleado.apellidos ASC
-            """)
-    Page<Empleado> findEmpleadosPorEstadoCivilConContratoActivo(@Param("estadoCivil") EstadoCivil estadoCivil, Pageable pageable);
+        SELECT c.empleado
+        FROM Contrato c
+        WHERE c.numeroContrato = (
+            SELECT MAX(c2.numeroContrato)
+            FROM Contrato c2
+            WHERE c2.empleado.id = c.empleado.id
+        )
+        AND c.continua = true
+        AND c.empleado.estadoCivil = :estadoCivil
+        AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
+        ORDER BY c.empleado.apellidos ASC
+        """)
+    Page<Empleado> findEmpleadosPorEstadoCivilConContratoActivo(
+            @Param("estadoCivil") EstadoCivil estadoCivil,
+            @Param("tipoEmpleado") TipoEmpleado tipoEmpleado,
+            Pageable pageable);
+
+    @Query("""
+        SELECT c.empleado
+        FROM Contrato c
+        WHERE c.numeroContrato = (
+            SELECT MAX(c2.numeroContrato)
+            FROM Contrato c2
+            WHERE c2.empleado.id = c.empleado.id
+        )
+        AND c.continua = true
+        AND c.empleado.genero = :genero
+        AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
+        ORDER BY c.empleado.apellidos ASC
+        """)
+    Page<Empleado> findEmpleadosPorGeneroConContratoActivo(
+            @Param("genero") Genero genero,
+            @Param("tipoEmpleado") TipoEmpleado tipoEmpleado,
+            Pageable pageable);
 }
