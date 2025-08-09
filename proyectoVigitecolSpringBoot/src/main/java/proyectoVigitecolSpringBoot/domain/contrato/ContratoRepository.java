@@ -5,10 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import proyectoVigitecolSpringBoot.domain.empleado.Empleado;
-import proyectoVigitecolSpringBoot.domain.empleado.EstadoCivil;
-import proyectoVigitecolSpringBoot.domain.empleado.Genero;
-import proyectoVigitecolSpringBoot.domain.empleado.TipoEmpleado;
+import proyectoVigitecolSpringBoot.domain.empleado.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +49,10 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
     @Query("SELECT c.empleado FROM Contrato c " + "WHERE c.empleado.id = :empleadoId " + "AND c.continua = true " + "ORDER BY c.fechaIngreso DESC")
     Optional<Empleado> findEmpleadoActivoPorId(@Param("empleadoId") Long empleadoId);
 
-    @Query("SELECT c.empleado FROM Contrato c " + "WHERE c.continua = true " + "ORDER BY c.fechaIngreso DESC")
+    @Query("SELECT c.empleado " +
+            "FROM Contrato c " +
+            "WHERE c.continua = true " +
+            "ORDER BY c.fechaIngreso DESC")
     List<Empleado> buscarTodosEmpleadosActivos();
 
     @Query("SELECT c.empleado FROM Contrato c " + "WHERE c.empleado.numeroDocumento = :numeroDocumento " + "AND c.continua = true " + "ORDER BY c.fechaIngreso DESC")
@@ -117,9 +117,12 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
                 )
                 AND c.continua = true
                 AND c.empleado.edad >= 50
-                ORDER BY c.empleado.cargo ASC
+                AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
+                ORDER BY c.empleado.edad ASC
             """)
-    Page<Empleado> findEmpleadosConContratoActivoMayoresDe50(Pageable pageable);
+    Page<Empleado> findEmpleadosConContratoActivoMayoresDe50(
+            @Param("tipoEmpleado") TipoEmpleado tipoEmpleado,
+            Pageable pageable);
 
     @Query("""
         SELECT c.empleado
@@ -154,6 +157,42 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
         """)
     Page<Empleado> findEmpleadosPorGeneroConContratoActivo(
             @Param("genero") Genero genero,
+            @Param("tipoEmpleado") TipoEmpleado tipoEmpleado,
+            Pageable pageable);
+
+    @Query("""
+        SELECT c.empleado
+        FROM Contrato c
+        WHERE c.numeroContrato = (
+            SELECT MAX(c2.numeroContrato)
+            FROM Contrato c2
+            WHERE c2.empleado.id = c.empleado.id
+        )
+        AND c.continua = true
+        AND c.empleado.libretaMilitar = :libretaMilitar
+        AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
+        ORDER BY c.empleado.apellidos ASC
+        """)
+    Page<Empleado> findEmpleadosPorLibretaMilitarConContratoActivo(
+            @Param("libretaMilitar") LibretaMilitar libretaMilitar,
+            @Param("tipoEmpleado") TipoEmpleado tipoEmpleado,
+            Pageable pageable);
+
+    @Query("""
+        SELECT c.empleado
+        FROM Contrato c
+        WHERE c.numeroContrato = (
+            SELECT MAX(c2.numeroContrato)
+            FROM Contrato c2
+            WHERE c2.empleado.id = c.empleado.id
+        )
+        AND c.continua = true
+        AND LOWER(c.empleado.cargo) LIKE LOWER((CONCAT('%', REPLACE(:cargo, ' ', '%'), '%')))
+        AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
+        ORDER BY c.empleado.apellidos ASC
+        """)
+    Page<Empleado> findEmpleadosPorCargoConContratoActivo(
+            @Param("cargo") String cargo,
             @Param("tipoEmpleado") TipoEmpleado tipoEmpleado,
             Pageable pageable);
 }

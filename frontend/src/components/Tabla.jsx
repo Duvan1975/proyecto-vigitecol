@@ -42,6 +42,10 @@ export function Tabla({
     //Estados de búsqueda
     const [estadoCivilBuscar, setEstadoCivilBuscar] = useState("");
     const [generoBuscar, setGeneroBuscar] = useState("");
+    const [libretaMilitarBuscar, setLibretaMilitarBuscar] = useState("");
+    const [cargoBuscar, setCargoBuscar] = useState("");
+    //const [mayoresDe50, setMayoresDe50Buscar] = useState("");
+
 
     useEffect(() => {
         cargarEmpleados(paginaActual);
@@ -52,18 +56,22 @@ export function Tabla({
         mostrarSupervisores,
         estadoCivilBuscar,
         generoBuscar,
+        libretaMilitarBuscar,
+        cargoBuscar,
         paginaActual]);
 
     useEffect(() => {
         if (tipoBusqueda === "sinContrato" ||
             tipoBusqueda === "personalMayorDe50" ||
             tipoBusqueda === "estadoCivil" ||
-            tipoBusqueda === "genero") {
+            tipoBusqueda === "genero" ||
+            tipoBusqueda === "libretaMilitar" ||
+            tipoBusqueda === "cargo"
+        ) {
             cargarEmpleados(paginaActual);
         }
         // eslint-disable-next-line
     }, [tipoBusqueda, paginaActual]);
-
 
     //Cargando el listado de Empleados activos, retirados, operativos, supervisores y administrativos
     const cargarEmpleados = (pagina = 0) => {
@@ -71,6 +79,16 @@ export function Tabla({
 
         if (sinContrato || tipoBusqueda === "sinContrato") {
             url = `http://localhost:8080/empleados/sin-contrato?page=${pagina}`;
+
+        } else if (tipoBusqueda === "personalMayorDe50") {
+            url = `http://localhost:8080/empleados/activos/mayores-de-50?&page=${pagina}`;
+
+            // Agregar filtro por tipo de empleado si está activo
+            if (mostrarAdministrativos) {
+                url += `&tipoEmpleado=ADMINISTRATIVO`;
+            } else if (mostrarOperativos) {
+                url += `&tipoEmpleado=OPERATIVO`;
+            }
 
         } else if (tipoBusqueda === "estadoCivil" && estadoCivilBuscar) {
             url = `http://localhost:8080/empleados/estado-civil?estadoCivil=${estadoCivilBuscar}&page=${pagina}`;
@@ -92,8 +110,26 @@ export function Tabla({
                 url += `&tipoEmpleado=OPERATIVO`;
             }
 
-        } else if (tipoBusqueda === "personalMayorDe50") {
-            url = `http://localhost:8080/empleados/activos/mayores-de-50?page=${pagina}`;
+        } else if (tipoBusqueda === "libretaMilitar" && libretaMilitarBuscar) {
+            url = `http://localhost:8080/empleados/libreta-militar?libretaMilitar=${libretaMilitarBuscar}&page=${pagina}`;
+
+            // Agregar filtro por tipo de empleado si está activo
+            if (mostrarAdministrativos) {
+                url += `&tipoEmpleado=ADMINISTRATIVO`;
+            } else if (mostrarOperativos) {
+                url += `&tipoEmpleado=OPERATIVO`;
+            }
+
+        } else if (tipoBusqueda === "cargo" && cargoBuscar) {
+            url = `http://localhost:8080/empleados/por-cargo?cargo=${cargoBuscar}&page=${pagina}`;
+
+            // Agregar filtro por tipo de empleado si está activo
+            if (mostrarAdministrativos) {
+                url += `&tipoEmpleado=ADMINISTRATIVO`;
+            } else if (mostrarOperativos) {
+                url += `&tipoEmpleado=OPERATIVO`;
+            }
+
         } else if (mostrarAdministrativos) {
             url = `http://localhost:8080/empleados/administrativos/activos?page=${pagina}`;
         } else if (mostrarOperativos) {
@@ -109,12 +145,6 @@ export function Tabla({
         fetch(url)
             .then((response) => response.json())
             .then((data) => {
-                if (data.content.length > data.totalElements) {
-                    console.warn('Discrepancia detectada!', {
-                        contentLength: data.content.length,
-                        totalElements: data.totalElements
-                    });
-                }
                 setEmpleados(data.content);
                 setTotalPaginas(data.totalPages);
                 setPaginaActual(data.number);
@@ -153,22 +183,24 @@ export function Tabla({
             return false;
         }
 
-        let url = `http://localhost:8080/empleados/${tipo}?${tipo}=${valor}`;
+        let url = `http://localhost:8080/empleados/${tipo}?${valor}=${valor}`;
 
         fetch(url)
             .then((response) => response.json())
             .then((data) => {
-
+                console.log("Resultado de la búsqueda:", data);
                 setResultadoBusqueda(data.content);
                 setTotalPaginas(data.totalPages);
                 setPaginaActual(data.number);
                 setTotalElementos(data.totalElements);
                 setTamanoPagina(data.size);
 
+                //No está activando el mensaje de confirmación		-------------------------
+
                 Swal.fire({
                     icon: "success",
                     title: "Búsqueda completada",
-                    text: `Se encontraron ${data.totalElements} empleados por ${tipo}`,
+                    text: `Se encontraron ${data.totalElements}`,
                     timer: 2500,
                     showConfirmButton: false,
                 });
@@ -190,6 +222,7 @@ export function Tabla({
         setEmpleadoParaHistorial(null);
 
         if (tipoBusqueda === "nombre") {
+
             if (!nombreBuscar || nombreBuscar.trim() === "") {
                 Swal.fire({
                     icon: "warning",
@@ -205,6 +238,7 @@ export function Tabla({
             realizarBusqueda(url);
         } else {
             if (!documentoBuscar || documentoBuscar.trim() === "") {
+
                 Swal.fire({
                     icon: "warning",
                     title: "Número de documento requerido",
@@ -229,101 +263,17 @@ export function Tabla({
                     console.error("Error al buscar empleados sin contrato", error);
                 });
             return;
-        }
-        else if (tipoBusqueda === "estadoCivil") {
+
+        } else if (tipoBusqueda === "estadoCivil") {
             realizarBusquedaFiltrada("estado-civil", estadoCivilBuscar, "Estado civil");
         } else if (tipoBusqueda === "genero") {
             realizarBusquedaFiltrada("genero", generoBuscar, "Género");
+        } else if (tipoBusqueda === "libretaMilitar") {
+            realizarBusquedaFiltrada("libreta-militar", libretaMilitarBuscar, "Libreta Militar");
+        } else if (tipoBusqueda === "cargo") {
+            realizarBusquedaFiltrada("por-cargo", cargoBuscar, "Cargo");
         }
-
-
     };
-
-
-    /*const manejarBusqueda = () => {
-        setMostrarTablaContratos(false);
-        setEmpleadoParaHistorial(null);
-
-        if (tipoBusqueda === "nombre") {
-            if (!nombreBuscar || nombreBuscar.trim() === "") {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Nombre requerido",
-                    text: "Por favor ingrese un nombre válido.",
-                });
-                return;
-            }
-            const url = mostrarInactivos
-                ? `http://localhost:8080/empleados/buscar/inactivos?filtro=${nombreBuscar}`
-                : `http://localhost:8080/empleados/buscar/activos?filtro=${nombreBuscar}`;
-
-            realizarBusqueda(url);
-        } else if (tipoBusqueda === "documento") {
-            if (!documentoBuscar || documentoBuscar.trim() === "") {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Número de documento requerido",
-                    text: "Por favor ingrese un número válido.",
-                });
-                return;
-            }
-
-            const url = mostrarInactivos
-                ? `http://localhost:8080/empleados/buscar/inactivos/documento?numeroDocumento=${documentoBuscar}`
-                : `http://localhost:8080/empleados/buscar/activos/documento?numeroDocumento=${documentoBuscar}`;
-
-            realizarBusqueda(url);
-        } else if (tipoBusqueda === "estadoCivil") {
-            if (!estadoCivilBuscar) {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Estado civil requerido",
-                    text: "Por favor seleccione un estado civil.",
-                });
-                return;
-            }
-
-            const url = `http://localhost:8080/empleados/estado-civil?estadoCivil=${estadoCivilBuscar}`;
-
-        } else if (tipoBusqueda === "genero") {
-            if (!generoBuscar) {
-                Swal.fire({
-                    icon: "warning",
-                    title: "Género requerido",
-                    text: "Por favor seleccione un género.",
-                });
-                return;
-            }
-
-            const url = `http://localhost:8080/empleados/genero?genero=${generoBuscar}`;
-
-            fetch(url)
-                .then((response) => response.json())
-                .then((data) => {
-                    setResultadoBusqueda(data.content);
-                    setTotalPaginas(data.totalPages);
-                    setPaginaActual(data.number);
-                    setTotalElementos(data.totalElements);
-                    setTamanoPagina(data.size);
-
-                    Swal.fire({
-                        icon: "success",
-                        title: "Búsqueda completada",
-                        text: `Se encontraron ${data.totalElements} empleados con estado civil ${estadoCivilBuscar}`,
-                        timer: 2500,
-                        showConfirmButton: false,
-                    });
-                })
-                .catch((error) => {
-                    console.error("Error al buscar por estado civil:", error);
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error",
-                        text: "Ocurrió un error al buscar por estado civil",
-                    });
-                });
-        }
-    };*/
 
     const realizarBusqueda = (url) => {
         fetch(url)
@@ -370,6 +320,40 @@ export function Tabla({
             });
     };
 
+    const obtenerTitulo = () => {
+        if (tipoBusqueda === "sinContrato") return `PERSONAL SIN CONTRATO (total = ${totalElementos})`;
+        if (tipoBusqueda === "personalMayorDe50") {
+            if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO MAYOR DE 50 AÑOS (total = ${totalElementos})`;
+            if (mostrarOperativos) return `PERSONAL OPERATIVO MAYOR DE 50 AÑOS (total = ${totalElementos})`;
+            return `PERSONAL ACTIVO MAYOR DE 50 AÑOS (total = ${totalElementos})`;
+        }
+        if (tipoBusqueda === "estadoCivil") {
+            if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO CON ESTADO CIVIL: ${estadoCivilBuscar}(total = ${totalElementos})`;
+            if (mostrarOperativos) return `PERSONAL OPERATIVO CON ESTADO CIVIL: ${estadoCivilBuscar} (total = ${totalElementos})`;
+            return `PERSONAL ACTIVO CON ESTADO CIVIL: ${estadoCivilBuscar} (total = ${totalElementos})`;
+        }
+        if (tipoBusqueda === "genero") {
+            if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO GÉNERO: ${generoBuscar} (total = ${totalElementos})`;
+            if (mostrarOperativos) return `PERSONAL OPERATIVO GÉNERO: = ${generoBuscar} (total = ${totalElementos})`;
+            return `PERSONAL ACTIVO GÉNERO: ${generoBuscar} (total = ${totalElementos})`;
+        }
+        if (tipoBusqueda === "libretaMilitar") {
+            if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO CON LIBRETA MILITAR: ${libretaMilitarBuscar} (total = ${totalElementos})`;
+            if (mostrarOperativos) return `PERSONAL OPERATIVO CON LIBRETA MILITAR: ${libretaMilitarBuscar} (total = ${totalElementos})`;
+            return `PERSONAL ACTIVO CON LIBRETA MILITAR: ${libretaMilitarBuscar} (total = ${totalElementos})`;
+        }
+        if (tipoBusqueda === "cargo") {
+            if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO CON CARGO: ${cargoBuscar} (total = ${totalElementos})`;
+            if (mostrarOperativos) return `PERSONAL OPERATIVO CON CARGO: ${cargoBuscar} (total = ${totalElementos})`;
+            return `PERSONAL ACTIVO CON CARGO: ${cargoBuscar} (total = ${totalElementos})`;
+        }
+        if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO (total = ${totalElementos})`;
+        if (mostrarOperativos) return `PERSONAL  OPERATIVO (total = ${totalElementos})`;
+        if (mostrarSupervisores) return `SUPERVISORES (total = ${totalElementos})`;
+        if (mostrarInactivos) return `PERSONAL RETIRADO (total = ${totalElementos})`;
+        return `PERSONAL ACTIVO (total = ${totalElementos})`;
+    };
+
     return (
         <>
             <div className="mb-4">
@@ -383,33 +367,46 @@ export function Tabla({
                             onChange={(e) => setTipoBusqueda(e.target.value)}
                             value={tipoBusqueda}
                         >
-                            <option value="nombre">Por Nombre</option>
-                            <option value="documento">Por Documento</option>
-                            <option value="conContrato">Por Contrato</option>
-                            <option value="sinContrato">Sin Contrato</option>
-                            <option value="personalMayorDe50">Mayores de 50 años</option>
-                            <option value="estadoCivil">Estado Civil</option>
-                            <option value="genero">Género</option>
+                            <option value="nombre">POR NOMBRE</option>
+                            <option value="documento">N° DOCUMENTO</option>
+                            <option value="cargo">POR CARGO</option>
+                            <option value="personalMayorDe50">MAYORES DE 50 AÑOS</option>
+                            <option value="estadoCivil">ESTADO CIVIL</option>
+                            <option value="genero">GÉNERO</option>
+                            <option value="libretaMilitar">LIBRETA MILITAR</option>
+                            <option value="conContrato">CON CONTRATO</option>
+                            <option value="sinContrato">SIN CONTRATO</option>
                         </select>
                     </div>
 
                     {tipoBusqueda !== "sinContrato" &&
+                        tipoBusqueda !== "conContrato" &&
                         tipoBusqueda !== "estadoCivil" &&
                         tipoBusqueda !== "personalMayorDe50" &&
-                        tipoBusqueda !== "genero" && (
+                        tipoBusqueda !== "genero" &&
+                        tipoBusqueda !== "libretaMilitar" && (
                             <div className="col-md-5">
                                 <label className="form-label">
-                                    {tipoBusqueda === "nombre" ? "Nombre" : "Documento"}
+                                    {tipoBusqueda === "nombre" ? "Nombre" :
+                                        tipoBusqueda === "cargo" ? "Cargo" : "Documento"}
                                 </label>
                                 <input
-                                    type={tipoBusqueda === "nombre" ? "text" : "number"}
-                                    value={tipoBusqueda === "nombre" ? nombreBuscar : documentoBuscar}
-                                    onChange={(e) =>
-                                        tipoBusqueda === "nombre"
-                                            ? setNombreBuscar(e.target.value)
-                                            : setDocumentoBuscar(e.target.value)
+                                    type={tipoBusqueda === "documento" ? "number" : "text"}
+                                    value={tipoBusqueda === "nombre" ? nombreBuscar :
+                                        tipoBusqueda === "cargo" ? cargoBuscar : documentoBuscar}
+                                    onChange={(e) => {
+                                        if (tipoBusqueda === "nombre") {
+                                            setNombreBuscar(e.target.value);
+                                        } else if (tipoBusqueda === "cargo") {
+                                            setCargoBuscar(e.target.value);
+                                        } else {
+                                            setDocumentoBuscar(e.target.value);
+                                        }
+                                    }}
+                                    placeholder={
+                                        tipoBusqueda === "nombre" ? "Ingrese el nombre" :
+                                            tipoBusqueda === "cargo" ? "Ingrese cargo" : "Ingrese el número de documento"
                                     }
-                                    placeholder={`Ingrese ${tipoBusqueda}`}
                                     className="form-control"
                                 />
                             </div>
@@ -449,11 +446,32 @@ export function Tabla({
                         </div>
                     )}
 
+                    {tipoBusqueda === "libretaMilitar" && (
+                        <div className="col-md-5">
+                            <label className="form-label">LIBRETA MILITAR</label>
+                            <select
+                                className="form-select"
+                                value={libretaMilitarBuscar}
+                                onChange={(e) => setLibretaMilitarBuscar(e.target.value)}
+                            >
+                                <option value="">SELECCIONE</option>
+                                <option value="PRIMERA">PRIMERA CLASE</option>
+                                <option value="SEGUNDA">SEGUNDA CLASE</option>
+                                <option value="NO_TIENE">NO TIENE</option>
+
+                            </select>
+                        </div>
+                    )}
+
+
                     <div className="col-md-4">
                         {tipoBusqueda !== "sinContrato"
                             && tipoBusqueda !== "estadoCivil"
+                            && tipoBusqueda !== "conContrato"
                             && tipoBusqueda !== "personalMayorDe50"
                             && tipoBusqueda !== "genero"
+                            && tipoBusqueda !== "libretaMilitar"
+                            && tipoBusqueda !== "cargo"
                             && (
                                 <button
                                     onClick={manejarBusqueda}
@@ -463,60 +481,59 @@ export function Tabla({
                                 </button>
                             )}
 
-                        {tipoBusqueda !== "sinContrato" && resultadoBusqueda && tipoBusqueda !== "personalMayorDe50" && (
-                            <button
-                                onClick={() => {
-                                    setResultadoBusqueda([]);
-                                    setDocumentoBuscar("");
-                                    setNombreBuscar("");
-                                    setEstadoCivilBuscar("");
-                                    setGeneroBuscar("");
-                                    cargarEmpleados();
-                                    setMostrarTablaContratos(false);
-                                }}
-                                className="btn btn-secondary"
-                            >
-                                Limpiar
-                            </button>
-                        )}
+                        {tipoBusqueda !== "sinContrato"
+                            && tipoBusqueda !== "conContrato"
+                            && resultadoBusqueda
+                            && tipoBusqueda !== "personalMayorDe50" && (
+                                <button
+                                    onClick={() => {
+                                        obtenerTitulo("");
+                                        setPaginaActual(0);
+                                        setResultadoBusqueda([]);
+                                        setDocumentoBuscar("");
+                                        setNombreBuscar("");
+                                        setCargoBuscar("");
+                                        setEstadoCivilBuscar("");
+                                        setGeneroBuscar("");
+                                        setLibretaMilitarBuscar("");
+                                        cargarEmpleados();
+                                        setMostrarTablaContratos(false);
+                                    }}
+                                    className="btn btn-secondary"
+                                >
+                                    Limpiar
+                                </button>
+                            )}
                     </div>
                 </div>
             </div>
-            <h4 className="alinearTexto">
-                {tipoBusqueda === "sinContrato"
-                    ? "Listado de Empleados Sin Contrato"
-                    : tipoBusqueda === "personalMayorDe50"
-                        ? "Personal Mayor de 50 Años"
-                        : tipoBusqueda === "estadoCivil"
-                            ? `Empleados con estado civil: ${estadoCivilBuscar}`
-                            : tipoBusqueda === "genero"
-                                ? `Personal por género: ${generoBuscar}`
-                                : mostrarAdministrativos
-                                    ? "Listado de Empleados ADMINISTRATIVOS"
-                                    : mostrarOperativos
-                                        ? "Listado de Personal OPERATIVO"
-                                        : mostrarSupervisores
-                                            ? "Listado de SUPERVISORES"
-                                            : mostrarInactivos
-                                                ? "Listado de Empleados Retirados"
-                                                : "Listado de Empleados Activos"}
-            </h4>
 
-            {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
-                <Paginacion
-                    paginaActual={paginaActual}
-                    totalPaginas={totalPaginas}
-                    onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
-                />
+            {tipoBusqueda !== "conContrato" && (
+                <>
+                    <h4 className="alinearTexto">
+                        {obtenerTitulo()}
+                    </h4>
+
+                    {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
+                        <Paginacion
+                            paginaActual={paginaActual}
+                            totalPaginas={totalPaginas}
+                            onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
+                        />
+                    )}
+
+
+                    {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
+                        <div className="mt-2 text-center">
+                            <small>
+                                Mostrando página {paginaActual + 1} de {totalPaginas} —{" "}
+                                {tamanoPagina} por página, total de registros: {totalElementos}
+                            </small>
+                        </div>
+                    )}
+                </>
             )}
-            {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
-                <div className="mt-2 text-center">
-                    <small>
-                        Mostrando página {paginaActual + 1} de {totalPaginas} —{" "}
-                        {tamanoPagina} por página, total de registros: {totalElementos}
-                    </small>
-                </div>
-            )}
+
             {tipoBusqueda === "conContrato" && (
                 <div className="mt-4">
                     <TablaContrato />
@@ -569,6 +586,16 @@ export function Tabla({
                                                 >
                                                     <i className="bi bi-pencil-fill"></i>
                                                 </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setEmpleadoParaHistorial(emp.id);
+                                                        setMostrarTablaContratos(true);  // activamos la tabla
+                                                    }}
+                                                    className="btn btn-sm btn-outline-secondary"
+                                                    title="Ver contratos"
+                                                >
+                                                    <i className="bi bi-eye-fill"></i>
+                                                </button>
                                                 {!mostrarInactivos && (
                                                     <button
                                                         onClick={() => {
@@ -592,22 +619,13 @@ export function Tabla({
                                                                 }
                                                             });
                                                         }}
-                                                        className="btn btn-sm btn-outline-danger me-2"
+                                                        className="btn btn-sm btn-outline-danger"
                                                         title="Desactivar"
                                                     >
                                                         <i className="bi bi-trash-fill"></i>
                                                     </button>
                                                 )}
-                                                <button
-                                                    onClick={() => {
-                                                        setEmpleadoParaHistorial(emp.id);
-                                                        setMostrarTablaContratos(true);  // activamos la tabla
-                                                    }}
-                                                    className="btn btn-sm btn-outline-secondary"
-                                                    title="Ver contratos"
-                                                >
-                                                    <i className="bi bi-eye-fill"></i>
-                                                </button>
+                                                
                                             </div>
 
                                         </td>
@@ -685,25 +703,28 @@ export function Tabla({
                             )}
                         </tbody>
                     </table>
-
+                </>
+            )}
+            {tipoBusqueda !== "conContrato" && (
+                <>
+                    {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
+                        <Paginacion
+                            paginaActual={paginaActual}
+                            totalPaginas={totalPaginas}
+                            onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
+                        />
+                    )}
+                    {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
+                        <div className="mt-2 text-center">
+                            <small>
+                                Mostrando página {paginaActual + 1} de {totalPaginas} —{" "}
+                                {tamanoPagina} por página, total de registros: {totalElementos}
+                            </small>
+                        </div>
+                    )}
                 </>
             )}
 
-            {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
-                <Paginacion
-                    paginaActual={paginaActual}
-                    totalPaginas={totalPaginas}
-                    onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
-                />
-            )}
-            {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
-                <div className="mt-2 text-center">
-                    <small>
-                        Mostrando página {paginaActual + 1} de {totalPaginas} —{" "}
-                        {tamanoPagina} por página, total de registros: {totalElementos}
-                    </small>
-                </div>
-            )}
             {mostrarTablaContratos && empleadoParaHistorial && (
                 <TablaContratosPorEmpleado empleadoId={empleadoParaHistorial}
                     actualizar={contadorActualizacion}

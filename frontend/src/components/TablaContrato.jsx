@@ -40,13 +40,19 @@ export function TablaContrato() {
     }
     return (
         <div>
-            <h4 className="mb-3">Listado de Empleados con Contrato</h4>
+            <h4 className="mb-3 alinearTexto">LISTADO DE PERSONAL CON CONTRATO</h4>
 
             <Paginacion
                 paginaActual={paginaActual}
                 totalPaginas={totalPaginas}
                 onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
             />
+            <div className="mt-2 text-center">
+                <small>
+                    Mostrando página {paginaActual + 1} de {totalPaginas} — {tamanoPagina} por página,
+                    total de registros: {totalElementos}
+                </small>
+            </div>
 
             <table className="table table-bordered table-hover table-striped">
                 <thead className="table-primary">
@@ -76,7 +82,6 @@ export function TablaContrato() {
                 totalPaginas={totalPaginas}
                 onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
             />
-
             <div className="mt-2 text-center">
                 <small>
                     Mostrando página {paginaActual + 1} de {totalPaginas} — {tamanoPagina} por página,

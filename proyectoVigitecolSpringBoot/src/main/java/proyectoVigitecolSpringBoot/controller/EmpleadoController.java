@@ -93,8 +93,12 @@ public class EmpleadoController {
     }
     @GetMapping("/activos/mayores-de-50")
     public ResponseEntity<Page<DatosListadoEmpleado>> listadoEmpleadosActivosMayoresDe50(
+            @RequestParam(required = false) TipoEmpleado tipoEmpleado, // Nuevo parámetro
             @PageableDefault(size = 10, sort = "empleado.edad") Pageable paginacion) {
-        return empleadoService.listarEmpleadosActivosMayoresDe50(paginacion);
+
+        Page<DatosListadoEmpleado> empleados = empleadoService
+                .listarEmpleadosActivosMayoresDe50(tipoEmpleado, paginacion);
+        return ResponseEntity.ok(empleados);
     }
     @GetMapping("/estado-civil")
     public ResponseEntity<Page<DatosListadoEmpleado>> listadoEmpleadosActivosPorEstadoCivil(
@@ -115,6 +119,28 @@ public class EmpleadoController {
 
         Page<DatosListadoEmpleado> empleados = empleadoService
                 .listarEmpleadosActivosPorGenero(genero, tipoEmpleado, pageable);
+        return ResponseEntity.ok(empleados);
+    }
+
+    @GetMapping("/libreta-militar")
+    public ResponseEntity<Page<DatosListadoEmpleado>> listadoEmpleadosActivosPorLibretaMilitar(
+            @RequestParam LibretaMilitar libretaMilitar,
+            @RequestParam(required = false) TipoEmpleado tipoEmpleado, // Nuevo parámetro
+            @PageableDefault(size = 10, sort = "empleado.apellidos") Pageable pageable) {
+
+        Page<DatosListadoEmpleado> empleados = empleadoService
+                .listarEmpleadosActivosPorLibretaMilitar(libretaMilitar, tipoEmpleado, pageable);
+        return ResponseEntity.ok(empleados);
+    }
+
+    @GetMapping("/por-cargo")
+    public ResponseEntity<Page<DatosListadoEmpleado>> listadoEmpleadosActivosPorCargo(
+            @RequestParam String cargo,
+            @RequestParam(required = false) TipoEmpleado tipoEmpleado, // Nuevo parámetro
+            @PageableDefault(size = 10, sort = "empleado.apellidos") Pageable pageable) {
+
+        Page<DatosListadoEmpleado> empleados = empleadoService
+                .listarEmpleadosActivosPorCargo(cargo, tipoEmpleado, pageable);
         return ResponseEntity.ok(empleados);
     }
 

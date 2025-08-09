@@ -378,10 +378,12 @@ public class EmpleadoService {
         return ResponseEntity.ok(respuesta);
     }
 
-    public ResponseEntity<Page<DatosListadoEmpleado>> listarEmpleadosActivosMayoresDe50(Pageable pageable) {
-        Page<Empleado> empleados = contratoRepository.findEmpleadosConContratoActivoMayoresDe50(pageable);
-        Page<DatosListadoEmpleado> respuesta = empleados.map(DatosListadoEmpleado::new);
-        return ResponseEntity.ok(respuesta);
+    public Page<DatosListadoEmpleado> listarEmpleadosActivosMayoresDe50(
+            TipoEmpleado tipoEmpleado,
+            Pageable pageable) {
+        Page<Empleado> empleados = contratoRepository
+                .findEmpleadosConContratoActivoMayoresDe50(tipoEmpleado, pageable);
+        return empleados.map(DatosListadoEmpleado::new);
     }
 
     public Page<DatosListadoEmpleado> listarEmpleadosActivosPorEstadoCivil(
@@ -401,6 +403,32 @@ public class EmpleadoService {
 
         Page<Empleado> empleados = contratoRepository
                 .findEmpleadosPorGeneroConContratoActivo(genero, tipoEmpleado, pageable);
+        return empleados.map(DatosListadoEmpleado::new);
+    }
+
+    public Page<DatosListadoEmpleado> listarEmpleadosActivosPorLibretaMilitar(
+            LibretaMilitar libretaMilitar,
+            TipoEmpleado tipoEmpleado,
+            Pageable pageable) {
+
+        Page<Empleado> empleados = contratoRepository
+                .findEmpleadosPorLibretaMilitarConContratoActivo(libretaMilitar, tipoEmpleado, pageable);
+        return empleados.map(DatosListadoEmpleado::new);
+    }
+
+    public Page<DatosListadoEmpleado> listarEmpleadosActivosPorCargo(
+            String cargo,
+            TipoEmpleado tipoEmpleado,
+            Pageable pageable) {
+
+        // Normaliza el cargo: elimina espacios extras y convierte a minúsculas
+        String cargoBusqueda = cargo.trim()
+                .replaceAll("\\s+", " ") // Reemplaza múltiples espacios por uno
+                .toLowerCase();
+
+        Page<Empleado> empleados = contratoRepository
+                .findEmpleadosPorCargoConContratoActivo(cargoBusqueda, tipoEmpleado, pageable);
+
         return empleados.map(DatosListadoEmpleado::new);
     }
 
