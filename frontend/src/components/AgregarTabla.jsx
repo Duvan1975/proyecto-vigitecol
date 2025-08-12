@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-export async function AgregarTabla(contrato, empleado, limpiarFormulario) {
+export async function AgregarTabla(contrato, familiares, empleado, limpiarFormulario) {
 
     try {
         const responseEmpleado = await fetch("http://localhost:8080/empleados", {
@@ -33,6 +33,30 @@ export async function AgregarTabla(contrato, empleado, limpiarFormulario) {
         const empleadoData = await responseEmpleado.json();
         const empleadoId = empleadoData.id || empleadoData.Id;
 
+        // 2. Enviar todos los familiares juntos
+        const familiaresLimpios = familiares.filter(f =>
+            f.tipoFamiliar && f.nombreFamiliar && f.edadFamiliar)
+            .map((f) => ({
+                tipoFamiliar: f.tipoFamiliar,
+                nombreFamiliar: f.nombreFamiliar,
+                edadFamiliar: parseInt(f.edadFamiliar) || 0
+            }));
+
+        if (familiaresLimpios.length > 0) {
+            const responseFamiliares = await fetch(`http://localhost:8080/familiares/${empleadoId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(familiaresLimpios)
+            });
+
+            if (!responseFamiliares.ok) {
+                const errorData = await responseFamiliares.json();
+                throw new Error(errorData.message || "Error al registrar familiares");
+            }
+        }
+
         const responseContratos = await fetch(`http://localhost:8080/contratos/${empleadoId}`, {
 
             method: "POST",
@@ -50,7 +74,7 @@ export async function AgregarTabla(contrato, empleado, limpiarFormulario) {
         Swal.fire({
             icon: "success",
             title: "Registro exitoso",
-            text: "Empleado y contratos registrados correctamente.",
+            text: "Empleado registrado correctamente.",
         }).then(() => {
             if (typeof limpiarFormulario === "function") {
                 limpiarFormulario();

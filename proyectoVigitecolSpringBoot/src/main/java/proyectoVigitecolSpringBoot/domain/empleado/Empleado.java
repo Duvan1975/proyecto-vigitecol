@@ -3,6 +3,7 @@ package proyectoVigitecolSpringBoot.domain.empleado;
 import jakarta.persistence.*;
 import lombok.*;
 import proyectoVigitecolSpringBoot.domain.contrato.Contrato;
+import proyectoVigitecolSpringBoot.domain.familia.Familiar;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -53,6 +54,9 @@ public class Empleado {
 
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Contrato> contratos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Familiar> familiares = new ArrayList<>();
 
     //Constructor para registrar empleado
     public Empleado(DatosRegistroEmpleado datos) {
@@ -223,6 +227,18 @@ public class Empleado {
         this.contratos = contratos;
     }
 
+    public List<Familiar> getFamiliares() {
+        return familiares;
+    }
+
+    public void setFamiliares(List<Familiar> familiares) {
+        this.familiares = familiares;
+    }
+
     public void actualizarDatos(DatosActualizarEmpleado datos) {
     }
+
+    /*public Long getEmpleadoId() {
+        return id;
+    }*/
 }

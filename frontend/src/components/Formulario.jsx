@@ -23,6 +23,31 @@ export function Formulario() {
         cargo: ""
     });
 
+    const [familiares, setFamiliares] = useState([]);
+    const [familiarActual, setFamiliarActual] = useState({
+        tipoFamiliar: "",
+        nombreFamiliar: "",
+        edadFamiliar: ""
+    });
+
+
+    // Agregar familiar a la lista y limpiar campos
+    const agregarFamiliar = () => {
+        if (
+            familiarActual.tipoFamiliar &&
+            familiarActual.nombreFamiliar &&
+            familiarActual.edadFamiliar
+        ) {
+            setFamiliares([...familiares, { ...familiarActual }]);
+            setFamiliarActual({
+                tipoFamiliar: "",
+                nombreFamiliar: "",
+                edadFamiliar: ""
+            });
+        }
+    };
+
+
     const [contrato, setContrato] = useState({
         fechaIngreso: ""
     });
@@ -47,12 +72,24 @@ export function Formulario() {
         setContrato({
             fechaIngreso: "",
         });
-    }
+        setFamiliarActual({
+            tipoFamiliar: "",
+            nombreFamiliar: "",
+            edadFamiliar: ""
+        });
+
+        setFamiliares([]);
+    };
+    const eliminarFamiliarTabla = (index) => {
+        const nuevosFamiliares = [...familiares];
+        nuevosFamiliares.splice(index, 1);
+        setFamiliares(nuevosFamiliares);
+    };
 
     return (
         <div>
             <h3 className='alinearTexto'>Formulario de Registro de Empleados</h3>
-            <div className='row'>
+            <div className='row align-items-center g-2'>
                 <CuadrosTexto
                     tamanoinput="col-md-4"
                     titulolabel="Nombres:"
@@ -89,9 +126,9 @@ export function Formulario() {
                 />
             </div>
 
-            <div className='row'>
+            <div className='row align-items-center g-2'>
                 <CuadrosTexto
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Número Documento:"
                     tipoinput="number"
                     nombreinput="numeroDocumento"
@@ -101,7 +138,7 @@ export function Formulario() {
                     onChange={(e) => setEmpleado({ ...empleado, numeroDocumento: e.target.value })}
                 />
                 <CuadrosTexto
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Fecha de Nacimiento:"
                     tipoinput="date"
                     nombreinput="fechaNacimiento"
@@ -111,7 +148,7 @@ export function Formulario() {
                     onChange={(e) => setEmpleado({ ...empleado, fechaNacimiento: e.target.value })}
                 />
                 <CuadrosTexto
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Lugar de Nacimiento:"
                     tipoinput="text"
                     nombreinput="lugarNacimiento"
@@ -120,12 +157,9 @@ export function Formulario() {
                     value={empleado.lugarNacimiento}
                     onChange={(e) => setEmpleado({ ...empleado, lugarNacimiento: e.target.value })}
                 />
-            </div>
-
-            <div className='row'>
                 <CuadrosTexto
-                    tamanoinput="col-md-4"
-                    titulolabel="Ciudad de expedición del documento:"
+                    tamanoinput="col-md-3"
+                    titulolabel="Ciudad de expedición:"
                     tipoinput="text"
                     nombreinput="ciudadExpedicion"
                     idinput="ciudadExpedicion"
@@ -133,8 +167,11 @@ export function Formulario() {
                     value={empleado.ciudadExpedicion}
                     onChange={(e) => setEmpleado({ ...empleado, ciudadExpedicion: e.target.value })}
                 />
+            </div>
+
+            <div className='row align-items-center g-2'>
                 <CuadrosSelect
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Libreta Militar:"
                     nombreinput="libretaMilitar"
                     idinput="libretaMilitar"
@@ -147,7 +184,7 @@ export function Formulario() {
                     ]}
                 />
                 <CuadrosSelect
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Estado Civil:"
                     nombreinput="estadoCivil"
                     idinput="estadoCivil"
@@ -161,11 +198,8 @@ export function Formulario() {
                         { valor: "UNION_LIBRE", texto: "UNIÓN LIBRE" },
                     ]}
                 />
-            </div>
-
-            <div className='row'>
                 <CuadrosSelect
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="GÉNERO:"
                     nombreinput="genero"
                     idinput="genero"
@@ -176,11 +210,12 @@ export function Formulario() {
                         { valor: "FEMENINO", texto: "FEMENINO" },
                     ]}
                 />
+
             </div>
 
-            <h3 className='alinearTexto'>Datos de Contacto</h3>
+            <h4 className='alinearTexto'>Datos de Contacto</h4>
 
-            <div className='row'>
+            <div className='row align-items-center g-2'>
                 <CuadrosTexto
                     tamanoinput="col-md-4"
                     titulolabel="Dirección:"
@@ -213,9 +248,92 @@ export function Formulario() {
                 />
             </div>
             <br></br>
-            <h3 className='alinearTexto'>Asignar Cargo</h3>
+            <h4 className='alinearTexto'>Hijos Hijastros</h4>
 
-            <div className='row'>
+            <div className='row align-items-center g-2'>
+                <CuadrosSelect
+                    tamanoinput="col-md-4"
+                    titulolabel="Tipo de Familiar:"
+                    nombreinput="tipoFamiliar"
+                    idinput="tipoFamiliar"
+                    value={familiarActual.tipoFamiliar}
+                    onChange={(e) =>
+                        setFamiliarActual({ ...familiarActual, tipoFamiliar: e.target.value })
+                    }
+                    opciones={[
+                        { valor: "HIJOS", texto: "HIJOS" },
+                        { valor: "HIJASTROS", texto: "HIJASTROS" }
+                    ]}
+                />
+                <CuadrosTexto
+                    tamanoinput="col-md-4"
+                    titulolabel="Nombres y Apellidos:"
+                    tipoinput="text"
+                    nombreinput="nombreFamiliar"
+                    idinput="nombreFamiliar"
+                    placeholderinput="Ingresa el nombre del familiar"
+                    value={familiarActual.nombreFamiliar}
+                    onChange={(e) =>
+                        setFamiliarActual({ ...familiarActual, nombreFamiliar: e.target.value })
+                    }
+                />
+                <CuadrosTexto
+                    tamanoinput="col-md-4"
+                    titulolabel="Edad (años):"
+                    tipoinput="number"
+                    nombreinput="edadFamiliar"
+                    idinput="edadFamiliar"
+                    placeholderinput="Edad Familiar"
+                    value={familiarActual.edadFamiliar}
+                    onChange={(e) =>
+                        setFamiliarActual({ ...familiarActual, edadFamiliar: e.target.value })
+                    }
+                />
+            </div>
+
+            <br />
+            <button type="button"
+                className="btn btn-secondary mb-4"
+                onClick={agregarFamiliar}
+            >
+                Agregar HIJO/HIJASTRO
+            </button>
+            <br />
+            {familiares.length > 0 && (
+                <div>
+                    <h4>Familiares Registrados:</h4>
+                    <table className="table table-bordered border-black">
+                        <thead className="table-primary border-black">
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Nombre</th>
+                                <th>Edad</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {familiares.map((f, idx) => (
+                                <tr key={idx}>
+                                    <td>{f.tipoFamiliar}</td>
+                                    <td>{f.nombreFamiliar}</td>
+                                    <td>{f.edadFamiliar}</td>
+                                    <td><button
+                                        className="btn btn-outline-danger btn-sm"
+                                        onClick={() => eliminarFamiliarTabla(idx)}
+                                        title="Eliminar"
+                                    >
+                                        <i className="bi bi-trash"></i>
+                                    </button></td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
+            <h4 className='alinearTexto'>Asignar Cargo</h4>
+
+            <div className='row align-items-center g-2'>
                 <CuadrosSelect
                     tamanoinput="col-md-4"
                     titulolabel="Tipo de Empleado:"
@@ -247,13 +365,13 @@ export function Formulario() {
                     value={contrato.fechaIngreso}
                     onChange={(e) => setContrato({ ...contrato, fechaIngreso: e.target.value })}
                 />
-
             </div>
 
             <br />
             <div className='col-md-auto'>
                 <button
-                    onClick={() => AgregarTabla(contrato, empleado, limpiarFormulario)}
+                    onClick={() => AgregarTabla(
+                        contrato, familiares, empleado, limpiarFormulario)}
                     className="botonregistrar btn btn-success"
                 >
                     Registrar

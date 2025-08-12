@@ -143,5 +143,14 @@ public class EmpleadoController {
                 .listarEmpleadosActivosPorCargo(cargo, tipoEmpleado, pageable);
         return ResponseEntity.ok(empleados);
     }
+    @GetMapping("/con-familiares")
+    public ResponseEntity<Page<DatosEmpleadoConFamiliares>> empleadosConFamiliares(
+            @PageableDefault(size = 10, sort = "apellidos") Pageable pageable) {
+
+        Page<DatosEmpleadoConFamiliares> resultado = empleadoService
+                .findConFamiliares(pageable);
+
+        return ResponseEntity.ok(resultado);
+    }
 
 }

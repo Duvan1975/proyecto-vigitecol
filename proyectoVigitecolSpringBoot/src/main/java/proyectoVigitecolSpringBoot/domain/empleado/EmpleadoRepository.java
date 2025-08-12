@@ -25,4 +25,15 @@ public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
                 ORDER BY e.apellidos ASC
             """)
     Page<Empleado> findEmpleadosSinContrato(Pageable pageable);
+
+    @Query("""
+        SELECT e FROM Empleado e
+        JOIN Contrato c ON c.empleado = e AND c.numeroContrato = (
+            SELECT MAX(c2.numeroContrato) 
+            FROM Contrato c2 
+            WHERE c2.empleado = e
+        ) AND c.continua = true
+        WHERE SIZE(e.familiares) > 0
+    """)
+    Page<Empleado> findEmpleadosConFamiliares(Pageable pageable);
 }
