@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface FamiliarRepository extends JpaRepository<Familiar, Long> {
-    List<Familiar> findByEmpleadoId(Long id);
+
 
     @Query("""
             SELECT f FROM Familiar f

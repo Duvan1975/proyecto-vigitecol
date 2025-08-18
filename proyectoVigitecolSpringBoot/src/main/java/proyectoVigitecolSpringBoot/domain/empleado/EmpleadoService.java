@@ -22,8 +22,14 @@ import java.util.regex.Pattern;
 @Service
 public class EmpleadoService {
 
-    @Autowired
-    EmpleadoRepository empleadoRepository;
+    /*@Autowired
+    EmpleadoRepository empleadoRepository;*/
+
+    private final EmpleadoRepository empleadoRepository;
+
+    public EmpleadoService(EmpleadoRepository empleadoRepository) {
+        this.empleadoRepository = empleadoRepository;
+    }
 
     @Autowired
     ContratoRepository contratoRepository;
@@ -430,9 +436,41 @@ public class EmpleadoService {
 
         return empleados.map(DatosListadoEmpleado::new);
     }
-    public Page<DatosEmpleadoConFamiliares> findConFamiliares(Pageable pageable) {
-        return empleadoRepository.findEmpleadosConFamiliares(pageable)
-                .map(DatosEmpleadoConFamiliares::new);
+
+    public Page<DatosEmpleadoConFamiliaresMenoresDe12> findConFamiliares(
+            TipoEmpleado tipoEmpleado,
+            Pageable pageable) {
+        return empleadoRepository.findEmpleadosConFamiliares(tipoEmpleado, pageable)
+                .map(DatosEmpleadoConFamiliaresMenoresDe12::new);
+    }
+
+    public Page<DatosEmpleadoConFamiliaresMenoresDe12> listarFamiliaresMenoresDe12(
+            TipoEmpleado tipoEmpleado,
+            Pageable pageable) {
+        return empleadoRepository.findEmpleadosConFamiliaresMenoresDe12(tipoEmpleado, pageable)
+                .map(DatosEmpleadoConFamiliaresMenoresDe12::new);
+    }
+
+    public Page<DatosEmpleadoConFamiliares> obtenerEmpleadosConTodosFamiliares(
+            TipoEmpleado tipoEmpleado,
+            Pageable pageable) {
+
+        Page<Empleado> empleados = empleadoRepository.findConTodosLosFamiliares(
+                tipoEmpleado,
+                pageable
+        );
+
+        return empleados.map(DatosEmpleadoConFamiliares::new);
+    }
+
+    public Page<DatosEmpleadoConFamiliares> listarEmpleadosConFamiliaresPorGenero(
+            Genero genero,
+            TipoEmpleado tipoEmpleado,
+            Pageable pageable) {
+
+        Page<Empleado> empleados = contratoRepository
+                .findEmpleadosConFamiliaresPorGenero(genero, tipoEmpleado, pageable);
+        return empleados.map(DatosEmpleadoConFamiliares::new);
     }
 
 }

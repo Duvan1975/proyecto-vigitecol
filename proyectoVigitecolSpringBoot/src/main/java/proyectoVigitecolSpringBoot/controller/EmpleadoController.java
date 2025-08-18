@@ -3,6 +3,7 @@ package proyectoVigitecolSpringBoot.controller;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -143,12 +144,47 @@ public class EmpleadoController {
                 .listarEmpleadosActivosPorCargo(cargo, tipoEmpleado, pageable);
         return ResponseEntity.ok(empleados);
     }
+
     @GetMapping("/con-familiares")
-    public ResponseEntity<Page<DatosEmpleadoConFamiliares>> empleadosConFamiliares(
+    public ResponseEntity<Page<DatosEmpleadoConFamiliaresMenoresDe12>> empleadosConFamiliares(
+            @RequestParam(required = false) TipoEmpleado tipoEmpleado, // Nuevo parámetro
             @PageableDefault(size = 10, sort = "apellidos") Pageable pageable) {
 
+        Page<DatosEmpleadoConFamiliaresMenoresDe12> resultado = empleadoService
+                .findConFamiliares(tipoEmpleado, pageable);
+
+        return ResponseEntity.ok(resultado);
+    }
+    @GetMapping("/con-familiares-menores")
+    public ResponseEntity<Page<DatosEmpleadoConFamiliaresMenoresDe12>> listadoFamiliaresMenoresDe12(
+            @RequestParam(required = false) TipoEmpleado tipoEmpleado, // Nuevo parámetro
+            @PageableDefault(size = 10, sort = "apellidos") Pageable pageable) {
+
+        Page<DatosEmpleadoConFamiliaresMenoresDe12> resultado = empleadoService
+                .listarFamiliaresMenoresDe12(tipoEmpleado, pageable);
+
+        return ResponseEntity.ok(resultado);
+    }
+
+    @GetMapping("/conTodosLosFamiliares")
+    public ResponseEntity<Page<DatosEmpleadoConFamiliares>> empleadosConTodosLosFamiliares(
+            @RequestParam(required = false) TipoEmpleado tipoEmpleado,
+            @PageableDefault(size = 10, sort = {"genero"}, direction = Sort.Direction.ASC) Pageable paginacion) {
+
         Page<DatosEmpleadoConFamiliares> resultado = empleadoService
-                .findConFamiliares(pageable);
+                .obtenerEmpleadosConTodosFamiliares(tipoEmpleado, paginacion);
+
+        return ResponseEntity.ok(resultado);
+    }
+
+    @GetMapping("/conFamiliares/genero")
+    public ResponseEntity<Page<DatosEmpleadoConFamiliares>> listadoEmpleadosConFamiliaresPorGenero(
+            @RequestParam(required = false) Genero genero,
+            @RequestParam(required = false) TipoEmpleado tipoEmpleado,
+            @PageableDefault(size = 10, sort = "empleado.apellidos") Pageable pageable) {
+
+        Page<DatosEmpleadoConFamiliares> resultado = empleadoService
+                .listarEmpleadosConFamiliaresPorGenero(genero, tipoEmpleado, pageable);
 
         return ResponseEntity.ok(resultado);
     }

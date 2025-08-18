@@ -69,4 +69,15 @@ public class Familiar {
     public void setEmpleado(Empleado empleado) {
         this.empleado = empleado;
     }
+
+    public void actualizarDatos(DatosActualizarFamiliar datos){
+        if (datos.tipoFamiliar() != null){
+            this.tipoFamiliar = datos.tipoFamiliar();
+        }
+        if (datos.nombreFamiliar() != null && !datos.nombreFamiliar().isBlank()) {
+            this.nombreFamiliar = datos.nombreFamiliar();
+        }
+        if (datos.edadFamiliar() >= 0)
+            this.edadFamiliar = datos.edadFamiliar();
+    }
 }

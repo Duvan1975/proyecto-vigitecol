@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
     boolean existsByCorreo(@Email(
@@ -33,7 +34,40 @@ public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
             FROM Contrato c2 
             WHERE c2.empleado = e
         ) AND c.continua = true
+          AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
         WHERE SIZE(e.familiares) > 0
     """)
-    Page<Empleado> findEmpleadosConFamiliares(Pageable pageable);
+    Page<Empleado> findEmpleadosConFamiliares(
+            @Param("tipoEmpleado") TipoEmpleado tipoEmpleado,
+            Pageable pageable);
+
+    @Query("""
+                SELECT DISTINCT e FROM Empleado e
+                JOIN e.familiares f
+                JOIN Contrato c ON c.empleado = e AND c.numeroContrato = (
+                    SELECT MAX(c2.numeroContrato) 
+                    FROM Contrato c2 
+                    WHERE c2.empleado = e
+                ) AND c.continua = true
+                  AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
+                WHERE f.edadFamiliar <= 12
+            """)
+    Page<Empleado> findEmpleadosConFamiliaresMenoresDe12(
+            @Param("tipoEmpleado") TipoEmpleado tipoEmpleado,
+            Pageable pageable);
+
+    @Query("""
+                SELECT e FROM Empleado e
+                JOIN FETCH e.familiares f
+                JOIN Contrato c ON c.empleado = e AND c.numeroContrato = (
+                    SELECT MAX(c2.numeroContrato) 
+                    FROM Contrato c2 
+                    WHERE c2.empleado = e
+                ) AND c.continua = true
+                WHERE (:tipoEmpleado IS NULL OR e.tipoEmpleado = :tipoEmpleado)
+                AND SIZE(e.familiares) > 0
+            """)
+    Page<Empleado> findConTodosLosFamiliares(
+            @Param("tipoEmpleado") TipoEmpleado tipoEmpleado,
+            Pageable pageable);
 }

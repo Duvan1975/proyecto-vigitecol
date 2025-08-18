@@ -2,7 +2,7 @@ package proyectoVigitecolSpringBoot.domain.empleado;
 
 import java.util.List;
 
-public record DatosEmpleadoConFamiliares(
+public record DatosEmpleadoConFamiliaresMenoresDe12(
         Long id,
         String nombres,
         String apellidos,
@@ -16,7 +16,7 @@ public record DatosEmpleadoConFamiliares(
         int numeroDeFamiliares,
         List<DatosFamiliarDTO> familiares
 ) {
-    public DatosEmpleadoConFamiliares(Empleado empleado) {
+    public DatosEmpleadoConFamiliaresMenoresDe12(Empleado empleado) {
         this(
                 empleado.getId(),
                 empleado.getNombres(),
@@ -28,8 +28,11 @@ public record DatosEmpleadoConFamiliares(
                 empleado.getTelefono(),
                 empleado.getCorreo(),
                 empleado.getCargo(),
-                empleado.getFamiliares().size(), //Cuenta número de hijos/hijastros
+                (int) empleado.getFamiliares().stream()
+                        .filter(f -> f.getEdadFamiliar() <= 12)
+                        .count(),
                 empleado.getFamiliares().stream()
+                        .filter(f -> f.getEdadFamiliar() <= 12)
                         .map(DatosFamiliarDTO::new)
                         .toList()
         );

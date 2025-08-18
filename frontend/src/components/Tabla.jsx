@@ -4,6 +4,7 @@ import { TablaContrato } from "./TablaContrato";
 import { TablaContratosPorEmpleado } from "./TablaContratosPorEmpleado";
 import Swal from "sweetalert2";
 import Paginacion from "./Paginacion";
+import { TablaFamiliar } from "./TablaFamiliar";
 
 export function Tabla({
     mostrarInactivos = false,
@@ -42,6 +43,7 @@ export function Tabla({
     //Estados de búsqueda
     const [estadoCivilBuscar, setEstadoCivilBuscar] = useState("");
     const [generoBuscar, setGeneroBuscar] = useState("");
+    const [generoBuscarFamiliares, setGeneroBuscarFamiliares] = useState("");
     const [libretaMilitarBuscar, setLibretaMilitarBuscar] = useState("");
     const [cargoBuscar, setCargoBuscar] = useState("");
     //const [mayoresDe50, setMayoresDe50Buscar] = useState("");
@@ -56,6 +58,7 @@ export function Tabla({
         mostrarSupervisores,
         estadoCivilBuscar,
         generoBuscar,
+        generoBuscarFamiliares,
         libretaMilitarBuscar,
         cargoBuscar,
         paginaActual]);
@@ -66,7 +69,9 @@ export function Tabla({
             tipoBusqueda === "estadoCivil" ||
             tipoBusqueda === "genero" ||
             tipoBusqueda === "libretaMilitar" ||
-            tipoBusqueda === "cargo"
+            tipoBusqueda === "cargo" ||
+            tipoBusqueda === "conFamiliares" ||
+            tipoBusqueda === "familiaresPorGenero"
         ) {
             cargarEmpleados(paginaActual);
         }
@@ -90,7 +95,18 @@ export function Tabla({
                 url += `&tipoEmpleado=OPERATIVO`;
             }
 
-        } else if (tipoBusqueda === "estadoCivil" && estadoCivilBuscar) {
+        } else if (tipoBusqueda === "conFamiliares") {
+            url = `http://localhost:8080/empleados/con-familiares-menores?&page=${pagina}`;
+
+            // Agregar filtro por tipo de empleado si está activo
+            if (mostrarAdministrativos) {
+                url += `&tipoEmpleado=ADMINISTRATIVO`;
+            } else if (mostrarOperativos) {
+                url += `&tipoEmpleado=OPERATIVO`;
+            }
+
+        }
+        else if (tipoBusqueda === "estadoCivil" && estadoCivilBuscar) {
             url = `http://localhost:8080/empleados/estado-civil?estadoCivil=${estadoCivilBuscar}&page=${pagina}`;
 
             // Agregar filtro por tipo de empleado si está activo
@@ -102,6 +118,17 @@ export function Tabla({
 
         } else if (tipoBusqueda === "genero" && generoBuscar) {
             url = `http://localhost:8080/empleados/genero?genero=${generoBuscar}&page=${pagina}`;
+
+            // Agregar filtro por tipo de empleado si está activo
+            if (mostrarAdministrativos) {
+                url += `&tipoEmpleado=ADMINISTRATIVO`;
+            } else if (mostrarOperativos) {
+                url += `&tipoEmpleado=OPERATIVO`;
+            }
+
+        }
+        else if (tipoBusqueda === "familiaresPorGenero" && generoBuscarFamiliares) {
+            url = `http://localhost:8080/empleados/conFamiliares/genero?genero=${generoBuscarFamiliares}&page=${pagina}`;
 
             // Agregar filtro por tipo de empleado si está activo
             if (mostrarAdministrativos) {
@@ -268,6 +295,8 @@ export function Tabla({
             realizarBusquedaFiltrada("estado-civil", estadoCivilBuscar, "Estado civil");
         } else if (tipoBusqueda === "genero") {
             realizarBusquedaFiltrada("genero", generoBuscar, "Género");
+        } else if (tipoBusqueda === "familiaresPorGenero") {
+            realizarBusquedaFiltrada("familiaresPorGenero", generoBuscarFamiliares, "Familiares por Género");
         } else if (tipoBusqueda === "libretaMilitar") {
             realizarBusquedaFiltrada("libreta-militar", libretaMilitarBuscar, "Libreta Militar");
         } else if (tipoBusqueda === "cargo") {
@@ -327,15 +356,30 @@ export function Tabla({
             if (mostrarOperativos) return `PERSONAL OPERATIVO MAYOR DE 50 AÑOS (total = ${totalElementos})`;
             return `PERSONAL ACTIVO MAYOR DE 50 AÑOS (total = ${totalElementos})`;
         }
+        if (tipoBusqueda === "conFamiliares") {
+            if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO CON HIJOS MENORES DE 12 (total = ${totalElementos} PADRES)`;
+            if (mostrarOperativos) return `PERSONAL OPERATIVO CON HIJOS MENORES DE 12 (total = ${totalElementos} PADRES)`;
+            return `PERSONAL ACTIVO CON HIJOS MENORES DE 12 (total = ${totalElementos} PADRES)`;
+        }
         if (tipoBusqueda === "estadoCivil") {
             if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO CON ESTADO CIVIL: ${estadoCivilBuscar}(total = ${totalElementos})`;
             if (mostrarOperativos) return `PERSONAL OPERATIVO CON ESTADO CIVIL: ${estadoCivilBuscar} (total = ${totalElementos})`;
             return `PERSONAL ACTIVO CON ESTADO CIVIL: ${estadoCivilBuscar} (total = ${totalElementos})`;
         }
         if (tipoBusqueda === "genero") {
-            if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO GÉNERO: ${generoBuscar} (total = ${totalElementos})`;
-            if (mostrarOperativos) return `PERSONAL OPERATIVO GÉNERO: = ${generoBuscar} (total = ${totalElementos})`;
-            return `PERSONAL ACTIVO GÉNERO: ${generoBuscar} (total = ${totalElementos})`;
+            if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO POR GÉNERO: ${generoBuscar} (total = ${totalElementos})`;
+            if (mostrarOperativos) return `PERSONAL OPERATIVO POR GÉNERO: = ${generoBuscar} (total = ${totalElementos})`;
+            return `PERSONAL ACTIVO POR GÉNERO: ${generoBuscar} (total = ${totalElementos})`;
+        }
+        if (tipoBusqueda === "familiaresPorGenero") {
+            const tipoGenero = generoBuscarFamiliares === "MASCULINO"
+                ? "PADRES"
+                : generoBuscarFamiliares === "FEMENINO"
+                    ? "MADRES"
+                    : "";
+            if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO GÉNERO: ${generoBuscarFamiliares} (total = ${totalElementos} ${tipoGenero})`;
+            if (mostrarOperativos) return `PERSONAL OPERATIVO GÉNERO: = ${generoBuscarFamiliares} (total = ${totalElementos} ${tipoGenero})`;
+            return `PERSONAL ACTIVO TODOS LOS PADRES: ${generoBuscarFamiliares} (total = ${totalElementos} ${tipoGenero})`;
         }
         if (tipoBusqueda === "libretaMilitar") {
             if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO CON LIBRETA MILITAR: ${libretaMilitarBuscar} (total = ${totalElementos})`;
@@ -373,17 +417,17 @@ export function Tabla({
                             <option value="personalMayorDe50">MAYORES DE 50 AÑOS</option>
                             <option value="estadoCivil">ESTADO CIVIL</option>
                             <option value="genero">GÉNERO</option>
+                            <option value="familiaresPorGenero">PADRES/MADRES</option>
                             <option value="libretaMilitar">LIBRETA MILITAR</option>
+                            <option value="conFamiliares">HIJOS/HIJASTROS</option>
                             <option value="conContrato">CON CONTRATO</option>
                             <option value="sinContrato">SIN CONTRATO</option>
                         </select>
                     </div>
 
-                    {tipoBusqueda !== "sinContrato" &&
-                        tipoBusqueda !== "conContrato" &&
-                        tipoBusqueda !== "estadoCivil" &&
-                        tipoBusqueda !== "personalMayorDe50" &&
+                    {tipoBusqueda !== "estadoCivil" &&
                         tipoBusqueda !== "genero" &&
+                        tipoBusqueda !== "familiaresPorGenero" &&
                         tipoBusqueda !== "libretaMilitar" && (
                             <div className="col-md-5">
                                 <label className="form-label">
@@ -408,6 +452,10 @@ export function Tabla({
                                             tipoBusqueda === "cargo" ? "Ingrese cargo" : "Ingrese el número de documento"
                                     }
                                     className="form-control"
+                                    disabled={["personalMayorDe50",
+                                        "conFamiliares",
+                                        "conContrato",
+                                        "sinContrato"].includes(tipoBusqueda)}
                                 />
                             </div>
                         )}
@@ -446,6 +494,22 @@ export function Tabla({
                         </div>
                     )}
 
+                    {tipoBusqueda === "familiaresPorGenero" && (
+                        <div className="col-md-5">
+                            <label className="form-label">PADRES/MADRES</label>
+                            <select
+                                className="form-select"
+                                value={generoBuscarFamiliares}
+                                onChange={(e) => setGeneroBuscarFamiliares(e.target.value)}
+                            >
+                                <option value="">Seleccione el género</option>
+                                <option value="MASCULINO">MASCULINO</option>
+                                <option value="FEMENINO">FEMENINO</option>
+
+                            </select>
+                        </div>
+                    )}
+
                     {tipoBusqueda === "libretaMilitar" && (
                         <div className="col-md-5">
                             <label className="form-label">LIBRETA MILITAR</label>
@@ -463,267 +527,297 @@ export function Tabla({
                         </div>
                     )}
 
-
                     <div className="col-md-4">
-                        {tipoBusqueda !== "sinContrato"
-                            && tipoBusqueda !== "estadoCivil"
-                            && tipoBusqueda !== "conContrato"
-                            && tipoBusqueda !== "personalMayorDe50"
-                            && tipoBusqueda !== "genero"
-                            && tipoBusqueda !== "libretaMilitar"
-                            && tipoBusqueda !== "cargo"
-                            && (
-                                <button
-                                    onClick={manejarBusqueda}
-                                    className="btn btn-info me-2"
-                                >
-                                    Buscar
-                                </button>
-                            )}
+                        <button
+                            onClick={manejarBusqueda}
+                            className="btn btn-info me-2"
+                            disabled={[
+                                "estadoCivil",
+                                "personalMayorDe50",
+                                "genero",
+                                "familiaresPorGenero",
+                                "libretaMilitar",
+                                "cargo",
+                                "conFamiliares",
+                                "conContrato",
+                                "sinContrato"]
+                                .includes(tipoBusqueda)}
+                        >
+                            Buscar
+                        </button>
+                        <button
+                            onClick={() => {
+                                setTipoBusqueda("nombre");
+                                obtenerTitulo("");
+                                setPaginaActual(0);
+                                setResultadoBusqueda([]);
+                                setDocumentoBuscar("");
+                                setNombreBuscar("");
+                                setCargoBuscar("");
+                                setEstadoCivilBuscar("");
+                                setGeneroBuscar("");
+                                setGeneroBuscarFamiliares("");
+                                setLibretaMilitarBuscar("");
+                                setMostrarTablaContratos(false);
+                                cargarEmpleados(0);
+                            }}
+                            className="btn btn-secondary"
+                        >
+                            Limpiar
+                        </button>
 
-                        {tipoBusqueda !== "sinContrato"
-                            && tipoBusqueda !== "conContrato"
-                            && resultadoBusqueda
-                            && tipoBusqueda !== "personalMayorDe50" && (
-                                <button
-                                    onClick={() => {
-                                        obtenerTitulo("");
-                                        setPaginaActual(0);
-                                        setResultadoBusqueda([]);
-                                        setDocumentoBuscar("");
-                                        setNombreBuscar("");
-                                        setCargoBuscar("");
-                                        setEstadoCivilBuscar("");
-                                        setGeneroBuscar("");
-                                        setLibretaMilitarBuscar("");
-                                        cargarEmpleados();
-                                        setMostrarTablaContratos(false);
-                                    }}
-                                    className="btn btn-secondary"
-                                >
-                                    Limpiar
-                                </button>
-                            )}
                     </div>
                 </div>
             </div>
 
-            {tipoBusqueda !== "conContrato" && (
-                <>
-                    <h4 className="alinearTexto">
-                        {obtenerTitulo()}
-                    </h4>
+            {tipoBusqueda !== "conContrato" &&
+                tipoBusqueda !== "conFamiliares" &&
+                tipoBusqueda !== "familiaresPorGenero" && (
+                    <>
+                        <h4 className="alinearTexto">
+                            {obtenerTitulo()}
+                        </h4>
 
-                    {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
-                        <Paginacion
-                            paginaActual={paginaActual}
-                            totalPaginas={totalPaginas}
-                            onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
-                        />
-                    )}
+                        {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
+                            <Paginacion
+                                paginaActual={paginaActual}
+                                totalPaginas={totalPaginas}
+                                onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
+                            />
+                        )}
 
-
-                    {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
-                        <div className="mt-2 text-center">
-                            <small>
-                                Mostrando página {paginaActual + 1} de {totalPaginas} —{" "}
-                                {tamanoPagina} por página, total de registros: {totalElementos}
-                            </small>
-                        </div>
-                    )}
-                </>
-            )}
+                        {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
+                            <div className="mt-2 text-center">
+                                <small>
+                                    Mostrando página {paginaActual + 1} de {totalPaginas} —{" "}
+                                    {tamanoPagina} por página, total de registros: {totalElementos}
+                                </small>
+                            </div>
+                        )}
+                    </>
+                )}
 
             {tipoBusqueda === "conContrato" && (
                 <div className="mt-4">
                     <TablaContrato />
                 </div>
             )}
-            {tipoBusqueda !== "conContrato" && (
-                <>
-                    <table className={`table table-bordered border-primary table-striped table-hover 
+            {tipoBusqueda === "conFamiliares" && (
+                <div className="mt-4">
+                    <TablaFamiliar
+                        tipoEmpleado={
+                            mostrarAdministrativos ? "ADMINISTRATIVO" :
+                                mostrarOperativos ? "OPERATIVO" :
+                                    null
+                        }
+                        titulo={obtenerTitulo()}
+                    />
+                </div>
+            )}
+
+            {tipoBusqueda === "familiaresPorGenero" && (
+                <div className="mt-4">
+                    <TablaFamiliar
+                        tipoEmpleado={
+                            mostrarAdministrativos ? "ADMINISTRATIVO" :
+                                mostrarOperativos ? "OPERATIVO" :
+                                    null
+                        }
+                        genero={generoBuscarFamiliares}
+                        titulo={obtenerTitulo()}
+                    />
+                </div>
+            )}
+
+            {tipoBusqueda !== "conContrato" &&
+                tipoBusqueda !== "conFamiliares" &&
+                tipoBusqueda !== "familiaresPorGenero" && (
+                    <>
+                        <table className={`table table-bordered border-primary table-striped table-hover 
     ${tipoBusqueda === "sinContrato"
-                            ? "table-info"
-                            : mostrarInactivos
-                                ? "table-warning"
-                                : "table-light"
-                        }`} id="tabla">
+                                ? "table-info"
+                                : mostrarInactivos
+                                    ? "table-warning"
+                                    : "table-light"
+                            }`} id="tabla">
 
-                        <thead className="table-primary">
-                            <tr>
-                                <th>Nombres</th>
-                                <th>Apellidos</th>
-                                <th>Número Documento</th>
-                                <th>Edad</th>
-                                <th>Estado Civil</th>
-                                <th>Teléfono</th>
-                                <th>Correo</th>
-                                <th>Cargo</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {resultadoBusqueda.length > 0 ? (
-                                resultadoBusqueda.map((emp, index) => (
-                                    <tr key={index}>
-                                        <td>{emp.nombres}</td>
-                                        <td>{emp.apellidos}</td>
-                                        <td>{emp.numeroDocumento}</td>
-                                        <td>{emp.edad}</td>
-                                        <td>{emp.estadoCivil}</td>
-                                        <td>{emp.telefono}</td>
-                                        <td>{emp.correo}</td>
-                                        <td>{emp.cargo}</td>
-                                        <td>
-                                            <div className="d-flex justify-content-center gap-2">
-                                                <button
-                                                    onClick={() => {
-                                                        setEmpleadoSeleccionado(emp);
-                                                        setMostrarModal(true);
-                                                    }}
-                                                    className="btn btn-sm btn-outline-primary me-2"
-                                                    title="Editar"
-                                                >
-                                                    <i className="bi bi-pencil-fill"></i>
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        setEmpleadoParaHistorial(emp.id);
-                                                        setMostrarTablaContratos(true);  // activamos la tabla
-                                                    }}
-                                                    className="btn btn-sm btn-outline-secondary"
-                                                    title="Ver contratos"
-                                                >
-                                                    <i className="bi bi-eye-fill"></i>
-                                                </button>
-                                                {!mostrarInactivos && (
+                            <thead className="table-primary">
+                                <tr>
+                                    <th>Nombres</th>
+                                    <th>Apellidos</th>
+                                    <th>Número Documento</th>
+                                    <th>Edad</th>
+                                    <th>Estado Civil</th>
+                                    <th>Teléfono</th>
+                                    <th>Correo</th>
+                                    <th>Cargo</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {resultadoBusqueda.length > 0 ? (
+                                    resultadoBusqueda.map((emp, index) => (
+                                        <tr key={index}>
+                                            <td>{emp.nombres}</td>
+                                            <td>{emp.apellidos}</td>
+                                            <td>{emp.numeroDocumento}</td>
+                                            <td>{emp.edad}</td>
+                                            <td>{emp.estadoCivil}</td>
+                                            <td>{emp.telefono}</td>
+                                            <td>{emp.correo}</td>
+                                            <td>{emp.cargo}</td>
+                                            <td>
+                                                <div className="d-flex justify-content-center gap-2">
                                                     <button
                                                         onClick={() => {
-                                                            Swal.fire({
-                                                                title: '¿Estás seguro?',
-                                                                text: "Esta acción eliminará al empleado.",
-                                                                icon: 'warning',
-                                                                showCancelButton: true,
-                                                                confirmButtonColor: '#3085d6',
-                                                                cancelButtonColor: '#d33',
-                                                                confirmButtonText: 'Sí, eliminar',
-                                                                cancelButtonText: 'Cancelar'
-                                                            }).then((result) => {
-                                                                if (result.isConfirmed) {
-                                                                    eliminarEmpleado(emp.id);
-                                                                    Swal.fire(
-                                                                        'Eliminado',
-                                                                        'La persona ha sido eliminada.',
-                                                                        'success'
-                                                                    );
-                                                                }
-                                                            });
+                                                            setEmpleadoSeleccionado(emp);
+                                                            setMostrarModal(true);
                                                         }}
-                                                        className="btn btn-sm btn-outline-danger"
-                                                        title="Desactivar"
+                                                        className="btn btn-sm btn-outline-primary me-2"
+                                                        title="Editar"
                                                     >
-                                                        <i className="bi bi-trash-fill"></i>
+                                                        <i className="bi bi-pencil-fill"></i>
                                                     </button>
-                                                )}
-                                                
-                                            </div>
-
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                empleados.map((emp) => (
-                                    <tr key={emp.id}>
-                                        <td>{emp.nombres}</td>
-                                        <td>{emp.apellidos}</td>
-                                        <td>{emp.numeroDocumento}</td>
-                                        <td>{emp.edad}</td>
-                                        <td>{emp.estadoCivil}</td>
-                                        <td>{emp.telefono}</td>
-                                        <td>{emp.correo}</td>
-                                        <td>{emp.cargo}</td>
-                                        <td>
-                                            <div className="d-flex justify-content-center gap-2">
-                                                <button
-                                                    onClick={() => {
-                                                        setEmpleadoSeleccionado(emp);
-                                                        setMostrarModal(true);
-                                                    }}
-                                                    className="btn btn-sm btn-outline-primary me-1"
-                                                    title="Editar"
-                                                >
-                                                    <i className="bi bi-pencil-fill"></i>
-                                                </button>
-
-                                                <button
-                                                    onClick={() => {
-                                                        setEmpleadoParaHistorial(emp.id);
-                                                        setMostrarTablaContratos(true);  // activamos la tabla
-
-                                                    }}
-                                                    className="btn btn-sm btn-outline-secondary"
-                                                    title="Ver contratos"
-                                                >
-                                                    <i className="bi bi-eye-fill"></i>
-                                                </button>
-
-                                                {!mostrarInactivos && tipoBusqueda !== "sinContrato" && (
                                                     <button
                                                         onClick={() => {
-                                                            Swal.fire({
-                                                                title: '¿Estás seguro?',
-                                                                text: "Esta acción eliminará al empleado.",
-                                                                icon: 'warning',
-                                                                showCancelButton: true,
-                                                                confirmButtonColor: '#3085d6',
-                                                                cancelButtonColor: '#d33',
-                                                                confirmButtonText: 'Sí, eliminar',
-                                                                cancelButtonText: 'Cancelar'
-                                                            }).then((result) => {
-                                                                if (result.isConfirmed) {
-                                                                    eliminarEmpleado(emp.id);
-                                                                    Swal.fire(
-                                                                        'Eliminado',
-                                                                        'La persona ha sido eliminada.',
-                                                                        'success'
-                                                                    );
-                                                                }
-                                                            });
+                                                            setEmpleadoParaHistorial(emp.id);
+                                                            setMostrarTablaContratos(true);  // activamos la tabla
                                                         }}
-                                                        className="btn btn-sm btn-outline-danger"
-                                                        title="Desactivar"
+                                                        className="btn btn-sm btn-outline-secondary"
+                                                        title="Ver contratos"
                                                     >
-                                                        <i className="bi bi-trash-fill"></i>
+                                                        <i className="bi bi-eye-fill"></i>
                                                     </button>
-                                                )}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </>
-            )}
-            {tipoBusqueda !== "conContrato" && (
-                <>
-                    {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
-                        <Paginacion
-                            paginaActual={paginaActual}
-                            totalPaginas={totalPaginas}
-                            onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
-                        />
-                    )}
-                    {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
-                        <div className="mt-2 text-center">
-                            <small>
-                                Mostrando página {paginaActual + 1} de {totalPaginas} —{" "}
-                                {tamanoPagina} por página, total de registros: {totalElementos}
-                            </small>
-                        </div>
-                    )}
-                </>
-            )}
+                                                    {!mostrarInactivos && (
+                                                        <button
+                                                            onClick={() => {
+                                                                Swal.fire({
+                                                                    title: '¿Estás seguro?',
+                                                                    text: "Esta acción eliminará al empleado.",
+                                                                    icon: 'warning',
+                                                                    showCancelButton: true,
+                                                                    confirmButtonColor: '#3085d6',
+                                                                    cancelButtonColor: '#d33',
+                                                                    confirmButtonText: 'Sí, eliminar',
+                                                                    cancelButtonText: 'Cancelar'
+                                                                }).then((result) => {
+                                                                    if (result.isConfirmed) {
+                                                                        eliminarEmpleado(emp.id);
+                                                                        Swal.fire(
+                                                                            'Eliminado',
+                                                                            'La persona ha sido eliminada.',
+                                                                            'success'
+                                                                        );
+                                                                    }
+                                                                });
+                                                            }}
+                                                            className="btn btn-sm btn-outline-danger"
+                                                            title="Desactivar"
+                                                        >
+                                                            <i className="bi bi-trash-fill"></i>
+                                                        </button>
+                                                    )}
+
+                                                </div>
+
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    empleados.map((emp) => (
+                                        <tr key={emp.id}>
+                                            <td>{emp.nombres}</td>
+                                            <td>{emp.apellidos}</td>
+                                            <td>{emp.numeroDocumento}</td>
+                                            <td>{emp.edad}</td>
+                                            <td>{emp.estadoCivil}</td>
+                                            <td>{emp.telefono}</td>
+                                            <td>{emp.correo}</td>
+                                            <td>{emp.cargo}</td>
+                                            <td>
+                                                <div className="d-flex justify-content-center gap-2">
+                                                    <button
+                                                        onClick={() => {
+                                                            setEmpleadoSeleccionado(emp);
+                                                            setMostrarModal(true);
+                                                        }}
+                                                        className="btn btn-sm btn-outline-primary me-1"
+                                                        title="Editar"
+                                                    >
+                                                        <i className="bi bi-pencil-fill"></i>
+                                                    </button>
+
+                                                    <button
+                                                        onClick={() => {
+                                                            setEmpleadoParaHistorial(emp.id);
+                                                            setMostrarTablaContratos(true);  // activamos la tabla
+
+                                                        }}
+                                                        className="btn btn-sm btn-outline-secondary"
+                                                        title="Ver contratos"
+                                                    >
+                                                        <i className="bi bi-eye-fill"></i>
+                                                    </button>
+
+                                                    {!mostrarInactivos && tipoBusqueda !== "sinContrato" && (
+                                                        <button
+                                                            onClick={() => {
+                                                                Swal.fire({
+                                                                    title: '¿Estás seguro?',
+                                                                    text: "Esta acción eliminará al empleado.",
+                                                                    icon: 'warning',
+                                                                    showCancelButton: true,
+                                                                    confirmButtonColor: '#3085d6',
+                                                                    cancelButtonColor: '#d33',
+                                                                    confirmButtonText: 'Sí, eliminar',
+                                                                    cancelButtonText: 'Cancelar'
+                                                                }).then((result) => {
+                                                                    if (result.isConfirmed) {
+                                                                        eliminarEmpleado(emp.id);
+                                                                        Swal.fire(
+                                                                            'Eliminado',
+                                                                            'La persona ha sido eliminada.',
+                                                                            'success'
+                                                                        );
+                                                                    }
+                                                                });
+                                                            }}
+                                                            className="btn btn-sm btn-outline-danger"
+                                                            title="Desactivar"
+                                                        >
+                                                            <i className="bi bi-trash-fill"></i>
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </>
+                )}
+            {tipoBusqueda !== "conContrato" &&
+                tipoBusqueda !== "conFamiliares" &&
+                tipoBusqueda !== "familiaresPorGenero" && (
+                    <>
+                        {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
+                            <Paginacion
+                                paginaActual={paginaActual}
+                                totalPaginas={totalPaginas}
+                                onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
+                            />
+                        )}
+                        {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
+                            <div className="mt-2 text-center">
+                                <small>
+                                    Mostrando página {paginaActual + 1} de {totalPaginas} —{" "}
+                                    {tamanoPagina} por página, total de registros: {totalElementos}
+                                </small>
+                            </div>
+                        )}
+                    </>
+                )}
 
             {mostrarTablaContratos && empleadoParaHistorial && (
                 <TablaContratosPorEmpleado empleadoId={empleadoParaHistorial}
