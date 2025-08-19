@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { authFetch } from "../utils/authFetch";
 import Paginacion from "./Paginacion";
 
 export function TablaFamiliar({ tipoEmpleado, titulo, genero }) {
@@ -34,7 +35,7 @@ export function TablaFamiliar({ tipoEmpleado, titulo, genero }) {
             url += `&tipoEmpleado=${tipoEmpleado}`;
         }
 
-        fetch(url, {
+        authFetch(url, {
             headers: {
 
             },

@@ -5,6 +5,7 @@ import { TablaContratosPorEmpleado } from "./TablaContratosPorEmpleado";
 import Swal from "sweetalert2";
 import Paginacion from "./Paginacion";
 import { TablaFamiliar } from "./TablaFamiliar";
+import { authFetch } from "../utils/authFetch";
 
 export function Tabla({
     mostrarInactivos = false,
@@ -169,7 +170,7 @@ export function Tabla({
                 : `http://localhost:8080/empleados/activos?page=${pagina}`;
         }
 
-        fetch(url)
+        authFetch(url)
             .then((response) => response.json())
             .then((data) => {
                 setEmpleados(data.content);
@@ -184,7 +185,7 @@ export function Tabla({
     const eliminarEmpleado = async (id) => {
         console.log("Id a eliminar:", id); //Prueba en consola
         try {
-            const response = await fetch(`http://localhost:8080/empleados/${id}`, {
+            const response = await authFetch(`http://localhost:8080/empleados/${id}`, {
                 method: 'DELETE'
             });
             if (response.ok) {
@@ -212,7 +213,7 @@ export function Tabla({
 
         let url = `http://localhost:8080/empleados/${tipo}?${valor}=${valor}`;
 
-        fetch(url)
+        authFetch(url)
             .then((response) => response.json())
             .then((data) => {
                 console.log("Resultado de la búsqueda:", data);
@@ -281,7 +282,7 @@ export function Tabla({
             realizarBusqueda(url);
         }
         if (tipoBusqueda === "sinContrato") {
-            fetch("http://localhost:8080/empleados/sin-contrato")
+            authFetch("http://localhost:8080/empleados/sin-contrato")
                 .then(res => res.json())
                 .then(data => {
                     setResultadoBusqueda(data.content || []);
@@ -305,7 +306,7 @@ export function Tabla({
     };
 
     const realizarBusqueda = (url) => {
-        fetch(url)
+        authFetch(url)
             .then((res) => {
                 if (!res.ok) throw new Error("Error al buscar empleado");
                 return res.json();
@@ -395,7 +396,7 @@ export function Tabla({
         if (mostrarOperativos) return `PERSONAL  OPERATIVO (total = ${totalElementos})`;
         if (mostrarSupervisores) return `SUPERVISORES (total = ${totalElementos})`;
         if (mostrarInactivos) return `PERSONAL RETIRADO (total = ${totalElementos})`;
-        return `PERSONAL ACTIVO (total = ${totalElementos})`;
+        return `PERSONAL ACTIVO (Administrativos, Operativos, Supervisores total = ${totalElementos})`;
     };
 
     return (

@@ -1,8 +1,10 @@
 import Swal from "sweetalert2";
+import { authFetch } from "../utils/authFetch";
+
 export async function AgregarTabla(contrato, familiares, empleado, limpiarFormulario) {
 
     try {
-        const responseEmpleado = await fetch("http://localhost:8080/empleados", {
+        const responseEmpleado = await authFetch("http://localhost:8080/empleados", {
             method: "POST",
             headers: {
                 "Content-type": "application/json",
@@ -43,7 +45,7 @@ export async function AgregarTabla(contrato, familiares, empleado, limpiarFormul
             }));
 
         if (familiaresLimpios.length > 0) {
-            const responseFamiliares = await fetch(`http://localhost:8080/familiares/${empleadoId}`, {
+            const responseFamiliares = await authFetch(`http://localhost:8080/familiares/${empleadoId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -57,7 +59,7 @@ export async function AgregarTabla(contrato, familiares, empleado, limpiarFormul
             }
         }
 
-        const responseContratos = await fetch(`http://localhost:8080/contratos/${empleadoId}`, {
+        const responseContratos = await authFetch(`http://localhost:8080/contratos/${empleadoId}`, {
 
             method: "POST",
             headers: {

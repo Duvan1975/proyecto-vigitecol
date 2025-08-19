@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { authFetch } from "../utils/authFetch";
 import Paginacion from "./Paginacion";
 
 export function TablaContrato() {
@@ -17,7 +18,7 @@ export function TablaContrato() {
     const cargarEmpleadosConContratos = (pagina = 0) => {
         setCargando(true);
 
-        fetch(`http://localhost:8080/contratos?page=${pagina}`)
+        authFetch(`http://localhost:8080/contratos?page=${pagina}`)
             .then((res) => res.json())
             .then((data) => {
                 setEmpleadosConContratos(data.content);

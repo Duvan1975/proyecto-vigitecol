@@ -1,4 +1,4 @@
 package proyectoVigitecolSpringBoot.infra.errores.security;
 
-public record DatosJWTtoken() {
+public record DatosJWTtoken(String jwTtoken) {
 }

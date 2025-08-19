@@ -1,4 +1,7 @@
 package proyectoVigitecolSpringBoot.domain.usuarios;
 
-public record DatosAutenticacionUsuario() {
+public record DatosAutenticacionUsuario(
+        String admin,
+        String clave
+) {
 }

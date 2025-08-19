@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import { authFetch } from "../utils/authFetch";
 
 export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
@@ -40,7 +41,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             setFormulario(empleado);
 
             // Obtener el último contrato del empleado
-            fetch(`http://localhost:8080/contratos/ultimo-contrato/${empleado.id}`)
+            authFetch(`http://localhost:8080/contratos/ultimo-contrato/${empleado.id}`)
                 .then(res => {
                     if (!res.ok) throw new Error("Error al obtener el contrato");
                     return res.json();
@@ -72,7 +73,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             setFormulario(empleado);
 
             //Obtener familiares de la persona por ID
-            fetch(`http://localhost:8080/familiares/por-empleado/${empleado.id}`, {
+            authFetch(`http://localhost:8080/familiares/por-empleado/${empleado.id}`, {
 
             })
                 .then(res => res.json())
@@ -126,7 +127,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             return;
         }*/
 
-        fetch("http://localhost:8080/empleados", {
+        authFetch("http://localhost:8080/empleados", {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -183,7 +184,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
     const actualizarFamiliar = (familiar) => {
 
-        fetch("http://localhost:8080/familiares", {
+        authFetch("http://localhost:8080/familiares", {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -213,7 +214,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             return;
         }
 
-        fetch(`http://localhost:8080/familiares/${empleado.id}`, {
+        authFetch(`http://localhost:8080/familiares/${empleado.id}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -259,7 +260,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
     const actualizarContrato = (contrato) => {
 
-        fetch("http://localhost:8080/contratos", {
+        authFetch("http://localhost:8080/contratos", {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -291,7 +292,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             vacacionesHasta: ""
         };
 
-        fetch(`http://localhost:8080/contratos/${empleado.id}`, {
+        authFetch(`http://localhost:8080/contratos/${empleado.id}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -304,7 +305,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             })
             .then(() => {
                 // Volver a cargar todos los contratos desde el backend
-                fetch(`http://localhost:8080/contratos/por-empleado/${empleado.id}`)
+                authFetch(`http://localhost:8080/contratos/por-empleado/${empleado.id}`)
                     .then(res => res.json())
                     .then(data => {
                         const contratosPreparados = (Array.isArray(data) ? data : []).map(c => ({
@@ -339,7 +340,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             cancelButtonText: "Cancelar",
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`http://localhost:8080/contratos/${id}`, {
+                authFetch(`http://localhost:8080/contratos/${id}`, {
                     method: "DELETE",
                 })
                     .then((res) => {
@@ -356,7 +357,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const cargarTodosContratos = () => {
-        fetch(`http://localhost:8080/contratos/por-empleado/${empleado.id}`)
+        authFetch(`http://localhost:8080/contratos/por-empleado/${empleado.id}`)
             .then(res => res.json())
             .then(data => {
                 const contratosPreparados = data.map(c => ({
@@ -390,7 +391,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             if (result.isConfirmed) {
                 const token = localStorage.getItem("token");
 
-                fetch(`http://localhost:8080/familiares/${id}`, {
+                authFetch(`http://localhost:8080/familiares/${id}`, {
                     method: "DELETE",
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -878,7 +879,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                 cargarTodosContratos(); // ← muestra todos
                                             } else {
                                                 // ← dejamos solo el contrato más reciente
-                                                fetch(`http://localhost:8080/contratos/ultimo-contrato/${empleado.id}`)
+                                                authFetch(`http://localhost:8080/contratos/ultimo-contrato/${empleado.id}`)
                                                     .then(res => res.json())
                                                     .then(data => {
                                                         const contratoUnico = {

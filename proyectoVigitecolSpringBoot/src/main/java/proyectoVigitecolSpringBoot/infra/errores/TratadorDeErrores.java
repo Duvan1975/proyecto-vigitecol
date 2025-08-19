@@ -1,8 +1,6 @@
-package proyectoVigitecolSpringBoot.infra;
+package proyectoVigitecolSpringBoot.infra.errores;
 
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
