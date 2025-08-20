@@ -23,6 +23,7 @@ export function Formulario() {
         cargo: ""
     });
 
+    //Estados para registrar familiares, cursos y contratos
     const [familiares, setFamiliares] = useState([]);
     const [familiarActual, setFamiliarActual] = useState({
         tipoFamiliar: "",
@@ -30,6 +31,16 @@ export function Formulario() {
         edadFamiliar: ""
     });
 
+    const [cursos, setCursos] = useState([]);
+    const [cursoActual, setCursoActual] = useState({
+        tipoCurso: "",
+        categoria: "",
+        fechaCurso: ""
+    });
+
+    const [contrato, setContrato] = useState({
+        fechaIngreso: ""
+    });
 
     // Agregar familiar a la lista y limpiar campos
     const agregarFamiliar = () => {
@@ -47,10 +58,21 @@ export function Formulario() {
         }
     };
 
+    const agregarCurso = () => {
+        if (
+            cursoActual.tipoCurso &&
+            cursoActual.categoria &&
+            cursoActual.fechaCurso
+        ) {
+            setCursos([...cursos, { ...cursoActual }]);
+            setCursoActual({
+                tipoCurso: "",
+                categoria: "",
+                fechaCurso: ""
+            });
+        }
+    };
 
-    const [contrato, setContrato] = useState({
-        fechaIngreso: ""
-    });
     const limpiarFormulario = () => {
         setEmpleado({
             nombres: "",
@@ -77,13 +99,24 @@ export function Formulario() {
             nombreFamiliar: "",
             edadFamiliar: ""
         });
-
         setFamiliares([]);
+
+        setCursoActual({
+            tipoCurso: "",
+            categoria: "",
+            fechaCurso: ""
+        });
+        setCursos([]);
     };
     const eliminarFamiliarTabla = (index) => {
         const nuevosFamiliares = [...familiares];
         nuevosFamiliares.splice(index, 1);
         setFamiliares(nuevosFamiliares);
+    };
+    const eliminarCursoTabla = (index) => {
+        const nuevosCursos = [...cursos];
+        nuevosCursos.splice(index, 1);
+        setCursos(nuevosCursos);
     };
 
     return (
@@ -331,6 +364,91 @@ export function Formulario() {
                 </div>
             )}
 
+            <h4 className='alinearTexto'>Cursos de Vigilancia</h4>
+
+            <div className='row align-items-center g-2'>
+                <CuadrosSelect
+                    tamanoinput="col-md-4"
+                    titulolabel="Tipo de Curso:"
+                    nombreinput="tipoCurso"
+                    idinput="tipoCurso"
+                    value={cursoActual.tipoCurso}
+                    onChange={(e) =>
+                        setCursoActual({ ...cursoActual, tipoCurso: e.target.value })
+                    }
+                    opciones={[
+                        { valor: "FUNDAMENTACION", texto: "FUNDAMENTACION" },
+                        { valor: "REENTRENAMIENTO", texto: "REENTRENAMIENTO" },
+                    ]}
+                />
+                <CuadrosSelect
+                    tamanoinput="col-md-4"
+                    titulolabel="Categoria:"
+                    nombreinput="categoria"
+                    idinput="categoria"
+                    value={cursoActual.categoria}
+                    onChange={(e) =>
+                        setCursoActual({ ...cursoActual, categoria: e.target.value })
+                    }
+                    opciones={[
+                        { valor: "GUARDA_DE_SEGURIDAD", texto: "GUARDA DE SEGURIDAD" },
+                        { valor: "MANEJADOR_CANINO", texto: "MANEJADOR CANINO" },
+                        { valor: "SUPERVISOR", texto: "SUPERVISOR" },
+                        { valor: "OPERADOR_DE_MEDIOS", texto: "OPERADOR DE MEDIOS" },
+                        { valor: "ESCOLTA", texto: "ESCOLTA" },
+                    ]}
+                />
+                <CuadrosTexto
+                    tamanoinput="col-md-4"
+                    titulolabel="Fecha del Curso:"
+                    tipoinput="date"
+                    nombreinput="fechaCurso"
+                    idinput="fechaCurso"
+                    value={cursoActual.fechaCurso}
+                    onChange={(e) =>
+                        setCursoActual({ ...cursoActual, fechaCurso: e.target.value })
+                    }
+                />
+            </div>
+            <button type="button"
+                className="btn btn-secondary mb-4"
+                onClick={agregarCurso}
+            >
+                Agregar otro Curso
+            </button>
+            <br />
+            {cursos.length > 0 && (
+                <div>
+                    <h4>Cursos Registrados:</h4>
+                    <table className="table table-bordered border-black">
+                        <thead className="table-primary border-black">
+                            <tr>
+                                <th>Tipo de Curso</th>
+                                <th>Categoria</th>
+                                <th>Fecha del Curso</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {cursos.map((c, idx) => (
+                                <tr key={idx}>
+                                    <td>{c.tipoCurso}</td>
+                                    <td>{c.categoria}</td>
+                                    <td>{c.fechaCurso}</td>
+                                    <td><button
+                                        className="btn btn-outline-danger btn-sm"
+                                        onClick={() => eliminarCursoTabla(idx)}
+                                        title="Eliminar"
+                                    >
+                                        <i className="bi bi-trash"></i>
+                                    </button></td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+            
             <h4 className='alinearTexto'>Asignar Cargo</h4>
 
             <div className='row align-items-center g-2'>
@@ -371,7 +489,7 @@ export function Formulario() {
             <div className='col-md-auto'>
                 <button
                     onClick={() => AgregarTabla(
-                        contrato, familiares, empleado, limpiarFormulario)}
+                        contrato, familiares, cursos, empleado, limpiarFormulario)}
                     className="botonregistrar btn btn-success"
                 >
                     Registrar

@@ -1,7 +1,12 @@
 import Swal from "sweetalert2";
 import { authFetch } from "../utils/authFetch";
 
-export async function AgregarTabla(contrato, familiares, empleado, limpiarFormulario) {
+export async function AgregarTabla(
+    contrato,
+    familiares,
+    cursos,
+    empleado,
+    limpiarFormulario) {
 
     try {
         const responseEmpleado = await authFetch("http://localhost:8080/empleados", {
@@ -56,6 +61,30 @@ export async function AgregarTabla(contrato, familiares, empleado, limpiarFormul
             if (!responseFamiliares.ok) {
                 const errorData = await responseFamiliares.json();
                 throw new Error(errorData.message || "Error al registrar familiares");
+            }
+        }
+
+        //Enviamos todos los cursos juntos
+        const cursosLimpios = cursos.filter(c =>
+            c.tipoCurso && c.categoria && c.fechaCurso
+        ).map((c) => ({
+            tipoCurso: c.tipoCurso,
+            categoria: c.categoria,
+            fechaCurso: c.fechaCurso
+        }));
+
+        if (cursosLimpios.length > 0) {
+            const responseCursos = await authFetch(`http://localhost:8080/cursos/${empleadoId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(cursosLimpios)
+            });
+
+            if (!responseCursos.ok) {
+                const errorData = await responseCursos.json();
+                throw new Error(errorData.message || "Error al registrar cursos");
             }
         }
 

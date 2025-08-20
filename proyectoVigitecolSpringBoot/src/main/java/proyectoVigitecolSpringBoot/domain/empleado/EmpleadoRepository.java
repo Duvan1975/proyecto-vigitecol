@@ -9,12 +9,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
+
 public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
     boolean existsByCorreo(@Email(
             message = "Debe ser un correo electrónico válido") String correo);
 
     boolean existsByNumeroDocumento(@NotBlank @Pattern(
-            regexp = "\\d{7,15}",message = "Debe contener solo números entre 7 y 15 digitos") String s);
+            regexp = "\\d{7,15}", message = "Debe contener solo números entre 7 y 15 digitos") String s);
 
     @Query("""
                 SELECT e
@@ -28,15 +30,15 @@ public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
     Page<Empleado> findEmpleadosSinContrato(Pageable pageable);
 
     @Query("""
-        SELECT e FROM Empleado e
-        JOIN Contrato c ON c.empleado = e AND c.numeroContrato = (
-            SELECT MAX(c2.numeroContrato) 
-            FROM Contrato c2 
-            WHERE c2.empleado = e
-        ) AND c.continua = true
-          AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
-        WHERE SIZE(e.familiares) > 0
-    """)
+                SELECT e FROM Empleado e
+                JOIN Contrato c ON c.empleado = e AND c.numeroContrato = (
+                    SELECT MAX(c2.numeroContrato) 
+                    FROM Contrato c2 
+                    WHERE c2.empleado = e
+                ) AND c.continua = true
+                  AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
+                WHERE SIZE(e.familiares) > 0
+            """)
     Page<Empleado> findEmpleadosConFamiliares(
             @Param("tipoEmpleado") TipoEmpleado tipoEmpleado,
             Pageable pageable);
@@ -69,5 +71,38 @@ public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
             """)
     Page<Empleado> findConTodosLosFamiliares(
             @Param("tipoEmpleado") TipoEmpleado tipoEmpleado,
+            Pageable pageable);
+
+    @Query("""
+                SELECT e FROM Empleado e
+                JOIN Contrato c ON c.empleado = e AND c.numeroContrato = (
+                    SELECT MAX(c2.numeroContrato)
+                    FROM Contrato c2
+                    WHERE c2.empleado = e
+                )AND c.continua = true
+                WHERE SIZE(e.cursos) > 0
+            """)
+    Page<Empleado> findEmpleadosConCurso(Pageable pageable);
+
+    @Query("""
+                SELECT e FROM Empleado e
+                JOIN Contrato c ON c.empleado = e AND c.numeroContrato = (
+                    SELECT MAX(c2.numeroContrato)
+                    FROM Contrato c2
+                    WHERE c2.empleado = e
+                )
+                WHERE c.continua = true
+                AND EXISTS (
+                    SELECT 1 FROM Curso cu
+                    WHERE cu.empleado = e
+                    AND cu.fechaCurso = (
+                        SELECT MAX(c2.fechaCurso) FROM Curso c2 WHERE c2.empleado = e
+                    )
+                    AND cu.fechaCurso + 1 YEAR BETWEEN :hoy AND :fechaLimite
+                )
+            """)
+    Page<Empleado> findEmpleadosConCursosPorVencer(
+            @Param("hoy") LocalDate hoy,
+            @Param("fechaLimite") LocalDate fechaLimite,
             Pageable pageable);
 }

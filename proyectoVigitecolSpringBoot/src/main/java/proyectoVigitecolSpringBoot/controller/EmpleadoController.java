@@ -189,4 +189,22 @@ public class EmpleadoController {
         return ResponseEntity.ok(resultado);
     }
 
+    @GetMapping("/con-cursos")
+    public ResponseEntity<Page<DatosEmpleadoConCurso>> empleadosConCursos(
+            @PageableDefault(size = 10, sort = "apellidos") Pageable pageable) {
+
+        Page<DatosEmpleadoConCurso> resultado = empleadoService
+                .findConCurso(pageable);
+
+        return ResponseEntity.ok(resultado);
+    }
+
+    @GetMapping("/con-cursos/por-vencer")
+    public ResponseEntity<Page<DatosEmpleadoConCurso>> empleadosConCursosPorVencer(
+            @PageableDefault(size = 10, sort = "apellidos") Pageable pageable) {
+
+        Page<DatosEmpleadoConCurso> resultado = empleadoService.findEmpleadosConCursosPorVencer(pageable);
+        return ResponseEntity.ok(resultado);
+    }
+
 }

@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -471,6 +472,38 @@ public class EmpleadoService {
         Page<Empleado> empleados = contratoRepository
                 .findEmpleadosConFamiliaresPorGenero(genero, tipoEmpleado, pageable);
         return empleados.map(DatosEmpleadoConFamiliares::new);
+    }
+
+    public Page<DatosEmpleadoConCurso> findConCurso(Pageable pageable) {
+        return empleadoRepository.findEmpleadosConCurso(pageable)
+                .map(DatosEmpleadoConCurso::new);
+    }
+
+    public Page<DatosEmpleadoConCurso> findEmpleadosConCursosPorVencer(Pageable pageable) {
+        return empleadoRepository.findEmpleadosConCurso(pageable)
+                .map(empleado -> {
+                    // Filtrar solo cursos vigentes (no vencidos)
+                    List<DatosCursoDTO> cursosVigentes = empleado.getCursos().stream()
+                            .filter(curso -> {
+                                LocalDate fechaVencimiento = curso.getFechaCurso().plusYears(1);
+                                return fechaVencimiento.isAfter(LocalDate.now()) // aún no vencido
+                                        && fechaVencimiento.isBefore(LocalDate.now().plusDays(30)); // vence en <= 30 días
+                            })
+                            .sorted((c1, c2) -> c1.getFechaCurso().compareTo(c2.getFechaCurso())) // orden ascendente por fechaCurso
+                            .map(DatosCursoDTO::new)
+                            .toList();
+
+                    return new DatosEmpleadoConCurso(
+                            empleado.getId(),
+                            empleado.getNombres(),
+                            empleado.getApellidos(),
+                            empleado.getNumeroDocumento(),
+                            empleado.getTelefono(),
+                            empleado.getCargo(),
+                            cursosVigentes.size(),
+                            cursosVigentes
+                    );
+                });
     }
 
 }
