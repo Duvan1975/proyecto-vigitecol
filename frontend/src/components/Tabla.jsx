@@ -5,6 +5,7 @@ import { TablaContratosPorEmpleado } from "./TablaContratosPorEmpleado";
 import Swal from "sweetalert2";
 import Paginacion from "./Paginacion";
 import { TablaFamiliar } from "./TablaFamiliar";
+import { TablaCurso } from "./TablaCurso";
 import { authFetch } from "../utils/authFetch";
 
 export function Tabla({
@@ -47,8 +48,6 @@ export function Tabla({
     const [generoBuscarFamiliares, setGeneroBuscarFamiliares] = useState("");
     const [libretaMilitarBuscar, setLibretaMilitarBuscar] = useState("");
     const [cargoBuscar, setCargoBuscar] = useState("");
-    //const [mayoresDe50, setMayoresDe50Buscar] = useState("");
-
 
     useEffect(() => {
         cargarEmpleados(paginaActual);
@@ -126,7 +125,6 @@ export function Tabla({
             } else if (mostrarOperativos) {
                 url += `&tipoEmpleado=OPERATIVO`;
             }
-
         }
         else if (tipoBusqueda === "familiaresPorGenero" && generoBuscarFamiliares) {
             url = `http://localhost:8080/empleados/conFamiliares/genero?genero=${generoBuscarFamiliares}&page=${pagina}`;
@@ -352,6 +350,7 @@ export function Tabla({
 
     const obtenerTitulo = () => {
         if (tipoBusqueda === "sinContrato") return `PERSONAL SIN CONTRATO (total = ${totalElementos})`;
+
         if (tipoBusqueda === "personalMayorDe50") {
             if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO MAYOR DE 50 AÑOS (total = ${totalElementos})`;
             if (mostrarOperativos) return `PERSONAL OPERATIVO MAYOR DE 50 AÑOS (total = ${totalElementos})`;
@@ -377,11 +376,15 @@ export function Tabla({
                 ? "PADRES"
                 : generoBuscarFamiliares === "FEMENINO"
                     ? "MADRES"
-                    : "";
-            if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO GÉNERO: ${generoBuscarFamiliares} (total = ${totalElementos} ${tipoGenero})`;
-            if (mostrarOperativos) return `PERSONAL OPERATIVO GÉNERO: = ${generoBuscarFamiliares} (total = ${totalElementos} ${tipoGenero})`;
-            return `PERSONAL ACTIVO TODOS LOS PADRES: ${generoBuscarFamiliares} (total = ${totalElementos} ${tipoGenero})`;
+                    : "PADRES Y MADRES";
+
+            if (mostrarAdministrativos)
+                return `PERSONAL ADMINISTRATIVO ${tipoGenero} =`;
+            if (mostrarOperativos)
+                return `PERSONAL OPERATIVO ${tipoGenero} =`;
+            return `PERSONAL ACTIVO TOTAL ${tipoGenero} =`;
         }
+
         if (tipoBusqueda === "libretaMilitar") {
             if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO CON LIBRETA MILITAR: ${libretaMilitarBuscar} (total = ${totalElementos})`;
             if (mostrarOperativos) return `PERSONAL OPERATIVO CON LIBRETA MILITAR: ${libretaMilitarBuscar} (total = ${totalElementos})`;
@@ -393,9 +396,13 @@ export function Tabla({
             return `PERSONAL ACTIVO CON CARGO: ${cargoBuscar} (total = ${totalElementos})`;
         }
         if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO (total = ${totalElementos})`;
+
         if (mostrarOperativos) return `PERSONAL  OPERATIVO (total = ${totalElementos})`;
+
         if (mostrarSupervisores) return `SUPERVISORES (total = ${totalElementos})`;
+
         if (mostrarInactivos) return `PERSONAL RETIRADO (total = ${totalElementos})`;
+
         return `PERSONAL ACTIVO (Administrativos, Operativos, Supervisores total = ${totalElementos})`;
     };
 
@@ -421,6 +428,7 @@ export function Tabla({
                             <option value="familiaresPorGenero">PADRES/MADRES</option>
                             <option value="libretaMilitar">LIBRETA MILITAR</option>
                             <option value="conFamiliares">HIJOS/HIJASTROS</option>
+                            <option value="cursosPorVencer">CURSOS A VENCER</option>
                             <option value="conContrato">CON CONTRATO</option>
                             <option value="sinContrato">SIN CONTRATO</option>
                         </select>
@@ -455,6 +463,7 @@ export function Tabla({
                                     className="form-control"
                                     disabled={["personalMayorDe50",
                                         "conFamiliares",
+                                        "cursosPorVencer",
                                         "conContrato",
                                         "sinContrato"].includes(tipoBusqueda)}
                                 />
@@ -540,6 +549,7 @@ export function Tabla({
                                 "libretaMilitar",
                                 "cargo",
                                 "conFamiliares",
+                                "cursosPorVencer",
                                 "conContrato",
                                 "sinContrato"]
                                 .includes(tipoBusqueda)}
@@ -573,6 +583,7 @@ export function Tabla({
 
             {tipoBusqueda !== "conContrato" &&
                 tipoBusqueda !== "conFamiliares" &&
+                tipoBusqueda !== "cursosPorVencer" &&
                 tipoBusqueda !== "familiaresPorGenero" && (
                     <>
                         <h4 className="alinearTexto">
@@ -606,10 +617,10 @@ export function Tabla({
             {tipoBusqueda === "conFamiliares" && (
                 <div className="mt-4">
                     <TablaFamiliar
+                        tipoBusqueda="conFamiliares"
                         tipoEmpleado={
                             mostrarAdministrativos ? "ADMINISTRATIVO" :
-                                mostrarOperativos ? "OPERATIVO" :
-                                    null
+                                mostrarOperativos ? "OPERATIVO" : null
                         }
                         titulo={obtenerTitulo()}
                     />
@@ -619,19 +630,27 @@ export function Tabla({
             {tipoBusqueda === "familiaresPorGenero" && (
                 <div className="mt-4">
                     <TablaFamiliar
+                        tipoBusqueda="familiaresPorGenero"
+                        genero={generoBuscarFamiliares || null}  // null = traer todos (padres y madres)
                         tipoEmpleado={
                             mostrarAdministrativos ? "ADMINISTRATIVO" :
-                                mostrarOperativos ? "OPERATIVO" :
-                                    null
+                                mostrarOperativos ? "OPERATIVO" : null
                         }
-                        genero={generoBuscarFamiliares}
                         titulo={obtenerTitulo()}
                     />
                 </div>
             )}
 
+
+            {tipoBusqueda === "cursosPorVencer" && (
+                <div className="mt-4">
+                    <TablaCurso />
+                </div>
+            )}
+
             {tipoBusqueda !== "conContrato" &&
                 tipoBusqueda !== "conFamiliares" &&
+                tipoBusqueda !== "cursosPorVencer" &&
                 tipoBusqueda !== "familiaresPorGenero" && (
                     <>
                         <table className={`table table-bordered border-primary table-striped table-hover 
@@ -800,6 +819,7 @@ export function Tabla({
                 )}
             {tipoBusqueda !== "conContrato" &&
                 tipoBusqueda !== "conFamiliares" &&
+                tipoBusqueda !== "cursosPorVencer" &&
                 tipoBusqueda !== "familiaresPorGenero" && (
                     <>
                         {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (

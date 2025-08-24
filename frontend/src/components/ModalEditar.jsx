@@ -8,12 +8,21 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
     const [familiares, setFamiliares] = useState([]);
 
+    const [cursos, setCursos] = useState([]);
+
     //Estado para agregar familiares modificado para que siempre sea visible en la tabla familiares
     const [nuevoFamiliar, setNuevoFamiliar] = useState({
         tipoFamiliar: "",
         nombreFamiliar: "",
         edadFamiliar: ""
 
+    });
+
+    //Estado para agregar cursos
+    const [nuevoCurso, setNuevoCurso] = useState({
+        tipoCurso: "",
+        categoria: "",
+        fechaCurso: ""
     });
 
     //Estado para cargar contratos
@@ -72,7 +81,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         if (empleado) {
             setFormulario(empleado);
 
-            //Obtener familiares de la persona por ID
+            //Obtener familiares del empleado por ID
             authFetch(`http://localhost:8080/familiares/por-empleado/${empleado.id}`, {
 
             })
@@ -85,6 +94,27 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                         edadFamiliar: f.edadFamiliar !== undefined ? f.edadFamiliar : ""
                     }));
                     setFamiliares(familiaresPreparados);
+                });
+        }
+    }, [empleado]);
+
+    useEffect(() => {
+        if (empleado) {
+            setFormulario(empleado);
+
+            //Obtener cursos del empleado por ID
+            authFetch(`http://localhost:8080/cursos/por-empleado/${empleado.id}`, {
+
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const cursosPreparados = (Array.isArray(data) ? data : []).map(cu => ({
+                        id: cu.id ?? cu.cursoId ?? null,
+                        tipoCurso: cu.tipoCurso ?? "",
+                        categoria: cu.categoria ?? "",
+                        fechaCurso: cu.fechaCurso ?? ""
+                    }));
+                    setCursos(cursosPreparados);
                 });
         }
     }, [empleado]);
@@ -112,20 +142,17 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         };
         setFamiliares(nuevosFamiliares);
     };
-    const actualizarEmpleado = () => {
 
-        /*if (nuevoFamiliar && (
-            nuevoFamiliar.tipoFamiliar ||
-            nuevoFamiliar.nombreFamiliar ||
-            nuevoFamiliar.edadFamiliar
-        )) {
-            Swal.fire({
-                title: "Familiar incompleto",
-                text: "Tienes un familiar en proceso de registro. Completa o cancela el registro antes de actualizar.",
-                icon: "warning"
-            });
-            return;
-        }*/
+    const handleCursoChange = (index, field, value) => {
+        const nuevosCursos = [...cursos];
+        nuevosCursos[index] = {
+            ...nuevosCursos[index],
+            [field]: value
+        };
+        setCursos(nuevosCursos);
+    };
+
+    const actualizarEmpleado = () => {
 
         authFetch("http://localhost:8080/empleados", {
             method: "PUT",
@@ -200,6 +227,24 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             });
     };
 
+    const actualizarCurso = (curso) => {
+
+        authFetch("http://localhost:8080/cursos", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(curso)
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Error al actualizar curso");
+                Swal.fire("Curso actualizado correctamente", "", "success");
+            })
+            .catch(err => {
+                Swal.fire("Error", err.message, "error");
+            });
+    };
+
     //Function para registrar un nuevo hijo/hijastros en el Modal
     const registrarNuevoFamiliar = () => {
 
@@ -257,6 +302,61 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             });
     };
 
+    //Function para registrar un nuevo curso en el Modal
+    const registrarNuevoCurso = () => {
+
+        // Valida que ningún campo este vacío
+        if (
+            !nuevoCurso.tipoCurso ||
+            !nuevoCurso.categoria ||
+            !nuevoCurso.fechaCurso === ""
+        ) {
+            Swal.fire("Campos incompletos", "Por favor llena todos los campos.", "warning");
+            return;
+        }
+
+        authFetch(`http://localhost:8080/cursos/${empleado.id}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify([
+                {
+                    tipoCurso: nuevoCurso.tipoCurso,
+                    categoria: nuevoCurso.categoria,
+                    fechaCurso: nuevoCurso.fechaCurso
+                }
+            ])
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error("Error al registrar el curso");
+                return res.json();
+            })
+            .then((cursoCreado) => {
+
+                // Agregar el curso creado a la lista
+
+                setCursos(prev => [...prev, {
+                    id: cursoCreado.id ?? cursoCreado.cursoId,
+                    tipoCurso: nuevoCurso.tipoCurso,
+                    categoria: nuevoCurso.categoria,
+                    fechaCurso: nuevoCurso.fechaCurso
+                }]);
+
+                // Resetear los campos PERO mantener el formulario visible
+
+                setNuevoCurso({
+                    tipoCurso: "",
+                    categoria: "",
+                    fechaCurso: ""
+                });
+
+                Swal.fire("Curso agregado", "El curso ha sido registrado correctamente", "success");
+            })
+            .catch((err) => {
+                Swal.fire("Error", err.message, "error");
+            });
+    };
 
     const actualizarContrato = (contrato) => {
 
@@ -401,6 +501,33 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                         if (!res.ok) throw new Error("Error al eliminar familiar");
                         setFamiliares(familiares.filter(f => f.id !== id));
                         Swal.fire("Eliminado", "El familiar fue eliminado correctamente", "success");
+                    })
+                    .catch((err) => {
+                        Swal.fire("Error", err.message, "error");
+                    });
+            }
+        });
+    };
+
+    const eliminarCurso = (id) => {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Este curso será eliminado.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                authFetch(`http://localhost:8080/cursos/${id}`, {
+                    method: "DELETE",
+
+                })
+                    .then((res) => {
+                        if (!res.ok) throw new Error("Error al eliminar curso");
+                        setCursos(cursos.filter(c => c.id !== id));
+                        Swal.fire("Eliminado", "El curso fue eliminado correctamente", "success");
                     })
                     .catch((err) => {
                         Swal.fire("Error", err.message, "error");
@@ -614,7 +741,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
                     <div className="mt-3">
                         <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
-                            <h5 className="mb-0">Registrar Actualizar Hijos</h5>
+                            <h5 className="alinearTexto  mb-0">Registrar Actualizar Hijos</h5>
 
                             <div>
                                 <button
@@ -679,7 +806,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                 />
                                             </td>
                                             <td>
-                                                <button className="btn btn-primary btn-sm" onClick={registrarNuevoFamiliar}>
+                                                <button className="btn btn-primary btn-sm"
+                                                    onClick={registrarNuevoFamiliar}>
                                                     Agregar
                                                 </button>
 
@@ -736,9 +864,147 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                 </tbody>
                             </table>
                         </div>
-
                         <hr />
+                        <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
+                            <h5 className="alinearTexto  mb-0">Registrar Cursos</h5>
 
+                            <div>
+                                <button
+                                    className="btn btn-outline-secondary me-2"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#tablaCursos"
+                                    aria-expanded="false"
+                                    aria-controls="tablaCursos"
+                                >
+                                    Mostrar/Ocultar Cursos
+                                </button>
+                            </div>
+                        </div>
+
+
+                        <div className="collapse" id="tablaCursos">
+                            <table className="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo Curso</th>
+                                        <th>Especialidad</th>
+                                        <th>Fecha de Realización</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {nuevoCurso && (
+                                        <tr>
+                                            <td>
+                                                <select
+                                                    className="form-select"
+                                                    value={nuevoCurso.tipoCurso}
+                                                    onChange={(e) =>
+                                                        setNuevoCurso({ ...nuevoCurso, tipoCurso: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Seleccione</option>
+                                                    <option value="FUNDAMENTACION">FUNDAMENTACIÓN</option>
+                                                    <option value="REENTRENAMIENTO">REENTRENAMIENTO</option>
+                                                </select>
+                                            </td>
+
+                                            <td>
+                                                <select
+                                                    className="form-select"
+                                                    value={nuevoCurso.categoria}
+                                                    onChange={(e) =>
+                                                        setNuevoCurso({ ...nuevoCurso, categoria: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Seleccione</option>
+                                                    <option value="GUARDA_DE_SEGURIDAD">GUARDA DE SEGURIDAD</option>
+                                                    <option value="MANEJADOR_CANINO">MANEJADOR CANINO</option>
+                                                    <option value="SUPERVISOR">SUPERVISOR</option>
+                                                    <option value="OPERADOR_DE_MEDIOS">OPERADOR DE MEDIOS</option>
+                                                    <option value="ESCOLTA">ESCOLTA</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    placeholder="Fecha de Realización"
+                                                    value={nuevoCurso.fechaCurso}
+                                                    onChange={(e) =>
+                                                        setNuevoCurso({ ...nuevoCurso, fechaCurso: e.target.value })
+                                                    }
+                                                />
+                                            </td>
+                                            <td>
+                                                <button className="btn btn-primary btn-sm"
+                                                    onClick={registrarNuevoCurso}
+                                                >
+                                                    Agregar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    )}
+                                    {cursos.map((c, idx) => (
+                                        <tr key={c.id || idx}>
+                                            <td>
+                                                <select
+                                                    className="form-select"
+                                                    value={c.tipoCurso !== undefined && c.tipoCurso !== null ? c.tipoCurso : ""}
+                                                    onChange={(e) => handleCursoChange(idx, "tipoCurso", e.target.value)}
+                                                >
+                                                    <option value="">Seleccione</option>
+                                                    <option value="FUNDAMENTACION">FUNDAMENTACION</option>
+                                                    <option value="REENTRENAMIENTO">REENTRENAMIENTO</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select
+                                                    className="form-select"
+                                                    value={c.categoria !== undefined && c.categoria !== null ? c.categoria : ""}
+                                                    onChange={(e) => handleCursoChange(idx, "categoria", e.target.value)}
+                                                >
+                                                    <option value="">Seleccione</option>
+                                                    <option value="GUARDA_DE_SEGURIDAD">GUARDA DE SEGURIDAD</option>
+                                                    <option value="MANEJADOR_CANINO">MANEJADOR CANINO</option>
+                                                    <option value="SUPERVISOR">SUPERVISOR</option>
+                                                    <option value="OPERADOR_DE_MEDIOS">OPERADOR DE MEDIOS</option>
+                                                    <option value="ESCOLTA">ESCOLTA</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    value={c.fechaCurso !== undefined && c.fechaCurso !== null ? c.fechaCurso : ""}
+                                                    onChange={(e) => handleCursoChange(idx, "fechaCurso", e.target.value)}
+                                                />
+                                            </td>
+
+                                            <td className="d-flex justify-content-between">
+                                                <button
+                                                    className="btn btn-success btn-sm me-2"
+                                                    onClick={() => actualizarCurso(c)}
+                                                >
+                                                    Guardar
+                                                </button>
+                                                <button
+                                                    className="btn btn-outline-danger btn-sm"
+                                                    onClick={() => eliminarCurso(c.id)}
+                                                    title="Eliminar"
+                                                >
+                                                    <i className="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+
+                                        </tr>
+                                    ))}
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <hr />
                         <div className="mt-1">
                             <div className="d-flex justify-content-between align-items-center mt-2 mb-2 alinearTexto">
                                 <h5 className="mb-0">Contratos Registrados</h5>

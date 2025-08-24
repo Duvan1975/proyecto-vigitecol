@@ -7,13 +7,15 @@ import java.time.LocalDate;
 public record DatosCursoDTO(
         String tipoCurso,
         String categoria,
-        LocalDate fechaCurso
+        LocalDate fechaCurso,
+        boolean vencido
 ) {
     public DatosCursoDTO(Curso curso) {
         this(
                 curso.getTipoCurso().toString(),
                 curso.getCategoria().toString(),
-                curso.getFechaCurso()
+                curso.getFechaCurso(),
+                curso.getFechaCurso().plusYears(1).isBefore(LocalDate.now())
         );
     }
 }

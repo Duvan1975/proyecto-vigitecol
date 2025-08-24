@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { authFetch } from "../utils/authFetch";
 import Paginacion from "./Paginacion";
 
-export function TablaFamiliar({ tipoEmpleado, titulo, genero }) {
+export function TablaFamiliar({ tipoEmpleado, titulo, genero, tipoBusqueda }) {
     const [empleadosConFamiliares, setEmpleadosConFamiliares] = useState([]);
 
     const [paginaActual, setPaginaActual] = useState(0);
@@ -27,12 +27,20 @@ export function TablaFamiliar({ tipoEmpleado, titulo, genero }) {
     const cargarEmpleadosConFamiliares = (pagina = 0) => {
         setCargando(true);
 
-        let url = genero
-            ? `http://localhost:8080/empleados/conFamiliares/genero?genero=${genero}&page=${pagina}`
-            : `http://localhost:8080/empleados/con-familiares-menores?page=${pagina}`;
-
-        if (tipoEmpleado) {
-            url += `&tipoEmpleado=${tipoEmpleado}`;
+        let url;
+        if (tipoBusqueda === "conFamiliares") {
+            // MENORES DE 12
+            url = `http://localhost:8080/empleados/con-familiares-menores?page=${pagina}`;
+            if (tipoEmpleado) url += `&tipoEmpleado=${tipoEmpleado}`;
+        } else if (tipoBusqueda === "familiaresPorGenero") {
+            // POR GÉNERO (si genero == null => trae todos padres y madres)
+            url = `http://localhost:8080/empleados/conFamiliares/genero?page=${pagina}`;
+            if (genero) url += `&genero=${genero}`;
+            if (tipoEmpleado) url += `&tipoEmpleado=${tipoEmpleado}`;
+        } else {
+            // fallback opcional
+            setCargando(false);
+            return;
         }
 
         authFetch(url, {
@@ -70,7 +78,12 @@ export function TablaFamiliar({ tipoEmpleado, titulo, genero }) {
 
     return (
         <div>
-            <h4 className="alinearTexto">{titulo} total hijos/hijastros: {totalFamiliares}</h4>
+            <h4 className="alinearTexto">
+                {tipoBusqueda === "conFamiliares"
+                    ? `${titulo} (hijos/hijastros: ${totalFamiliares} en esta página)`
+                    : `${titulo} ${totalElementos} (hijos/hijastros: ${totalFamiliares} en esta página)`}
+            </h4>
+
             <Paginacion
                 paginaActual={paginaActual}
                 totalPaginas={totalPaginas}

@@ -72,4 +72,16 @@ public class Curso {
     }
     //Constructor vacío
     public Curso() {}
+
+    public void actualizarDatos(DatosActualizarCurso datos) {
+        if (datos.tipoCurso() != null) {
+            this.tipoCurso = datos.tipoCurso();
+        }
+        if (datos.categoria() != null) {
+            this.categoria = datos.categoria();
+        }
+        if (datos.fechaCurso() != null) {
+            this.fechaCurso = datos.fechaCurso();
+        }
+    }
 }

@@ -1,15 +1,15 @@
 package proyectoVigitecolSpringBoot.controller;
 
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import proyectoVigitecolSpringBoot.domain.curso.Curso;
-import proyectoVigitecolSpringBoot.domain.curso.CursoService;
-import proyectoVigitecolSpringBoot.domain.curso.DatosListadoCurso;
-import proyectoVigitecolSpringBoot.domain.curso.DatosRegistroCurso;
+import proyectoVigitecolSpringBoot.domain.curso.*;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public class CursoController {
     public ResponseEntity<?> registrarCurso(@PathVariable Long empleadoId,
                                                @RequestBody List<DatosRegistroCurso> listaDatos) {
         cursoService.resgistrarCurso(empleadoId, listaDatos);
-        return ResponseEntity.ok("Curso Registrado con Éxito");
+        return ResponseEntity.ok(listaDatos);
     }
 
     @GetMapping
@@ -43,5 +43,21 @@ public class CursoController {
             @PathVariable Long empleadoId) {
         var cursos = cursoService.obtenerCursosPorEmpleadoActivo(empleadoId);
         return ResponseEntity.ok(cursos);
+    }
+
+    @PutMapping
+    @Transactional
+    public ResponseEntity<DatosRespuestaCurso> actualizarCurso(
+            @RequestBody @Valid DatosActualizarCurso datos) {
+
+        DatosRespuestaCurso respuesta = cursoService.actualizarCurso(datos);
+
+        return ResponseEntity.ok(respuesta);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarCurso(@PathVariable Long id) {
+        cursoService.eliminarCurso(id);
+        return ResponseEntity.noContent().build(); // Devuelve 204 No Content
     }
 }

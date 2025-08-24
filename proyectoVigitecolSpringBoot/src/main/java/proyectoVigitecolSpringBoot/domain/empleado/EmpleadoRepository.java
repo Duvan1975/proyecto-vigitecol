@@ -85,24 +85,35 @@ public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
     Page<Empleado> findEmpleadosConCurso(Pageable pageable);
 
     @Query("""
-                SELECT e FROM Empleado e
-                JOIN Contrato c ON c.empleado = e AND c.numeroContrato = (
-                    SELECT MAX(c2.numeroContrato)
-                    FROM Contrato c2
+            SELECT e FROM Empleado e
+            JOIN Contrato c ON c.empleado = e AND c.numeroContrato = (
+                SELECT MAX(c2.numeroContrato)
+                FROM Contrato c2
+                WHERE c2.empleado = e
+            )
+            WHERE c.continua = true
+            AND EXISTS (
+                SELECT 1 
+                FROM Curso cu
+                WHERE cu.empleado = e
+                AND cu.cursoId = (
+                    SELECT MAX(c2.cursoId)
+                    FROM Curso c2
                     WHERE c2.empleado = e
                 )
-                WHERE c.continua = true
-                AND EXISTS (
-                    SELECT 1 FROM Curso cu
-                    WHERE cu.empleado = e
-                    AND cu.fechaCurso = (
-                        SELECT MAX(c2.fechaCurso) FROM Curso c2 WHERE c2.empleado = e
-                    )
-                    AND cu.fechaCurso + 1 YEAR BETWEEN :hoy AND :fechaLimite
+                AND (
+                    (cu.fechaCurso + 1 YEAR BETWEEN :hoy AND :fechaLimite)
+                    OR (cu.fechaCurso + 1 YEAR BETWEEN :hace30Dias AND :ayer)
                 )
+            )
             """)
     Page<Empleado> findEmpleadosConCursosPorVencer(
             @Param("hoy") LocalDate hoy,
             @Param("fechaLimite") LocalDate fechaLimite,
-            Pageable pageable);
+            @Param("hace30Dias") LocalDate hace30Dias,
+            @Param("ayer") LocalDate ayer,
+            Pageable pageable
+    );
+
+
 }

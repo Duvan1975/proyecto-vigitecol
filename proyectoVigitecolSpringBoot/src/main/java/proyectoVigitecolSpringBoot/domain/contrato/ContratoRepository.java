@@ -125,72 +125,72 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
             Pageable pageable);
 
     @Query("""
-        SELECT c.empleado
-        FROM Contrato c
-        WHERE c.numeroContrato = (
-            SELECT MAX(c2.numeroContrato)
-            FROM Contrato c2
-            WHERE c2.empleado.id = c.empleado.id
-        )
-        AND c.continua = true
-        AND c.empleado.estadoCivil = :estadoCivil
-        AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
-        ORDER BY c.empleado.apellidos ASC
-        """)
+            SELECT c.empleado
+            FROM Contrato c
+            WHERE c.numeroContrato = (
+                SELECT MAX(c2.numeroContrato)
+                FROM Contrato c2
+                WHERE c2.empleado.id = c.empleado.id
+            )
+            AND c.continua = true
+            AND c.empleado.estadoCivil = :estadoCivil
+            AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
+            ORDER BY c.empleado.apellidos ASC
+            """)
     Page<Empleado> findEmpleadosPorEstadoCivilConContratoActivo(
             @Param("estadoCivil") EstadoCivil estadoCivil,
             @Param("tipoEmpleado") TipoEmpleado tipoEmpleado,
             Pageable pageable);
 
     @Query("""
-        SELECT c.empleado
-        FROM Contrato c
-        WHERE c.numeroContrato = (
-            SELECT MAX(c2.numeroContrato)
-            FROM Contrato c2
-            WHERE c2.empleado.id = c.empleado.id
-        )
-        AND c.continua = true
-        AND c.empleado.genero = :genero
-        AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
-        ORDER BY c.empleado.apellidos ASC
-        """)
+            SELECT c.empleado
+            FROM Contrato c
+            WHERE c.numeroContrato = (
+                SELECT MAX(c2.numeroContrato)
+                FROM Contrato c2
+                WHERE c2.empleado.id = c.empleado.id
+            )
+            AND c.continua = true
+            AND c.empleado.genero = :genero
+            AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
+            ORDER BY c.empleado.apellidos ASC
+            """)
     Page<Empleado> findEmpleadosPorGeneroConContratoActivo(
             @Param("genero") Genero genero,
             @Param("tipoEmpleado") TipoEmpleado tipoEmpleado,
             Pageable pageable);
 
     @Query("""
-        SELECT c.empleado
-        FROM Contrato c
-        WHERE c.numeroContrato = (
-            SELECT MAX(c2.numeroContrato)
-            FROM Contrato c2
-            WHERE c2.empleado.id = c.empleado.id
-        )
-        AND c.continua = true
-        AND c.empleado.libretaMilitar = :libretaMilitar
-        AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
-        ORDER BY c.empleado.apellidos ASC
-        """)
+            SELECT c.empleado
+            FROM Contrato c
+            WHERE c.numeroContrato = (
+                SELECT MAX(c2.numeroContrato)
+                FROM Contrato c2
+                WHERE c2.empleado.id = c.empleado.id
+            )
+            AND c.continua = true
+            AND c.empleado.libretaMilitar = :libretaMilitar
+            AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
+            ORDER BY c.empleado.apellidos ASC
+            """)
     Page<Empleado> findEmpleadosPorLibretaMilitarConContratoActivo(
             @Param("libretaMilitar") LibretaMilitar libretaMilitar,
             @Param("tipoEmpleado") TipoEmpleado tipoEmpleado,
             Pageable pageable);
 
     @Query("""
-        SELECT c.empleado
-        FROM Contrato c
-        WHERE c.numeroContrato = (
-            SELECT MAX(c2.numeroContrato)
-            FROM Contrato c2
-            WHERE c2.empleado.id = c.empleado.id
-        )
-        AND c.continua = true
-        AND LOWER(c.empleado.cargo) LIKE LOWER((CONCAT('%', REPLACE(:cargo, ' ', '%'), '%')))
-        AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
-        ORDER BY c.empleado.apellidos ASC
-        """)
+            SELECT c.empleado
+            FROM Contrato c
+            WHERE c.numeroContrato = (
+                SELECT MAX(c2.numeroContrato)
+                FROM Contrato c2
+                WHERE c2.empleado.id = c.empleado.id
+            )
+            AND c.continua = true
+            AND LOWER(c.empleado.cargo) LIKE LOWER((CONCAT('%', REPLACE(:cargo, ' ', '%'), '%')))
+            AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
+            ORDER BY c.empleado.apellidos ASC
+            """)
     Page<Empleado> findEmpleadosPorCargoConContratoActivo(
             @Param("cargo") String cargo,
             @Param("tipoEmpleado") TipoEmpleado tipoEmpleado,
@@ -206,8 +206,8 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
                     WHERE c2.empleado.id = c.empleado.id
                 )
                 AND c.continua = true
-                AND c.empleado.genero = :genero
                 AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
+                AND (:genero IS NULL OR c.empleado.genero = :genero)
                 AND SIZE(c.empleado.familiares) > 0
                 ORDER BY c.empleado.apellidos ASC
             """)

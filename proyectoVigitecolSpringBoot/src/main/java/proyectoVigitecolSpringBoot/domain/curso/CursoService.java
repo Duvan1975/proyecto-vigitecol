@@ -1,5 +1,7 @@
 package proyectoVigitecolSpringBoot.domain.curso;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -7,6 +9,7 @@ import org.springframework.stereotype.Service;
 import proyectoVigitecolSpringBoot.domain.empleado.EmpleadoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CursoService {
@@ -39,5 +42,28 @@ public class CursoService {
         return cursos.stream()
                 .map(DatosListadoCurso::new)
                 .toList();
+    }
+    @Transactional
+    public DatosRespuestaCurso actualizarCurso(DatosActualizarCurso datos) {
+        Optional<Curso> optionalCurso = cursoRepository.findById(datos.id());
+
+        if (optionalCurso.isEmpty()) {
+            throw new EntityNotFoundException("Curso no encontrado con ID: " + datos.id());
+        }
+        Curso curso = optionalCurso.get();
+        curso.actualizarDatos(datos);
+
+        return new DatosRespuestaCurso(
+                curso.getCursoId(),
+                curso.getTipoCurso(),
+                curso.getCategoria(),
+                curso.getFechaCurso()
+        );
+    }
+    public void eliminarCurso(Long id) {
+        if (!cursoRepository.existsById(id)) {
+            throw new EntityNotFoundException("Curso no encontrado con ID: " + id);
+        }
+        cursoRepository.deleteById(id); // Devuelve 204 No Content
     }
 }

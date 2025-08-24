@@ -4,20 +4,19 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 import proyectoVigitecolSpringBoot.domain.contrato.Contrato;
 import proyectoVigitecolSpringBoot.domain.contrato.ContratoRepository;
+import proyectoVigitecolSpringBoot.domain.curso.Curso;
 
 import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @Service
@@ -479,18 +478,22 @@ public class EmpleadoService {
                 .map(DatosEmpleadoConCurso::new);
     }
 
+
     public Page<DatosEmpleadoConCurso> findEmpleadosConCursosPorVencer(Pageable pageable) {
-        return empleadoRepository.findEmpleadosConCurso(pageable)
+        LocalDate hoy = LocalDate.now();
+        LocalDate fechaLimite = hoy.plusDays(30);
+        LocalDate hace30Dias = hoy.minusDays(30);
+        LocalDate ayer = hoy.minusDays(1);
+
+        return empleadoRepository.findEmpleadosConCursosPorVencer(hoy, fechaLimite, hace30Dias, ayer, pageable)
                 .map(empleado -> {
-                    // Filtrar solo cursos vigentes (no vencidos)
-                    List<DatosCursoDTO> cursosVigentes = empleado.getCursos().stream()
-                            .filter(curso -> {
-                                LocalDate fechaVencimiento = curso.getFechaCurso().plusYears(1);
-                                return fechaVencimiento.isAfter(LocalDate.now()) // aún no vencido
-                                        && fechaVencimiento.isBefore(LocalDate.now().plusDays(30)); // vence en <= 30 días
-                            })
-                            .sorted((c1, c2) -> c1.getFechaCurso().compareTo(c2.getFechaCurso())) // orden ascendente por fechaCurso
+                    // Tomar solo el curso más reciente
+                    Optional<Curso> cursoMasReciente = empleado.getCursos().stream()
+                            .max(Comparator.comparing(Curso::getCursoId));
+
+                    List<DatosCursoDTO> cursosVigentes = cursoMasReciente
                             .map(DatosCursoDTO::new)
+                            .stream()
                             .toList();
 
                     return new DatosEmpleadoConCurso(
@@ -505,5 +508,6 @@ public class EmpleadoService {
                     );
                 });
     }
+
 
 }
