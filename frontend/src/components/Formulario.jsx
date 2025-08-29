@@ -23,7 +23,7 @@ export function Formulario() {
         cargo: ""
     });
 
-    //Estados para registrar familiares, cursos y contratos
+    //Estados para registrar familiares
     const [familiares, setFamiliares] = useState([]);
     const [familiarActual, setFamiliarActual] = useState({
         tipoFamiliar: "",
@@ -31,6 +31,7 @@ export function Formulario() {
         edadFamiliar: ""
     });
 
+    //Estados para registrar Cursos de Vigilancia
     const [cursos, setCursos] = useState([]);
     const [cursoActual, setCursoActual] = useState({
         tipoCurso: "",
@@ -38,6 +39,15 @@ export function Formulario() {
         fechaCurso: ""
     });
 
+    //Estados para registrar Estudios
+    const [estudios, setEstudios] = useState([]);
+    const [estudioActual, setEstudioActual] = useState({
+        tipoEstudio: "",
+        nombreEstudio: "",
+        fechaEstudio: ""
+    });
+
+    //Estado para registrar Contrato
     const [contrato, setContrato] = useState({
         fechaIngreso: ""
     });
@@ -69,6 +79,21 @@ export function Formulario() {
                 tipoCurso: "",
                 categoria: "",
                 fechaCurso: ""
+            });
+        }
+    };
+
+    const agregarEstudio = () => {
+        if (
+            estudioActual.tipoEstudio &&
+            estudioActual.nombreEstudio &&
+            estudioActual.fechaEstudio
+        ) {
+            setEstudios([...estudios, { ...estudioActual }]);
+            setEstudioActual({
+                tipoEstudio: "",
+                nombreEstudio: "",
+                fechaEstudio: ""
             });
         }
     };
@@ -107,6 +132,13 @@ export function Formulario() {
             fechaCurso: ""
         });
         setCursos([]);
+
+        setEstudioActual({
+            tipoEstudio: "",
+            nombreEstudio: "",
+            fechaEstudio: ""
+        });
+        setEstudios([]);
     };
     const eliminarFamiliarTabla = (index) => {
         const nuevosFamiliares = [...familiares];
@@ -117,6 +149,11 @@ export function Formulario() {
         const nuevosCursos = [...cursos];
         nuevosCursos.splice(index, 1);
         setCursos(nuevosCursos);
+    };
+    const eliminarEstudioTabla = (index) => {
+        const nuevosEstudios = [...estudios];
+        nuevosEstudios.splice(index, 1);
+        setEstudios(nuevosEstudios);
     };
 
     return (
@@ -448,7 +485,86 @@ export function Formulario() {
                     </table>
                 </div>
             )}
-            
+
+            <h4 className='alinearTexto'>Estudios</h4>
+
+            <div className='row align-items-center g-2'>
+                <CuadrosSelect
+                    tamanoinput="col-md-4"
+                    titulolabel="Tipo de Estudio:"
+                    nombreinput="tipoEstudio"
+                    idinput="tipoEstudio"
+                    value={estudioActual.tipoEstudio}
+                    onChange={(e) =>
+                        setEstudioActual({ ...estudioActual, tipoEstudio: e.target.value })
+                    }
+                    opciones={[
+                        { valor: "BACHILLER_ACADEMICO", texto: "BACHILLER ACADÉMICO" },
+                        { valor: "TECNICO", texto: "TECNICO" },
+                        { valor: "OTRO", texto: "OTRO" },
+                    ]}
+                />
+                <CuadrosTexto
+                    tamanoinput="col-md-4"
+                    titulolabel="Descripción (Título):"
+                    tipoinput="text"
+                    nombreinput="nombreEstudio"
+                    idinput="nombreEstudio"
+                    value={estudioActual.nombreEstudio}
+                    onChange={(e) =>
+                        setEstudioActual({ ...estudioActual, nombreEstudio: e.target.value })
+                    }
+                />
+                <CuadrosTexto
+                    tamanoinput="col-md-4"
+                    titulolabel="Fecha de Realización:"
+                    tipoinput="date"
+                    nombreinput="fechaEstudio"
+                    idinput="fechaEstudio"
+                    value={estudioActual.fechaEstudio}
+                    onChange={(e) =>
+                        setEstudioActual({ ...estudioActual, fechaEstudio: e.target.value })
+                    }
+                />
+            </div>
+            <button type="button"
+                className="btn btn-secondary mb-4"
+                onClick={agregarEstudio}
+            >
+                Agregar otro Curso
+            </button>
+
+            {estudios.length > 0 && (
+                <div>
+                    <h4>Estudios Registrados:</h4>
+                    <table className="table table-bordered border-black">
+                        <thead className="table-primary border-black">
+                            <tr>
+                                <th>Tipo de Estudio</th>
+                                <th>Descripción (Título)</th>
+                                <th>Fecha de Realización</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {estudios.map((e, idx) => (
+                                <tr key={idx}>
+                                    <td>{e.tipoEstudio}</td>
+                                    <td>{e.nombreEstudio}</td>
+                                    <td>{e.fechaEstudio}</td>
+                                    <td><button
+                                        className="btn btn-outline-danger btn-sm"
+                                        onClick={() => eliminarEstudioTabla(idx)}
+                                        title="Eliminar"
+                                    >
+                                        <i className="bi bi-trash"></i>
+                                    </button></td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
             <h4 className='alinearTexto'>Asignar Cargo</h4>
 
             <div className='row align-items-center g-2'>
@@ -489,7 +605,7 @@ export function Formulario() {
             <div className='col-md-auto'>
                 <button
                     onClick={() => AgregarTabla(
-                        contrato, familiares, cursos, empleado, limpiarFormulario)}
+                        contrato, familiares, cursos, estudios, empleado, limpiarFormulario)}
                     className="botonregistrar btn btn-success"
                 >
                     Registrar

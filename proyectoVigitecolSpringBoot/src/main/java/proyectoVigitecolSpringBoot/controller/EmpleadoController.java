@@ -207,4 +207,23 @@ public class EmpleadoController {
         return ResponseEntity.ok(resultado);
     }
 
+    @GetMapping("/periodo-prueba/vencido")
+    public ResponseEntity<Page<DatosEmpleadoConPeriodoDePrueba>> empleadosEnPeriodoDePruebaVencido(
+            @PageableDefault(size = 10, sort = "apellidos") Pageable pageable) {
+
+        Page<DatosEmpleadoConPeriodoDePrueba> resultado =
+                empleadoService.findEmpleadosEnPeriodoDePrueba(pageable);
+
+        return ResponseEntity.ok(resultado);
+    }
+
+    @GetMapping("/con-estudios")
+    public ResponseEntity<Page<DatosEmpleadoConEstudios>> empleadosConEstudios(
+            @PageableDefault(size = 10, sort = "apellidos") Pageable pageable) {
+
+        Page<DatosEmpleadoConEstudios> resultado = empleadoService
+                .findConEstudios(pageable);
+
+        return ResponseEntity.ok(resultado);
+    }
 }

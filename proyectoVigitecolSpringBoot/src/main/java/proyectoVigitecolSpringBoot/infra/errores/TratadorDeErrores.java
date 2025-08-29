@@ -36,7 +36,7 @@ public class TratadorDeErrores {
             this(error.getField(), error.getDefaultMessage());
         }
     }
-    @ExceptionHandler(HttpMessageNotReadableException.class)
+    /*@ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> tratarErrorDeLectura(HttpMessageNotReadableException e) {
         Throwable causa = e.getMostSpecificCause();
         Map<String, String> error = new HashMap<>();
@@ -69,7 +69,7 @@ public class TratadorDeErrores {
         }
 
         return ResponseEntity.badRequest().body(error);
-    }
+    }*/
 
     //Tratando error cuando enviamos un correo duplicado
     @ExceptionHandler(RuntimeException.class)
@@ -95,4 +95,25 @@ public class TratadorDeErrores {
 
         return ResponseEntity.badRequest().body(error);
     }
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, String>> tratarErrorDeLectura(HttpMessageNotReadableException e) {
+        Throwable causa = e.getMostSpecificCause();
+        Map<String, String> error = new HashMap<>();
+
+        if (causa instanceof DateTimeParseException || causa.getMessage().contains("LocalDate")) {
+            error.put("error", "Error en el formato de fecha");
+            error.put("detalle", "Verifica que las fechas tengan el formato correcto (yyyy-MM-dd)");
+        } else if (causa.getMessage().contains("from String")) {
+            // 👇 Aquí generalizamos para cualquier enum
+            error.put("error", "Debe seleccionar una de las opciones válidas");
+            error.put("detalle", causa.getMessage());
+        } else {
+            error.put("error", "Error en el formato del JSON");
+            error.put("detalle", causa.getMessage());
+        }
+
+
+        return ResponseEntity.badRequest().body(error);
+    }
+
 }

@@ -5,7 +5,6 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +21,9 @@ public class CursoController {
     private CursoService cursoService;
 
     @PostMapping("/{empleadoId}")
-    public ResponseEntity<?> registrarCurso(@PathVariable Long empleadoId,
-                                               @RequestBody List<DatosRegistroCurso> listaDatos) {
+    public ResponseEntity<?> registrarCurso(
+            @PathVariable Long empleadoId,
+            @RequestBody List<@Valid DatosRegistroCurso> listaDatos) {
         cursoService.resgistrarCurso(empleadoId, listaDatos);
         return ResponseEntity.ok(listaDatos);
     }

@@ -5,6 +5,7 @@ export async function AgregarTabla(
     contrato,
     familiares,
     cursos,
+    estudios,
     empleado,
     limpiarFormulario) {
 
@@ -85,6 +86,30 @@ export async function AgregarTabla(
             if (!responseCursos.ok) {
                 const errorData = await responseCursos.json();
                 throw new Error(errorData.message || "Error al registrar cursos");
+            }
+        }
+
+        //Enviamos todos los cursos juntos
+        const estudiosLimpios = estudios.filter(e =>
+            e.tipoEstudio && e.nombreEstudio && e.fechaEstudio
+        ).map((e) => ({
+            tipoEstudio: e.tipoEstudio,
+            nombreEstudio: e.nombreEstudio,
+            fechaEstudio: e.fechaEstudio
+        }));
+
+        if (estudiosLimpios.length > 0) {
+            const responseEstudios = await authFetch(`http://localhost:8080/estudios/${empleadoId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(estudiosLimpios)
+            });
+
+            if (!responseEstudios.ok) {
+                const errorData = await responseEstudios.json();
+                throw new Error(errorData.message || "Error al registrar estudios");
             }
         }
 

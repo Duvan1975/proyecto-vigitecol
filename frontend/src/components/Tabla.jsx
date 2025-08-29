@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import Paginacion from "./Paginacion";
 import { TablaFamiliar } from "./TablaFamiliar";
 import { TablaCurso } from "./TablaCurso";
+import { TablaContratoConPeriodoDePrueba } from "./TablaContratoConPeriodoDePrueba";
 import { authFetch } from "../utils/authFetch";
 
 export function Tabla({
@@ -429,6 +430,7 @@ export function Tabla({
                             <option value="libretaMilitar">LIBRETA MILITAR</option>
                             <option value="conFamiliares">HIJOS/HIJASTROS</option>
                             <option value="cursosPorVencer">CURSOS A VENCER</option>
+                            <option value="periodoDePrueba">PERIODO DE PRUEBA</option>
                             <option value="conContrato">CON CONTRATO</option>
                             <option value="sinContrato">SIN CONTRATO</option>
                         </select>
@@ -464,6 +466,7 @@ export function Tabla({
                                     disabled={["personalMayorDe50",
                                         "conFamiliares",
                                         "cursosPorVencer",
+                                        "periodoDePrueba",
                                         "conContrato",
                                         "sinContrato"].includes(tipoBusqueda)}
                                 />
@@ -550,6 +553,7 @@ export function Tabla({
                                 "cargo",
                                 "conFamiliares",
                                 "cursosPorVencer",
+                                "periodoDePrueba",
                                 "conContrato",
                                 "sinContrato"]
                                 .includes(tipoBusqueda)}
@@ -584,6 +588,7 @@ export function Tabla({
             {tipoBusqueda !== "conContrato" &&
                 tipoBusqueda !== "conFamiliares" &&
                 tipoBusqueda !== "cursosPorVencer" &&
+                tipoBusqueda !== "periodoDePrueba" &&
                 tipoBusqueda !== "familiaresPorGenero" && (
                     <>
                         <h4 className="alinearTexto">
@@ -641,16 +646,22 @@ export function Tabla({
                 </div>
             )}
 
-
             {tipoBusqueda === "cursosPorVencer" && (
                 <div className="mt-4">
                     <TablaCurso />
                 </div>
             )}
 
+            {tipoBusqueda === "periodoDePrueba" && (
+                <div className="mt-4">
+                    <TablaContratoConPeriodoDePrueba />
+                </div>
+            )}
+
             {tipoBusqueda !== "conContrato" &&
                 tipoBusqueda !== "conFamiliares" &&
                 tipoBusqueda !== "cursosPorVencer" &&
+                tipoBusqueda !== "periodoDePrueba" &&
                 tipoBusqueda !== "familiaresPorGenero" && (
                     <>
                         <table className={`table table-bordered border-primary table-striped table-hover 
@@ -819,7 +830,8 @@ export function Tabla({
                 )}
             {tipoBusqueda !== "conContrato" &&
                 tipoBusqueda !== "conFamiliares" &&
-                tipoBusqueda !== "cursosPorVencer" &&
+                tipoBusqueda !== "cursosPorVencer" && 
+                tipoBusqueda !== "periodoDePrueba" && 
                 tipoBusqueda !== "familiaresPorGenero" && (
                     <>
                         {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (

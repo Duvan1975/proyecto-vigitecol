@@ -115,5 +115,26 @@ public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
             Pageable pageable
     );
 
+    @Query("""
+            SELECT e FROM Empleado e
+            JOIN Contrato c ON c.empleado = e
+            WHERE c.numeroContrato = 1
+            AND c.continua = true
+            AND c.fechaIngreso BETWEEN :fechaMin AND :fechaMax
+            """)
+    Page<Empleado> findEmpleadosEnPeriodoDePruebaVencido(
+            @Param("fechaMin") LocalDate fechaMin,
+            @Param("fechaMax") LocalDate fechaMax,
+            Pageable pageable);
 
+    @Query("""
+                SELECT e FROM Empleado e
+                JOIN Contrato c ON c.empleado = e AND c.numeroContrato = (
+                    SELECT MAX(c2.numeroContrato)
+                    FROM Contrato c2
+                    WHERE c2.empleado = e
+                )AND c.continua = true
+                WHERE SIZE(e.estudios) > 0
+            """)
+    Page<Empleado> findEmpleadosConEstudios(Pageable pageable);
 }

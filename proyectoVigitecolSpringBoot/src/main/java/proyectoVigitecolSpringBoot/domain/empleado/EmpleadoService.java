@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 import proyectoVigitecolSpringBoot.domain.contrato.Contrato;
 import proyectoVigitecolSpringBoot.domain.contrato.ContratoRepository;
+import proyectoVigitecolSpringBoot.domain.contrato.DatosContratoDTO;
 import proyectoVigitecolSpringBoot.domain.curso.Curso;
 
 import java.text.Normalizer;
@@ -509,5 +510,32 @@ public class EmpleadoService {
                 });
     }
 
+    public Page<DatosEmpleadoConPeriodoDePrueba> findEmpleadosEnPeriodoDePrueba(Pageable pageable) {
+        LocalDate fechaMin = LocalDate.now().minusDays(60);
+        LocalDate fechaMax = LocalDate.now().minusDays(45);
 
+        return empleadoRepository.findEmpleadosEnPeriodoDePruebaVencido(fechaMin, fechaMax, pageable)
+                .map(empleado -> {
+                    // Sólo el contrato número 1
+                    List<DatosContratoDTO> contratoPeriodoDePrueba = empleado.getContratos().stream()
+                            .filter(c -> c.getNumeroContrato() == 1)
+                            .map(DatosContratoDTO::new)
+                            .toList();
+
+                    return new DatosEmpleadoConPeriodoDePrueba(
+                            empleado.getId(),
+                            empleado.getNombres(),
+                            empleado.getApellidos(),
+                            empleado.getNumeroDocumento(),
+                            empleado.getTelefono(),
+                            empleado.getCargo(),
+                            contratoPeriodoDePrueba
+                    );
+                });
+    }
+
+    public Page<DatosEmpleadoConEstudios> findConEstudios(Pageable pageable) {
+        return empleadoRepository.findEmpleadosConEstudios(pageable)
+                .map(DatosEmpleadoConEstudios::new);
+    }
 }

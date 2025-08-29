@@ -10,6 +10,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
     const [cursos, setCursos] = useState([]);
 
+    const [estudios, setEstudios] = useState([]);
+
     //Estado para agregar familiares modificado para que siempre sea visible en la tabla familiares
     const [nuevoFamiliar, setNuevoFamiliar] = useState({
         tipoFamiliar: "",
@@ -25,8 +27,16 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         fechaCurso: ""
     });
 
+    //Estado para agregar estudios
+    const [nuevoEstudio, setNuevoEstudio] = useState({
+        tipoEstudio: "",
+        nombreEstudio: "",
+        fechaEstudio: ""
+    });
+
     //Estado para cargar contratos
     const [contratos, setContratos] = useState([]);
+
     const [formulario, setFormulario] = useState({
         id: "",
         nombres: "",
@@ -119,6 +129,27 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         }
     }, [empleado]);
 
+    useEffect(() => {
+        if (empleado) {
+            setFormulario(empleado);
+
+            //Obtener estudios del empleado por ID
+            authFetch(`http://localhost:8080/estudios/por-empleado/${empleado.id}`, {
+
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const estudiosPreparados = (Array.isArray(data) ? data : []).map(es => ({
+                        id: es.id ?? es.estudioId ?? null,
+                        tipoEstudio: es.tipoEstudio ?? "",
+                        nombreEstudio: es.nombreEstudio ?? "",
+                        fechaEstudio: es.fechaEstudio ?? ""
+                    }));
+                    setEstudios(estudiosPreparados);
+                });
+        }
+    }, [empleado]);
+
     const handleChange = (e) => {
         setFormulario({
             ...formulario,
@@ -150,6 +181,15 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             [field]: value
         };
         setCursos(nuevosCursos);
+    };
+
+    const handleEstudioChange = (index, field, value) => {
+        const nuevosEstudios = [...estudios];
+        nuevosEstudios[index] = {
+            ...nuevosEstudios[index],
+            [field]: value
+        };
+        setEstudios(nuevosEstudios);
     };
 
     const actualizarEmpleado = () => {
@@ -245,6 +285,24 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             });
     };
 
+    const actualizarEstudio = (estudio) => {
+
+        authFetch("http://localhost:8080/estudios", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(estudio)
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Error al actualizar estudio");
+                Swal.fire("Estudio actualizado correctamente", "", "success");
+            })
+            .catch(err => {
+                Swal.fire("Error", err.message, "error");
+            });
+    };
+
     //Function para registrar un nuevo hijo/hijastros en el Modal
     const registrarNuevoFamiliar = () => {
 
@@ -305,13 +363,27 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     //Function para registrar un nuevo curso en el Modal
     const registrarNuevoCurso = () => {
 
-        // Valida que ningún campo este vacío
-        if (
-            !nuevoCurso.tipoCurso ||
-            !nuevoCurso.categoria ||
-            !nuevoCurso.fechaCurso === ""
-        ) {
-            Swal.fire("Campos incompletos", "Por favor llena todos los campos.", "warning");
+        // Validar tipoCurso
+        if (!nuevoCurso.tipoCurso) {
+            Swal.fire("Campo incompleto", "Por favor selecciona el tipo de Curso.", "warning");
+            return;
+        }
+
+        if (!nuevoCurso.categoria) {
+            Swal.fire("Campo incompleto", "Por favor selecciona el tipo de Especialidad.", "warning");
+            return;
+        }
+
+        // Validar fechaEstudio (vacía o inválida)
+        if (!nuevoCurso.fechaCurso) {
+            Swal.fire("Campo incompleto", "Por favor ingresa la fecha del curso.", "warning");
+            return;
+        }
+
+        // Validar formato y validez real de la fecha
+        const fecha = new Date(nuevoCurso.fechaCurso);
+        if (isNaN(fecha.getTime())) {
+            Swal.fire("Fecha inválida", "Verifica que la fecha tenga el formato correcto (yyyy-MM-dd).", "error");
             return;
         }
 
@@ -320,38 +392,66 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify([
-                {
-                    tipoCurso: nuevoCurso.tipoCurso,
-                    categoria: nuevoCurso.categoria,
-                    fechaCurso: nuevoCurso.fechaCurso
-                }
-            ])
+            body: JSON.stringify([nuevoCurso])
         })
             .then((res) => {
                 if (!res.ok) throw new Error("Error al registrar el curso");
                 return res.json();
             })
             .then((cursoCreado) => {
-
-                // Agregar el curso creado a la lista
-
                 setCursos(prev => [...prev, {
-                    id: cursoCreado.id ?? cursoCreado.cursoId,
+                    id: cursoCreado.id ?? cursoCreado.estudioId,
                     tipoCurso: nuevoCurso.tipoCurso,
                     categoria: nuevoCurso.categoria,
                     fechaCurso: nuevoCurso.fechaCurso
                 }]);
 
-                // Resetear los campos PERO mantener el formulario visible
-
-                setNuevoCurso({
-                    tipoCurso: "",
-                    categoria: "",
-                    fechaCurso: ""
-                });
+                setNuevoCurso({ tipoCurso: "", categoria: "", fechaCurso: "" });
 
                 Swal.fire("Curso agregado", "El curso ha sido registrado correctamente", "success");
+            })
+            .catch((err) => {
+                Swal.fire("Error", err.message, "error");
+            });
+    };
+
+    //Function para registrar un nuevo estudio en el Modal
+    const registrarNuevoEstudio = () => {
+        // Validar tipoEstudio
+        if (!nuevoEstudio.tipoEstudio) {
+            Swal.fire("Campo incompleto", "Por favor selecciona el tipo de estudio.", "warning");
+            return;
+        }
+
+        // Validar fechaEstudio (vacía o inválida)
+        if (!nuevoEstudio.fechaEstudio) {
+            Swal.fire("Campo incompleto", "Por favor ingresa la fecha del estudio.", "warning");
+            return;
+        }
+
+        // ✅ Si todo está correcto, proceder con el fetch
+        authFetch(`http://localhost:8080/estudios/${empleado.id}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify([nuevoEstudio])
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error("Error al registrar el estudio");
+                return res.json();
+            })
+            .then((estudioCreado) => {
+                setEstudios(prev => [...prev, {
+                    id: estudioCreado.id ?? estudioCreado.estudioId,
+                    tipoEstudio: nuevoEstudio.tipoEstudio,
+                    nombreEstudio: nuevoEstudio.nombreEstudio,
+                    fechaEstudio: nuevoEstudio.fechaEstudio
+                }]);
+
+                setNuevoEstudio({ tipoEstudio: "", nombreEstudio: "", fechaEstudio: "" });
+
+                Swal.fire("Estudio agregado", "El estudio ha sido registrado correctamente", "success");
             })
             .catch((err) => {
                 Swal.fire("Error", err.message, "error");
@@ -525,9 +625,36 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
                 })
                     .then((res) => {
-                        if (!res.ok) throw new Error("Error al eliminar curso");
+                        if (!res.ok) throw new Error("Error al eliminar curso, (Debes actualizar los datos para poder eliminar)");
                         setCursos(cursos.filter(c => c.id !== id));
                         Swal.fire("Eliminado", "El curso fue eliminado correctamente", "success");
+                    })
+                    .catch((err) => {
+                        Swal.fire("Error", err.message, "error");
+                    });
+            }
+        });
+    };
+
+    const eliminarEstudio = (id) => {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Este estudio será eliminado.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                authFetch(`http://localhost:8080/estudios/${id}`, {
+                    method: "DELETE",
+
+                })
+                    .then((res) => {
+                        if (!res.ok) throw new Error("Error al eliminar estudio, (Debes actualizar los datos para poder eliminar este registro)");
+                        setEstudios(estudios.filter(es => es.id !== id));
+                        Swal.fire("Eliminado", "El registro fue eliminado correctamente", "success");
                     })
                     .catch((err) => {
                         Swal.fire("Error", err.message, "error");
@@ -867,7 +994,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                         <hr />
                         <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
                             <h5 className="alinearTexto  mb-0">Registrar Cursos</h5>
-
                             <div>
                                 <button
                                     className="btn btn-outline-secondary me-2"
@@ -1004,6 +1130,140 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                 </tbody>
                             </table>
                         </div>
+
+                        <hr />
+                        <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
+                            <h5 className="alinearTexto  mb-0">Registrar Estudios</h5>
+                            <div>
+                                <button
+                                    className="btn btn-outline-secondary me-2"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#tablaEstudios"
+                                    aria-expanded="false"
+                                    aria-controls="tablaEstudios"
+                                >
+                                    Mostrar/Ocultar Estudios
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="collapse" id="tablaEstudios">
+                            <table className="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo Estudio</th>
+                                        <th>Título Obtenido</th>
+                                        <th>Fecha de Realización</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {nuevoEstudio && (
+                                        <tr>
+                                            <td>
+                                                <select
+                                                    className="form-select"
+                                                    value={nuevoEstudio.tipoEstudio}
+                                                    onChange={(e) =>
+                                                        setNuevoEstudio({ ...nuevoEstudio, tipoEstudio: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Seleccione</option>
+                                                    <option value="BACHILLER_ACADEMICO">BACHILLER ACADÉMICO</option>
+                                                    <option value="TECNICO">TÉCNICO</option>
+                                                    <option value="OTRO">OTRO</option>
+                                                </select>
+                                            </td>
+
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    placeholder="Título Obtenido"
+                                                    value={nuevoEstudio.nombreEstudio}
+                                                    onChange={(e) =>
+                                                        setNuevoEstudio({ ...nuevoEstudio, nombreEstudio: e.target.value })
+                                                    }
+                                                />
+                                            </td>
+
+                                            <td>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    placeholder="Fecha de Realización"
+                                                    value={nuevoEstudio.fechaEstudio}
+                                                    onChange={(e) =>
+                                                        setNuevoEstudio({ ...nuevoEstudio, fechaEstudio: e.target.value })
+                                                    }
+                                                />
+                                            </td>
+
+                                            <td>
+                                                <button className="btn btn-primary btn-sm"
+                                                    onClick={registrarNuevoEstudio}
+                                                >
+                                                    Agregar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    )}
+                                    {estudios.map((es, idx) => (
+                                        <tr key={es.id || idx}>
+                                            <td>
+                                                <select
+                                                    className="form-select"
+                                                    value={es.tipoEstudio !== undefined && es.tipoEstudio !== null ? es.tipoEstudio : ""}
+                                                    onChange={(e) => handleEstudioChange(idx, "tipoEstudio", e.target.value)}
+                                                >
+                                                    <option value="">Seleccione</option>
+                                                    <option value="BACHILLER_ACADEMICO">BACHILLER ACADÉMICO</option>
+                                                    <option value="TECNICO">TÉCNICO</option>
+                                                    <option value="OTRO">OTRO</option>
+                                                </select>
+                                            </td>
+
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={es.nombreEstudio !== undefined && es.nombreEstudio !== null ? es.nombreEstudio : ""}
+                                                    onChange={(e) => handleEstudioChange(idx, "nombreEstudio", e.target.value)}
+                                                />
+                                            </td>
+
+                                            <td>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    value={es.fechaEstudio !== undefined && es.fechaEstudio !== null ? es.fechaEstudio : ""}
+                                                    onChange={(e) => handleEstudioChange(idx, "fechaEstudio", e.target.value)}
+                                                />
+                                            </td>
+
+                                            <td className="d-flex justify-content-between">
+                                                <button
+                                                    className="btn btn-success btn-sm me-2"
+                                                    onClick={() => actualizarEstudio(es)}
+                                                >
+                                                    Guardar
+                                                </button>
+                                                <button
+                                                    className="btn btn-outline-danger btn-sm"
+                                                    onClick={() => eliminarEstudio(es.id)}
+                                                    title="Eliminar"
+                                                >
+                                                    <i className="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
                         <hr />
                         <div className="mt-1">
                             <div className="d-flex justify-content-between align-items-center mt-2 mb-2 alinearTexto">
