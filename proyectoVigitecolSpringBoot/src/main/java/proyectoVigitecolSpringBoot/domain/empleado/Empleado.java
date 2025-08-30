@@ -2,9 +2,11 @@ package proyectoVigitecolSpringBoot.domain.empleado;
 
 import jakarta.persistence.*;
 import lombok.*;
+import proyectoVigitecolSpringBoot.domain.afiliacion.Afiliacion;
 import proyectoVigitecolSpringBoot.domain.contrato.Contrato;
 import proyectoVigitecolSpringBoot.domain.curso.Curso;
 import proyectoVigitecolSpringBoot.domain.estudio.Estudio;
+import proyectoVigitecolSpringBoot.domain.experienciaLaboral.ExperienciaLaboral;
 import proyectoVigitecolSpringBoot.domain.familia.Familiar;
 
 import java.time.LocalDate;
@@ -65,6 +67,12 @@ public class Empleado {
 
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Estudio> estudios = new ArrayList<>();
+
+    @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ExperienciaLaboral> experienciaLaboral = new ArrayList<>();
+
+    @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Afiliacion> afiliaciones = new ArrayList<>();
 
     //Constructor para registrar empleado
     public Empleado(DatosRegistroEmpleado datos) {
@@ -260,6 +268,22 @@ public class Empleado {
 
     public void setEstudios(List<Estudio> estudios) {
         this.estudios = estudios;
+    }
+
+    public List<ExperienciaLaboral> getExperienciaLaboral() {
+        return experienciaLaboral;
+    }
+
+    public void setExperienciaLaboral(List<ExperienciaLaboral> experienciaLaboral) {
+        this.experienciaLaboral = experienciaLaboral;
+    }
+
+    public List<Afiliacion> getAfiliaciones() {
+        return afiliaciones;
+    }
+
+    public void setAfiliaciones(List<Afiliacion> afiliaciones) {
+        this.afiliaciones = afiliaciones;
     }
     /*public Long getEmpleadoId() {
         return id;

@@ -6,6 +6,8 @@ export async function AgregarTabla(
     familiares,
     cursos,
     estudios,
+    experienciasLaborales,
+    afiliaciones,
     empleado,
     limpiarFormulario) {
 
@@ -89,7 +91,7 @@ export async function AgregarTabla(
             }
         }
 
-        //Enviamos todos los cursos juntos
+        //Enviamos todos los estudios juntos
         const estudiosLimpios = estudios.filter(e =>
             e.tipoEstudio && e.nombreEstudio && e.fechaEstudio
         ).map((e) => ({
@@ -110,6 +112,52 @@ export async function AgregarTabla(
             if (!responseEstudios.ok) {
                 const errorData = await responseEstudios.json();
                 throw new Error(errorData.message || "Error al registrar estudios");
+            }
+        }
+
+        //Enviamos todos las Experiencias Laborales
+        const experienciasLaboralesLimpias = experienciasLaborales.filter(ex =>
+            ex.descripcionExperiencia
+        ).map((ex) => ({
+            descripcionExperiencia: ex.descripcionExperiencia
+        }));
+
+        if (experienciasLaboralesLimpias.length > 0) {
+            const responseExperienciasLaborales = await authFetch(`http://localhost:8080/experienciasLaborales/${empleadoId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(experienciasLaboralesLimpias)
+            });
+
+            if (!responseExperienciasLaborales.ok) {
+                const errorData = await responseExperienciasLaborales.json();
+                throw new Error(errorData.message || "Error al registrar experiencia laboral");
+            }
+        }
+
+        //Enviamos todos las afiliaciones juntas
+        const afiliacionesLimpias = afiliaciones.filter(af =>
+            af.tipoAfiliacion && af.nombreEntidad && af.fechaAfiliacion
+        ).map((af) => ({
+            tipoAfiliacion: af.tipoAfiliacion,
+            nombreEntidad: af.nombreEntidad,
+            fechaAfiliacion: af.fechaAfiliacion
+        }));
+
+        if (afiliacionesLimpias.length > 0) {
+            const responseAfiliaciones = await authFetch(`http://localhost:8080/afiliaciones/${empleadoId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(afiliacionesLimpias)
+            });
+
+            if (!responseAfiliaciones.ok) {
+                const errorData = await responseAfiliaciones.json();
+                throw new Error(errorData.message || "Error al registrar afiliaciones");
             }
         }
 

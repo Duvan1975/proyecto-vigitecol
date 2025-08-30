@@ -12,6 +12,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
     const [estudios, setEstudios] = useState([]);
 
+    const [experienciasLaborales, setExperienciasLaborales] = useState([]);
+
     //Estado para agregar familiares modificado para que siempre sea visible en la tabla familiares
     const [nuevoFamiliar, setNuevoFamiliar] = useState({
         tipoFamiliar: "",
@@ -32,6 +34,11 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         tipoEstudio: "",
         nombreEstudio: "",
         fechaEstudio: ""
+    });
+
+    //Estado para agregar Experiencias Laborales
+    const [nuevaExperienciaLaboral, setNuevaExperienciaLaboral] = useState({
+        descripcionExperiencia: ""
     });
 
     //Estado para cargar contratos
@@ -150,6 +157,25 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         }
     }, [empleado]);
 
+    useEffect(() => {
+        if (empleado) {
+            setFormulario(empleado);
+
+            //Obtener experiencias laborales del empleado por ID
+            authFetch(`http://localhost:8080/experienciasLaborales/por-empleado/${empleado.id}`, {
+
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const experienciasPreparadas = (Array.isArray(data) ? data : []).map(ex => ({
+                        id: ex.id ?? ex.experienciaLaboralId ?? null,
+                        descripcionExperiencia: ex.descripcionExperiencia ?? ""
+                    }));
+                    setExperienciasLaborales(experienciasPreparadas);
+                });
+        }
+    }, [empleado]);
+
     const handleChange = (e) => {
         setFormulario({
             ...formulario,
@@ -190,6 +216,15 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             [field]: value
         };
         setEstudios(nuevosEstudios);
+    };
+
+    const handleExperienciaLaboralChange = (index, field, value) => {
+        const nuevasExperienciasLaborales = [...experienciasLaborales];
+        nuevasExperienciasLaborales[index] = {
+            ...nuevasExperienciasLaborales[index],
+            [field]: value
+        };
+        setExperienciasLaborales(nuevasExperienciasLaborales);
     };
 
     const actualizarEmpleado = () => {
@@ -303,6 +338,24 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             });
     };
 
+    const actualizarExperienciaLaboral = (experienciaLaboral) => {
+
+        authFetch("http://localhost:8080/experienciasLaborales", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(experienciaLaboral)
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Error al actualizar experiencia laboral");
+                Swal.fire("Experiencia Laboral actualizado correctamente", "", "success");
+            })
+            .catch(err => {
+                Swal.fire("Error", err.message, "error");
+            });
+    };
+
     //Function para registrar un nuevo hijo/hijastros en el Modal
     const registrarNuevoFamiliar = () => {
 
@@ -374,7 +427,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             return;
         }
 
-        // Validar fechaEstudio (vacía o inválida)
+        // Validar fechaCurso (vacía o inválida)
         if (!nuevoCurso.fechaCurso) {
             Swal.fire("Campo incompleto", "Por favor ingresa la fecha del curso.", "warning");
             return;
@@ -400,7 +453,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             })
             .then((cursoCreado) => {
                 setCursos(prev => [...prev, {
-                    id: cursoCreado.id ?? cursoCreado.estudioId,
+                    id: cursoCreado.id ?? cursoCreado.cursoId,
                     tipoCurso: nuevoCurso.tipoCurso,
                     categoria: nuevoCurso.categoria,
                     fechaCurso: nuevoCurso.fechaCurso
@@ -452,6 +505,36 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                 setNuevoEstudio({ tipoEstudio: "", nombreEstudio: "", fechaEstudio: "" });
 
                 Swal.fire("Estudio agregado", "El estudio ha sido registrado correctamente", "success");
+            })
+            .catch((err) => {
+                Swal.fire("Error", err.message, "error");
+            });
+    };
+
+    //Function para registrar una nueva experiencia en el Modal
+    const registrarNuevaExperienciaLaboral = () => {
+
+        // ✅ Si todo está correcto, proceder con el fetch
+        authFetch(`http://localhost:8080/experienciasLaborales/${empleado.id}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify([nuevaExperienciaLaboral])
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error("Error al registrar experiencia laboral");
+                return res.json();
+            })
+            .then((experienciaLaboralCreada) => {
+                setExperienciasLaborales(prev => [...prev, {
+                    id: experienciaLaboralCreada.id ?? experienciaLaboralCreada.experienciaLaboralId,
+                    descripcionExperiencia: nuevaExperienciaLaboral.descripcionExperiencia
+                }]);
+
+                setNuevaExperienciaLaboral({ descripcionExperiencia: "" });
+
+                Swal.fire("Experiencia Laboral agregada", "Experiencia Laboral ha sido registrado correctamente", "success");
             })
             .catch((err) => {
                 Swal.fire("Error", err.message, "error");
@@ -663,6 +746,33 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         });
     };
 
+    const eliminarExperienciaLaboral = (id) => {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Esta Experiencia Laboral será eliminada.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                authFetch(`http://localhost:8080/experienciasLaborales/${id}`, {
+                    method: "DELETE",
+
+                })
+                    .then((res) => {
+                        if (!res.ok) throw new Error("Error al eliminar experiencia laboral, (Debes actualizar los datos para poder eliminar este registro)");
+                        setExperienciasLaborales(experienciasLaborales.filter(ex => ex.id !== id));
+                        Swal.fire("Eliminado", "El registro fue eliminado correctamente", "success");
+                    })
+                    .catch((err) => {
+                        Swal.fire("Error", err.message, "error");
+                    });
+            }
+        });
+    };
+
     if (!visible) return null;
 
     return (
@@ -706,7 +816,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                 <option value="PPT">PERMISO DE PERMANENCIA (PPT)</option>
                             </select>
                         </div>
-
                     </div>
 
                     <div className="row">
@@ -721,20 +830,20 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             />
                         </div>
                         <div className="col-md-4">
-                            <label htmlFor=""> <strong>Fecha de Nacimiento:</strong></label>
-                            <input type="date"
-                                name="fechaNacimiento"
-                                value={formulario.fechaNacimiento}
+                            <label htmlFor=""> <strong>Ciudad de Expedición:</strong></label>
+                            <input type="text"
+                                name="ciudadExpedicion"
+                                value={formulario.ciudadExpedicion}
                                 onChange={handleChange}
-                                placeholder="Seleccione la fecha de nacimiento"
+                                placeholder="Ciudad de Expedición"
                                 className="form-control mb-2"
                             />
                         </div>
                         <div className="col-md-4">
-                            <label htmlFor=""> <strong>Edad:</strong></label>
-                            <input type="number"
-                                name="edad"
-                                value={formulario.edad}
+                            <label htmlFor=""> <strong>Fecha de Nacimiento:</strong></label>
+                            <input type="date"
+                                name="fechaNacimiento"
+                                value={formulario.fechaNacimiento}
                                 onChange={handleChange}
                                 placeholder="Seleccione la fecha de nacimiento"
                                 className="form-control mb-2"
@@ -754,15 +863,18 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             />
                         </div>
                         <div className="col-md-4">
-                            <label htmlFor=""> <strong>Ciudad de Expedición:</strong></label>
-                            <input type="text"
-                                name="ciudadExpedicion"
-                                value={formulario.ciudadExpedicion}
+                            <label htmlFor=""> <strong>Género:</strong></label>
+                            <select
+                                name="genero"
+                                value={formulario.genero}
                                 onChange={handleChange}
-                                placeholder="Ciudad de Expedición"
                                 className="form-control mb-2"
-                            />
+                            >
+                                <option value="MASCULINO">MASCULINO</option>
+                                <option value="FEMENINO">FEMENINO</option>
+                            </select>
                         </div>
+
                         <div className="col-md-4">
                             <label htmlFor="tipoDocumento"><strong>Libreta Militar:</strong></label>
                             <select
@@ -795,18 +907,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             </select>
                         </div>
                         <div className="col-md-4">
-                            <label htmlFor=""> <strong>Género:</strong></label>
-                            <select
-                                name="genero"
-                                value={formulario.genero}
-                                onChange={handleChange}
-                                className="form-control mb-2"
-                            >
-                                <option value="MASCULINO">MASCULINO</option>
-                                <option value="FEMENINO">FEMENINO</option>
-                            </select>
-                        </div>
-                        <div className="col-md-4">
                             <label htmlFor=""> <strong>Dirección:</strong></label>
                             <input type="text"
                                 name="direccion"
@@ -816,9 +916,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                 className="form-control mb-2"
                             />
                         </div>
-                    </div>
-
-                    <div className="row">
                         <div className="col-md-4">
                             <label htmlFor=""> <strong>Teléfono:</strong></label>
                             <input type="number"
@@ -829,6 +926,9 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                 className="form-control mb-2"
                             />
                         </div>
+                    </div>
+
+                    <div className="row">
                         <div className="col-md-4">
                             <label htmlFor=""> <strong>Correo Electrónico:</strong></label>
                             <input type="email"
@@ -851,9 +951,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                 <option value="OPERATIVO">OPERATIVO</option>
                             </select>
                         </div>
-                    </div>
-
-                    <div className="row">
                         <div className="col-md-4">
                             <label htmlFor=""> <strong>Cargo:</strong></label>
                             <input type="text"
@@ -866,7 +963,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                         </div>
                     </div>
 
-                    <div className="mt-3">
+                    <div className="mt-1">
                         <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
                             <h5 className="alinearTexto  mb-0">Registrar Actualizar Hijos</h5>
 
@@ -1263,6 +1360,92 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                 </tbody>
                             </table>
                         </div>
+
+                        <hr />
+                        <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
+                            <h5 className="alinearTexto  mb-0">Registrar Experiencia Laboral</h5>
+                            <div>
+                                <button
+                                    className="btn btn-outline-secondary me-2"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#tablaExperiencia"
+                                    aria-expanded="false"
+                                    aria-controls="tablaExperiencia"
+                                >
+                                    Mostrar/Ocultar Experiencia
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="collapse" id="tablaExperiencia">
+                            <table className="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Descripción Experiencia Laboral</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {nuevaExperienciaLaboral && (
+                                        <tr>
+
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    placeholder="Descripción Experiencia Laboral"
+                                                    value={nuevaExperienciaLaboral.descripcionExperiencia}
+                                                    onChange={(e) =>
+                                                        setNuevaExperienciaLaboral({ ...nuevaExperienciaLaboral, descripcionExperiencia: e.target.value })
+                                                    }
+                                                />
+                                            </td>
+
+                                            <td>
+                                                <button className="btn btn-primary btn-sm"
+                                                    onClick={registrarNuevaExperienciaLaboral}
+                                                >
+                                                    Agregar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    )}
+                                    {experienciasLaborales.map((ex, idx) => (
+                                        <tr key={ex.id || idx}>
+
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={ex.descripcionExperiencia !== undefined && ex.descripcionExperiencia !== null ? ex.descripcionExperiencia : ""}
+                                                    onChange={(e) => handleExperienciaLaboralChange(idx, "descripcionExperiencia", e.target.value)}
+                                                />
+                                            </td>
+
+                                            <td className="d-flex justify-content-between">
+                                                <button
+                                                    className="btn btn-success btn-sm me-2"
+                                                    onClick={() => actualizarExperienciaLaboral(ex)}
+                                                >
+                                                    Guardar
+                                                </button>
+                                                <button
+                                                    className="btn btn-outline-danger btn-sm"
+                                                    onClick={() => eliminarExperienciaLaboral(ex.id)}
+                                                    title="Eliminar"
+                                                >
+                                                    <i className="bi bi-trash"></i>
+                                                </button>
+
+                                            </td>
+
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
 
                         <hr />
                         <div className="mt-1">

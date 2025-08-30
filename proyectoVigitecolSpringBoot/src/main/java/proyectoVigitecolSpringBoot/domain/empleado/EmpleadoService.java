@@ -538,4 +538,14 @@ public class EmpleadoService {
         return empleadoRepository.findEmpleadosConEstudios(pageable)
                 .map(DatosEmpleadoConEstudios::new);
     }
+
+    public Page<DatosEmpleadoConExperienciaLaboral> findConExperienciasLaborales(Pageable pageable) {
+        return empleadoRepository.findEmpleadosConExperienciasLaborales(pageable)
+                .map(DatosEmpleadoConExperienciaLaboral::new);
+    }
+
+    public Page<DatosEmpleadoConAfiliaciones> findConAfiliaciones(Pageable pageable) {
+        return empleadoRepository.findEmpleadosConAfiliaciones(pageable)
+                .map(DatosEmpleadoConAfiliaciones::new);
+    }
 }

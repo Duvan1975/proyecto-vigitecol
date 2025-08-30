@@ -226,4 +226,24 @@ public class EmpleadoController {
 
         return ResponseEntity.ok(resultado);
     }
+
+    @GetMapping("/con-experiencia-laboral")
+    public ResponseEntity<Page<DatosEmpleadoConExperienciaLaboral>> empleadosConExperienciasLaborales(
+            @PageableDefault(size = 10, sort = "apellidos") Pageable pageable) {
+
+        Page<DatosEmpleadoConExperienciaLaboral> resultado = empleadoService
+                .findConExperienciasLaborales(pageable);
+
+        return ResponseEntity.ok(resultado);
+    }
+
+    @GetMapping("/con-afiliaciones")
+    public ResponseEntity<Page<DatosEmpleadoConAfiliaciones>> empleadosConAfiliaciones(
+            @PageableDefault(size = 10, sort = "apellidos") Pageable pageable) {
+
+        Page<DatosEmpleadoConAfiliaciones> resultado = empleadoService
+                .findConAfiliaciones(pageable);
+
+        return ResponseEntity.ok(resultado);
+    }
 }

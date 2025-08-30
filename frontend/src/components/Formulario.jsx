@@ -47,6 +47,20 @@ export function Formulario() {
         fechaEstudio: ""
     });
 
+    //Estado para registrar Experiencia Laboral
+    const [experienciasLaborales, setExperienciasLaborales] = useState([]);
+    const [experienciaLaboralActual, setExperienciaLaboralActual] = useState({
+        descripcionExperiencia: ""
+    });
+
+    //Estados para registrar Afiliaciones
+    const [afiliaciones, setAfiliaciones] = useState([]);
+    const [afiliacionActual, setAfiliacionActual] = useState({
+        tipoAfiliacion: "",
+        nombreEntidad: "",
+        fechaAfiliacion: ""
+    });
+
     //Estado para registrar Contrato
     const [contrato, setContrato] = useState({
         fechaIngreso: ""
@@ -98,6 +112,32 @@ export function Formulario() {
         }
     };
 
+    const agregarExperienciaLaboral = () => {
+        if (
+            experienciaLaboralActual.descripcionExperiencia
+        ) {
+            setExperienciasLaborales([...experienciasLaborales, { ...experienciaLaboralActual }]);
+            setExperienciaLaboralActual({
+                descripcionExperiencia: "",
+            });
+        }
+    };
+
+    const agregarAfiliacion = () => {
+        if (
+            afiliacionActual.tipoAfiliacion &&
+            afiliacionActual.nombreEntidad &&
+            afiliacionActual.fechaAfiliacion
+        ) {
+            setAfiliaciones([...afiliaciones, { ...afiliacionActual }]);
+            setAfiliacionActual({
+                tipoAfiliacion: "",
+                nombreEntidad: "",
+                fechaAfiliacion: ""
+            });
+        }
+    };
+
     const limpiarFormulario = () => {
         setEmpleado({
             nombres: "",
@@ -139,6 +179,18 @@ export function Formulario() {
             fechaEstudio: ""
         });
         setEstudios([]);
+
+        setExperienciaLaboralActual({
+            descripcionExperiencia: ""
+        });
+        setExperienciasLaborales([]);
+
+        setAfiliacionActual({
+            tipoAfiliacion: "",
+            nombreEntidad: "",
+            fechaAfiliacion: ""
+        });
+        setAfiliaciones([]);
     };
     const eliminarFamiliarTabla = (index) => {
         const nuevosFamiliares = [...familiares];
@@ -154,6 +206,16 @@ export function Formulario() {
         const nuevosEstudios = [...estudios];
         nuevosEstudios.splice(index, 1);
         setEstudios(nuevosEstudios);
+    };
+    const eliminarExperienciaLaboralTabla = (index) => {
+        const nuevasExperienciasLaborales = [...experienciasLaborales];
+        nuevasExperienciasLaborales.splice(index, 1);
+        setExperienciasLaborales(nuevasExperienciasLaborales);
+    };
+    const eliminarAfiliacionTabla = (index) => {
+        const nuevasAfiliaciones = [...afiliaciones];
+        nuevasAfiliaciones.splice(index, 1);
+        setAfiliaciones(nuevasAfiliaciones);
     };
 
     return (
@@ -283,7 +345,7 @@ export function Formulario() {
 
             </div>
 
-            <h4 className='alinearTexto'>Datos de Contacto</h4>
+            <h5 className='alinearTexto'>Datos de Contacto</h5>
 
             <div className='row align-items-center g-2'>
                 <CuadrosTexto
@@ -318,7 +380,7 @@ export function Formulario() {
                 />
             </div>
             <br></br>
-            <h4 className='alinearTexto'>Hijos Hijastros</h4>
+            <h5 className='alinearTexto'>Hijos Hijastros</h5>
 
             <div className='row align-items-center g-2'>
                 <CuadrosSelect
@@ -361,7 +423,6 @@ export function Formulario() {
                 />
             </div>
 
-            <br />
             <button type="button"
                 className="btn btn-secondary mb-4"
                 onClick={agregarFamiliar}
@@ -371,7 +432,7 @@ export function Formulario() {
             <br />
             {familiares.length > 0 && (
                 <div>
-                    <h4>Familiares Registrados:</h4>
+                    <h5>Familiares Registrados:</h5>
                     <table className="table table-bordered border-black">
                         <thead className="table-primary border-black">
                             <tr>
@@ -401,7 +462,7 @@ export function Formulario() {
                 </div>
             )}
 
-            <h4 className='alinearTexto'>Cursos de Vigilancia</h4>
+            <h5 className='alinearTexto'>Cursos de Vigilancia</h5>
 
             <div className='row align-items-center g-2'>
                 <CuadrosSelect
@@ -451,12 +512,12 @@ export function Formulario() {
                 className="btn btn-secondary mb-4"
                 onClick={agregarCurso}
             >
-                Agregar otro Curso
+                Agregar Curso
             </button>
             <br />
             {cursos.length > 0 && (
                 <div>
-                    <h4>Cursos Registrados:</h4>
+                    <h5>Cursos Registrados:</h5>
                     <table className="table table-bordered border-black">
                         <thead className="table-primary border-black">
                             <tr>
@@ -486,7 +547,7 @@ export function Formulario() {
                 </div>
             )}
 
-            <h4 className='alinearTexto'>Estudios</h4>
+            <h5 className='alinearTexto'>Estudios</h5>
 
             <div className='row align-items-center g-2'>
                 <CuadrosSelect
@@ -531,12 +592,12 @@ export function Formulario() {
                 className="btn btn-secondary mb-4"
                 onClick={agregarEstudio}
             >
-                Agregar otro Curso
+                Agregar Estudio
             </button>
 
             {estudios.length > 0 && (
                 <div>
-                    <h4>Estudios Registrados:</h4>
+                    <h5>Estudios Registrados:</h5>
                     <table className="table table-bordered border-black">
                         <thead className="table-primary border-black">
                             <tr>
@@ -565,7 +626,140 @@ export function Formulario() {
                     </table>
                 </div>
             )}
-            <h4 className='alinearTexto'>Asignar Cargo</h4>
+
+            <h5 className='alinearTexto'>Experiencia Laboral</h5>
+
+            <div className='row align-items-center g-2'>
+
+                <CuadrosTexto
+                    tamanoinput="col-md-8"
+                    titulolabel="Experiencia Laboral:"
+                    tipoinput="text"
+                    nombreinput="descripcionExperiencia"
+                    idinput="descripcionExperiencia"
+                    value={experienciaLaboralActual.descripcionExperiencia}
+                    onChange={(e) =>
+                        setExperienciaLaboralActual({ ...experienciaLaboralActual, descripcionExperiencia: e.target.value })
+                    }
+                />
+            </div>
+            
+            <button type="button"
+                className="btn btn-secondary mb-4"
+                onClick={agregarExperienciaLaboral}
+            >
+                Agregar Experiencia Laboral
+            </button>
+
+            {experienciasLaborales.length > 0 && (
+                <div>
+                    <h5>Experiencia Laboral Registradas:</h5>
+                    <table className="table table-bordered border-black">
+                        <thead className="table-primary border-black">
+                            <tr>
+                                <th>Descripción Experiencia Laboral</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {experienciasLaborales.map((ex, idx) => (
+                                <tr key={idx}>
+                                    <td>{ex.descripcionExperiencia}</td>
+                                    <td><button
+                                        className="btn btn-outline-danger btn-sm"
+                                        onClick={() => eliminarExperienciaLaboralTabla(idx)}
+                                        title="Eliminar"
+                                    >
+                                        <i className="bi bi-trash"></i>
+                                    </button></td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
+            <h5 className='alinearTexto'>Afiliaciones</h5>
+
+            <div className='row align-items-center g-2'>
+                <CuadrosSelect
+                    tamanoinput="col-md-4"
+                    titulolabel="Tipo de Afiliación:"
+                    nombreinput="tipoAfiliacion"
+                    idinput="tipoAfiliacion"
+                    value={afiliacionActual.tipoAfiliacion}
+                    onChange={(e) =>
+                        setAfiliacionActual({ ...afiliacionActual, tipoAfiliacion: e.target.value })
+                    }
+                    opciones={[
+                        { valor: "SALUD", texto: "SALUD" },
+                        { valor: "PENSION", texto: "PENSIÓN" },
+                        { valor: "ARL", texto: "ARL" },
+                    ]}
+                />
+                <CuadrosTexto
+                    tamanoinput="col-md-4"
+                    titulolabel="Nombre de la Entidad:"
+                    tipoinput="text"
+                    nombreinput="nombreEntidad"
+                    idinput="nombreEntidad"
+                    value={afiliacionActual.nombreEntidad}
+                    onChange={(e) =>
+                        setAfiliacionActual({ ...afiliacionActual, nombreEntidad: e.target.value })
+                    }
+                />
+                <CuadrosTexto
+                    tamanoinput="col-md-4"
+                    titulolabel="Fecha de Afiliación:"
+                    tipoinput="date"
+                    nombreinput="fechaAfiliacion"
+                    idinput="fechaAfiliacion"
+                    value={afiliacionActual.fechaAfiliacion}
+                    onChange={(e) =>
+                        setAfiliacionActual({ ...afiliacionActual, fechaAfiliacion: e.target.value })
+                    }
+                />
+            </div>
+            <button type="button"
+                className="btn btn-secondary mb-4"
+                onClick={agregarAfiliacion}
+            >
+                Agregar Afiliación
+            </button>
+
+            {afiliaciones.length > 0 && (
+                <div>
+                    <h4>Afiliaciones Registradas:</h4>
+                    <table className="table table-bordered border-black">
+                        <thead className="table-primary border-black">
+                            <tr>
+                                <th>Tipo de Afiliación</th>
+                                <th>Nombre de la Entidad</th>
+                                <th>Fecha de Afiliación</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {afiliaciones.map((af, idx) => (
+                                <tr key={idx}>
+                                    <td>{af.tipoAfiliacion}</td>
+                                    <td>{af.nombreEntidad}</td>
+                                    <td>{af.fechaAfiliacion}</td>
+                                    <td><button
+                                        className="btn btn-outline-danger btn-sm"
+                                        onClick={() => eliminarAfiliacionTabla(idx)}
+                                        title="Eliminar"
+                                    >
+                                        <i className="bi bi-trash"></i>
+                                    </button></td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
+            <h5 className='alinearTexto'>Asignar Cargo</h5>
 
             <div className='row align-items-center g-2'>
                 <CuadrosSelect
@@ -582,7 +776,7 @@ export function Formulario() {
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-4"
-                    titulolabel="Cargo:"
+                    titulolabel="Cargo a Desempeñar:"
                     tipoinput="text"
                     nombreinput="cargo"
                     idinput="cargo"
@@ -605,7 +799,14 @@ export function Formulario() {
             <div className='col-md-auto'>
                 <button
                     onClick={() => AgregarTabla(
-                        contrato, familiares, cursos, estudios, empleado, limpiarFormulario)}
+                        contrato, 
+                        familiares, 
+                        cursos, 
+                        estudios, 
+                        experienciasLaborales, 
+                        afiliaciones, 
+                        empleado, 
+                        limpiarFormulario)}
                     className="botonregistrar btn btn-success"
                 >
                     Registrar
