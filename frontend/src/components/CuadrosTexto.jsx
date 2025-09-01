@@ -6,11 +6,16 @@ export function CuadrosTexto({
   idinput,
   placeholderinput,
   value,
-  onChange
+  onChange,
+  required
 }) {
   return (
     <div className={tamanoinput}>
-      <label htmlFor={idinput}><strong>{titulolabel}</strong></label>
+      <label htmlFor={idinput}>
+        <strong>
+          {required && <span className="text-danger">*</span>} {titulolabel} 
+        </strong>
+      </label>
       <input
         type={tipoinput}
         name={nombreinput}
@@ -19,6 +24,7 @@ export function CuadrosTexto({
         className="form-control"
         value={value}
         onChange={onChange}
+        required={required}
       />
     </div>
   );

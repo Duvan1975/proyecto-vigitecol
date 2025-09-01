@@ -36,7 +36,7 @@ public class TratadorDeErrores {
             this(error.getField(), error.getDefaultMessage());
         }
     }
-    /*@ExceptionHandler(HttpMessageNotReadableException.class)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> tratarErrorDeLectura(HttpMessageNotReadableException e) {
         Throwable causa = e.getMostSpecificCause();
         Map<String, String> error = new HashMap<>();
@@ -69,7 +69,7 @@ public class TratadorDeErrores {
         }
 
         return ResponseEntity.badRequest().body(error);
-    }*/
+    }
 
     //Tratando error cuando enviamos un correo duplicado
     @ExceptionHandler(RuntimeException.class)
@@ -95,7 +95,7 @@ public class TratadorDeErrores {
 
         return ResponseEntity.badRequest().body(error);
     }
-    @ExceptionHandler(HttpMessageNotReadableException.class)
+    /*@ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> tratarErrorDeLectura(HttpMessageNotReadableException e) {
         Throwable causa = e.getMostSpecificCause();
         Map<String, String> error = new HashMap<>();
@@ -114,6 +114,6 @@ public class TratadorDeErrores {
 
 
         return ResponseEntity.badRequest().body(error);
-    }
+    }*/
 
 }

@@ -8,6 +8,7 @@ export async function AgregarTabla(
     estudios,
     experienciasLaborales,
     afiliaciones,
+    documentos,
     empleado,
     limpiarFormulario) {
 
@@ -158,6 +159,30 @@ export async function AgregarTabla(
             if (!responseAfiliaciones.ok) {
                 const errorData = await responseAfiliaciones.json();
                 throw new Error(errorData.message || "Error al registrar afiliaciones");
+            }
+        }
+
+        //Enviamos todos los documentos juntos
+        const documentosLimpios = documentos.filter(d =>
+            d.tipoDocumento && d.descripcionDocumento && d.fechaRegistro
+        ).map((d) => ({
+            tipoDocumento: d.tipoDocumento,
+            descripcionDocumento: d.descripcionDocumento,
+            fechaRegistro: d.fechaRegistro
+        }));
+
+        if (documentosLimpios.length > 0) {
+            const responseDocumentos = await authFetch(`http://localhost:8080/documentos/${empleadoId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(documentosLimpios)
+            });
+
+            if (!responseDocumentos.ok) {
+                const errorData = await responseDocumentos.json();
+                throw new Error(errorData.message || "Error al registrar documentos");
             }
         }
 

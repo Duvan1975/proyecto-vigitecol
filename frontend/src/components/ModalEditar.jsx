@@ -14,6 +14,12 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
     const [experienciasLaborales, setExperienciasLaborales] = useState([]);
 
+    const [afiliaciones, setAfiliaciones] = useState([]);
+
+    const [documentos, setDocumentos] = useState([]);
+
+
+
     //Estado para agregar familiares modificado para que siempre sea visible en la tabla familiares
     const [nuevoFamiliar, setNuevoFamiliar] = useState({
         tipoFamiliar: "",
@@ -39,6 +45,20 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     //Estado para agregar Experiencias Laborales
     const [nuevaExperienciaLaboral, setNuevaExperienciaLaboral] = useState({
         descripcionExperiencia: ""
+    });
+
+    //Estado para agregar afiliaciones
+    const [nuevaAfiliacion, setNuevaAfiliacion] = useState({
+        tipoAfiliacion: "",
+        nombreEntidad: "",
+        fechaAfiliacion: ""
+    });
+
+    //Estado para agregar documentos
+    const [nuevoDocumento, setNuevoDocumento] = useState({
+        tipoDocumento: "",
+        descripcionDocumento: "",
+        fechaRegistro: ""
     });
 
     //Estado para cargar contratos
@@ -176,6 +196,48 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         }
     }, [empleado]);
 
+    useEffect(() => {
+        if (empleado) {
+            setFormulario(empleado);
+
+            //Obtener afiliaciones del empleado por ID
+            authFetch(`http://localhost:8080/afiliaciones/por-empleado/${empleado.id}`, {
+
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const afiliacionesPreparadas = (Array.isArray(data) ? data : []).map(af => ({
+                        id: af.id ?? af.afiliacionId ?? null,
+                        tipoAfiliacion: af.tipoAfiliacion ?? "",
+                        nombreEntidad: af.nombreEntidad ?? "",
+                        fechaAfiliacion: af.fechaAfiliacion ?? ""
+                    }));
+                    setAfiliaciones(afiliacionesPreparadas);
+                });
+        }
+    }, [empleado]);
+
+    useEffect(() => {
+        if (empleado) {
+            setFormulario(empleado);
+
+            //Obtener documentos del empleado por ID
+            authFetch(`http://localhost:8080/documentos/por-empleado/${empleado.id}`, {
+
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const documentosPreparados = (Array.isArray(data) ? data : []).map(d => ({
+                        id: d.id ?? d.documentoId ?? null,
+                        tipoDocumento: d.tipoDocumento ?? "",
+                        descripcionDocumento: d.descripcionDocumento ?? "",
+                        fechaRegistro: d.fechaRegistro ?? ""
+                    }));
+                    setDocumentos(documentosPreparados);
+                });
+        }
+    }, [empleado]);
+
     const handleChange = (e) => {
         setFormulario({
             ...formulario,
@@ -225,6 +287,24 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             [field]: value
         };
         setExperienciasLaborales(nuevasExperienciasLaborales);
+    };
+
+    const handleAfiliacionChange = (index, field, value) => {
+        const nuevasAfiliaciones = [...afiliaciones];
+        nuevasAfiliaciones[index] = {
+            ...nuevasAfiliaciones[index],
+            [field]: value
+        };
+        setAfiliaciones(nuevasAfiliaciones);
+    };
+
+    const handleDocumentoChange = (index, field, value) => {
+        const nuevosDocumentos = [...documentos];
+        nuevosDocumentos[index] = {
+            ...nuevosDocumentos[index],
+            [field]: value
+        };
+        setDocumentos(nuevosDocumentos);
     };
 
     const actualizarEmpleado = () => {
@@ -294,7 +374,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             body: JSON.stringify(familiar)
         })
             .then(res => {
-                if (!res.ok) throw new Error("Error al actualizar familiar");
+                if (!res.ok) throw new Error("Error al actualizar familiar. Actualiza los datos generales y vuelve a intentarlo");
                 Swal.fire("Familiar actualizado correctamente", "", "success");
             })
             .catch(err => {
@@ -312,7 +392,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             body: JSON.stringify(curso)
         })
             .then(res => {
-                if (!res.ok) throw new Error("Error al actualizar curso");
+                if (!res.ok) throw new Error("Error al actualizar curso. Actualiza los datos generales y vuelve a intentarlo");
                 Swal.fire("Curso actualizado correctamente", "", "success");
             })
             .catch(err => {
@@ -330,7 +410,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             body: JSON.stringify(estudio)
         })
             .then(res => {
-                if (!res.ok) throw new Error("Error al actualizar estudio");
+                if (!res.ok) throw new Error("Error al actualizar estudio. Actualiza los datos generales y vuelve a intentarlo");
                 Swal.fire("Estudio actualizado correctamente", "", "success");
             })
             .catch(err => {
@@ -348,8 +428,44 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             body: JSON.stringify(experienciaLaboral)
         })
             .then(res => {
-                if (!res.ok) throw new Error("Error al actualizar experiencia laboral");
+                if (!res.ok) throw new Error("Error al actualizar experiencia laboral. Actualiza los datos generales y vuelve a intentarlo");
                 Swal.fire("Experiencia Laboral actualizado correctamente", "", "success");
+            })
+            .catch(err => {
+                Swal.fire("Error", err.message, "error");
+            });
+    };
+
+    const actualizarAfiliacion = (afiliacion) => {
+
+        authFetch("http://localhost:8080/afiliaciones", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(afiliacion)
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Error al actualizar afiliación. Actualiza los datos generales y vuelve a intentarlo");
+                Swal.fire("Afiliación actualizada correctamente", "", "success");
+            })
+            .catch(err => {
+                Swal.fire("Error", err.message, "error");
+            });
+    };
+
+    const actualizarDocumento = (documento) => {
+
+        authFetch("http://localhost:8080/documentos", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(documento)
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Error al actualizar el documento. Actualiza los datos generales y vuelve a intentarlo.");
+                Swal.fire("Documento actualizado correctamente", "", "success");
             })
             .catch(err => {
                 Swal.fire("Error", err.message, "error");
@@ -482,7 +598,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             return;
         }
 
-        // ✅ Si todo está correcto, proceder con el fetch
+        // Si todo está correcto, proceder con el fetch
         authFetch(`http://localhost:8080/estudios/${empleado.id}`, {
             method: "POST",
             headers: {
@@ -514,7 +630,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     //Function para registrar una nueva experiencia en el Modal
     const registrarNuevaExperienciaLaboral = () => {
 
-        // ✅ Si todo está correcto, proceder con el fetch
+        // Si todo está correcto, proceder con el fetch
         authFetch(`http://localhost:8080/experienciasLaborales/${empleado.id}`, {
             method: "POST",
             headers: {
@@ -535,6 +651,92 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                 setNuevaExperienciaLaboral({ descripcionExperiencia: "" });
 
                 Swal.fire("Experiencia Laboral agregada", "Experiencia Laboral ha sido registrado correctamente", "success");
+            })
+            .catch((err) => {
+                Swal.fire("Error", err.message, "error");
+            });
+    };
+
+    //Function para registrar una nueva afiliación en el Modal
+    const registrarNuevaAfiliacion = () => {
+        // Validar tipoAfiliacion
+        if (!nuevaAfiliacion.tipoAfiliacion) {
+            Swal.fire("Campo incompleto", "Por favor selecciona el tipo de afiliación.", "warning");
+            return;
+        }
+
+        // Validar fechaAfiliacion (vacía o inválida)
+        if (!nuevaAfiliacion.fechaAfiliacion) {
+            Swal.fire("Campo incompleto", "Por favor ingresa la fecha de afiliación.", "warning");
+            return;
+        }
+
+        // Si todo está correcto, proceder con el fetch
+        authFetch(`http://localhost:8080/afiliaciones/${empleado.id}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify([nuevaAfiliacion])
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error("Error al registrar afiliación");
+                return res.json();
+            })
+            .then((afiliacionCreada) => {
+                setAfiliaciones(prev => [...prev, {
+                    id: afiliacionCreada.id ?? afiliacionCreada.afiliacionId,
+                    tipoAfiliacion: nuevaAfiliacion.tipoAfiliacion,
+                    nombreEntidad: nuevaAfiliacion.nombreEntidad,
+                    fechaAfiliacion: nuevaAfiliacion.fechaAfiliacion
+                }]);
+
+                setNuevaAfiliacion({ tipoAfiliacion: "", nombreEntidad: "", fechaAfiliacion: "" });
+
+                Swal.fire("Afiliación agregada", "La afiliación ha sido registrada correctamente", "success");
+            })
+            .catch((err) => {
+                Swal.fire("Error", err.message, "error");
+            });
+    };
+
+    //Function para registrar una nueva afiliación en el Modal
+    const registrarNuevoDocumento = () => {
+        // Validar tipoDocumento
+        if (!nuevoDocumento.tipoDocumento) {
+            Swal.fire("Campo incompleto", "Por favor selecciona el tipo de documento.", "warning");
+            return;
+        }
+
+        // Validar fechaRegistro (vacía o inválida)
+        if (!nuevoDocumento.fechaRegistro) {
+            Swal.fire("Campo incompleto", "Por favor ingresa la fecha de registro.", "warning");
+            return;
+        }
+
+        // Si todo está correcto, proceder con el fetch
+        authFetch(`http://localhost:8080/documentos/${empleado.id}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify([nuevoDocumento])
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error("Error al registrar el documento");
+                return res.json();
+            })
+            .then((documentoCreado) => {
+                setDocumentos(prev => [...prev, {
+                    id: documentoCreado.id ?? documentoCreado.documentoId,
+                    tipoDocumento: nuevoDocumento.tipoDocumento,
+                    descripcionDocumento: nuevoDocumento.descripcionDocumento,
+                    fechaRegistro: nuevoDocumento.fechaRegistro
+                }]);
+
+                setNuevoDocumento({ tipoDocumento: "", descripcionDocumento: "", fechaRegistro: "" });
+
+                Swal.fire("Documento agregado", "El documento ha sido registrado correctamente", "success");
             })
             .catch((err) => {
                 Swal.fire("Error", err.message, "error");
@@ -773,6 +975,65 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         });
     };
 
+    const eliminarAfiliacion = (id) => {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Esta Afiliación será eliminada.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                authFetch(`http://localhost:8080/afiliaciones/${id}`, {
+                    method: "DELETE",
+
+                })
+                    .then((res) => {
+                        if (!res.ok) throw new Error("Error al eliminar afiliación, (Debes actualizar los datos para poder eliminar este registro)");
+                        setAfiliaciones(afiliaciones.filter(af => af.id !== id));
+                        Swal.fire("Eliminado", "El registro fue eliminado correctamente", "success");
+                    })
+                    .catch((err) => {
+                        Swal.fire("Error", err.message, "error");
+                    });
+            }
+        });
+    };
+
+    const eliminarDocumento = (id) => {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Este Documento será eliminado.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                authFetch(`http://localhost:8080/documentos/${id}`, {
+                    method: "DELETE",
+
+                })
+                    .then((res) => {
+                        if (!res.ok) throw new Error("Error al eliminar documento, (Debes actualizar los datos para poder eliminar este registro)");
+                        setDocumentos(documentos.filter(d => d.id !== id));
+                        Swal.fire("Eliminado", "El documento fue eliminado correctamente", "success");
+                    })
+                    .catch((err) => {
+                        Swal.fire("Error", err.message, "error");
+                    });
+            }
+        });
+    };
+
+    const contratoMasReciente = contratos.length > 0
+        ? contratos.reduce((max, c) =>
+            c.numeroContrato > max.numeroContrato ? c : max, contratos[0])
+        : null;
+
     if (!visible) return null;
 
     return (
@@ -780,7 +1041,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             <div className="modal-dialog modal-lg">
                 <div className="modal-content p-4" style={{ backgroundColor: "#f0f0f0" }}>
                     <h4 className="alinearTexto">Editar Empleado</h4>
-
                     <div className="row">
                         <div className="col-md-4">
                             <label htmlFor=""> <strong>Nombres:</strong></label>
@@ -874,7 +1134,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                 <option value="FEMENINO">FEMENINO</option>
                             </select>
                         </div>
-
                         <div className="col-md-4">
                             <label htmlFor="tipoDocumento"><strong>Libreta Militar:</strong></label>
                             <select
@@ -963,24 +1222,28 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                         </div>
                     </div>
 
-                    <div className="mt-1">
-                        <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
-                            <h5 className="alinearTexto  mb-0">Registrar Actualizar Hijos</h5>
+                    {contratoMasReciente?.continua === true && (
+                        <div>
+                            <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
+                                <h5 className="alinearTexto  mb-0">Registrar Actualizar Hijos</h5>
 
-                            <div>
-                                <button
-                                    className="btn btn-outline-secondary me-2"
-                                    type="button"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#tablaFamiliares"
-                                    aria-expanded="false"
-                                    aria-controls="tablaFamiliares"
-                                >
-                                    Mostrar/Ocultar Familiares
-                                </button>
+                                <div>
+                                    <button
+                                        className="btn btn-outline-secondary me-2"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#tablaFamiliares"
+                                        aria-expanded="false"
+                                        aria-controls="tablaFamiliares"
+                                    >
+                                        Mostrar/Ocultar Familiares
+                                    </button>
+                                </div>
                             </div>
                         </div>
+                    )}
 
+                    <div className="mt-1">
                         <div className="collapse" id="tablaFamiliares">
                             <table className="table table-bordered">
                                 <thead>
@@ -1073,7 +1336,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     className="btn btn-success btn-sm me-2"
                                                     onClick={() => actualizarFamiliar(f)}
                                                 >
-                                                    Guardar
+                                                    Actualizar
                                                 </button>
                                                 <button
                                                     className="btn btn-outline-danger btn-sm"
@@ -1088,23 +1351,27 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                 </tbody>
                             </table>
                         </div>
-                        <hr />
-                        <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
-                            <h5 className="alinearTexto  mb-0">Registrar Cursos</h5>
-                            <div>
-                                <button
-                                    className="btn btn-outline-secondary me-2"
-                                    type="button"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#tablaCursos"
-                                    aria-expanded="false"
-                                    aria-controls="tablaCursos"
-                                >
-                                    Mostrar/Ocultar Cursos
-                                </button>
-                            </div>
-                        </div>
 
+                        {contratoMasReciente?.continua === true && (
+                            <div>
+                                <hr />
+                                <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
+                                    <h5 className="alinearTexto  mb-0">Registrar Cursos</h5>
+                                    <div>
+                                        <button
+                                            className="btn btn-outline-secondary me-2"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#tablaCursos"
+                                            aria-expanded="false"
+                                            aria-controls="tablaCursos"
+                                        >
+                                            Mostrar/Ocultar Cursos
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
                         <div className="collapse" id="tablaCursos">
                             <table className="table table-bordered">
@@ -1132,7 +1399,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     <option value="REENTRENAMIENTO">REENTRENAMIENTO</option>
                                                 </select>
                                             </td>
-
                                             <td>
                                                 <select
                                                     className="form-select"
@@ -1204,13 +1470,12 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     onChange={(e) => handleCursoChange(idx, "fechaCurso", e.target.value)}
                                                 />
                                             </td>
-
                                             <td className="d-flex justify-content-between">
                                                 <button
                                                     className="btn btn-success btn-sm me-2"
                                                     onClick={() => actualizarCurso(c)}
                                                 >
-                                                    Guardar
+                                                    Actualizar
                                                 </button>
                                                 <button
                                                     className="btn btn-outline-danger btn-sm"
@@ -1220,7 +1485,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     <i className="bi bi-trash"></i>
                                                 </button>
                                             </td>
-
                                         </tr>
                                     ))}
 
@@ -1228,22 +1492,26 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             </table>
                         </div>
 
-                        <hr />
-                        <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
-                            <h5 className="alinearTexto  mb-0">Registrar Estudios</h5>
+                        {contratoMasReciente?.continua === true && (
                             <div>
-                                <button
-                                    className="btn btn-outline-secondary me-2"
-                                    type="button"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#tablaEstudios"
-                                    aria-expanded="false"
-                                    aria-controls="tablaEstudios"
-                                >
-                                    Mostrar/Ocultar Estudios
-                                </button>
+                                <hr />
+                                <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
+                                    <h5 className="alinearTexto  mb-0">Registrar Estudios</h5>
+                                    <div>
+                                        <button
+                                            className="btn btn-outline-secondary me-2"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#tablaEstudios"
+                                            aria-expanded="false"
+                                            aria-controls="tablaEstudios"
+                                        >
+                                            Mostrar/Ocultar Estudios
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         <div className="collapse" id="tablaEstudios">
                             <table className="table table-bordered">
@@ -1272,7 +1540,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     <option value="OTRO">OTRO</option>
                                                 </select>
                                             </td>
-
                                             <td>
                                                 <input
                                                     type="text"
@@ -1284,7 +1551,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     }
                                                 />
                                             </td>
-
                                             <td>
                                                 <input
                                                     type="date"
@@ -1296,7 +1562,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     }
                                                 />
                                             </td>
-
                                             <td>
                                                 <button className="btn btn-primary btn-sm"
                                                     onClick={registrarNuevoEstudio}
@@ -1320,7 +1585,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     <option value="OTRO">OTRO</option>
                                                 </select>
                                             </td>
-
                                             <td>
                                                 <input
                                                     type="text"
@@ -1329,7 +1593,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     onChange={(e) => handleEstudioChange(idx, "nombreEstudio", e.target.value)}
                                                 />
                                             </td>
-
                                             <td>
                                                 <input
                                                     type="date"
@@ -1338,13 +1601,12 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     onChange={(e) => handleEstudioChange(idx, "fechaEstudio", e.target.value)}
                                                 />
                                             </td>
-
                                             <td className="d-flex justify-content-between">
                                                 <button
                                                     className="btn btn-success btn-sm me-2"
                                                     onClick={() => actualizarEstudio(es)}
                                                 >
-                                                    Guardar
+                                                    Actualizar
                                                 </button>
                                                 <button
                                                     className="btn btn-outline-danger btn-sm"
@@ -1354,29 +1616,32 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     <i className="bi bi-trash"></i>
                                                 </button>
                                             </td>
-
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
 
-                        <hr />
-                        <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
-                            <h5 className="alinearTexto  mb-0">Registrar Experiencia Laboral</h5>
+                        {contratoMasReciente?.continua === true && (
                             <div>
-                                <button
-                                    className="btn btn-outline-secondary me-2"
-                                    type="button"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#tablaExperiencia"
-                                    aria-expanded="false"
-                                    aria-controls="tablaExperiencia"
-                                >
-                                    Mostrar/Ocultar Experiencia
-                                </button>
+                                <hr />
+                                <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
+                                    <h5 className="alinearTexto  mb-0">Registrar Experiencia Laboral</h5>
+                                    <div>
+                                        <button
+                                            className="btn btn-outline-secondary me-2"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#tablaExperiencia"
+                                            aria-expanded="false"
+                                            aria-controls="tablaExperiencia"
+                                        >
+                                            Mostrar/Ocultar Experiencia
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         <div className="collapse" id="tablaExperiencia">
                             <table className="table table-bordered">
@@ -1401,7 +1666,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     }
                                                 />
                                             </td>
-
                                             <td>
                                                 <button className="btn btn-primary btn-sm"
                                                     onClick={registrarNuevaExperienciaLaboral}
@@ -1422,13 +1686,12 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     onChange={(e) => handleExperienciaLaboralChange(idx, "descripcionExperiencia", e.target.value)}
                                                 />
                                             </td>
-
                                             <td className="d-flex justify-content-between">
                                                 <button
                                                     className="btn btn-success btn-sm me-2"
                                                     onClick={() => actualizarExperienciaLaboral(ex)}
                                                 >
-                                                    Guardar
+                                                    Actualizar
                                                 </button>
                                                 <button
                                                     className="btn btn-outline-danger btn-sm"
@@ -1437,15 +1700,272 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                 >
                                                     <i className="bi bi-trash"></i>
                                                 </button>
-
                                             </td>
-
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
 
+                        {contratoMasReciente?.continua === true && (
+                            <div>
+                                <hr />
+                                <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
+                                    <h5 className="alinearTexto  mb-0">Registrar Afiliaciones</h5>
+                                    <div>
+                                        <button
+                                            className="btn btn-outline-secondary me-2"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#tablaAfiliaciones"
+                                            aria-expanded="false"
+                                            aria-controls="tablaAfiliaciones"
+                                        >
+                                            Mostrar/Ocultar Afiliaciones
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="collapse" id="tablaAfiliaciones">
+                            <table className="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo de Afiliación</th>
+                                        <th>Nombre de la Entidad</th>
+                                        <th>Fecha de Afiliación</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {nuevaAfiliacion && (
+                                        <tr>
+                                            <td>
+                                                <select
+                                                    className="form-select"
+                                                    value={nuevaAfiliacion.tipoAfiliacion}
+                                                    onChange={(e) =>
+                                                        setNuevaAfiliacion({ ...nuevaAfiliacion, tipoAfiliacion: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Seleccione</option>
+                                                    <option value="SALUD">SALUD</option>
+                                                    <option value="PENSION">PENSIÓN</option>
+                                                    <option value="ARL">ARL</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    placeholder="Nombre de la Entidad"
+                                                    value={nuevaAfiliacion.nombreEntidad}
+                                                    onChange={(e) =>
+                                                        setNuevaAfiliacion({ ...nuevaAfiliacion, nombreEntidad: e.target.value })
+                                                    }
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    placeholder="Fecha de Afiliación"
+                                                    value={nuevaAfiliacion.fechaAfiliacion}
+                                                    onChange={(e) =>
+                                                        setNuevaAfiliacion({ ...nuevaAfiliacion, fechaAfiliacion: e.target.value })
+                                                    }
+                                                />
+                                            </td>
+                                            <td>
+                                                <button className="btn btn-primary btn-sm"
+                                                    onClick={registrarNuevaAfiliacion}
+                                                >
+                                                    Agregar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    )}
+                                    {afiliaciones.map((af, idx) => (
+                                        <tr key={af.id || idx}>
+                                            <td>
+                                                <select
+                                                    className="form-select"
+                                                    value={af.tipoAfiliacion !== undefined && af.tipoAfiliacion !== null ? af.tipoAfiliacion : ""}
+                                                    onChange={(e) => handleAfiliacionChange(idx, "tipoAfiliacion", e.target.value)}
+                                                >
+                                                    <option value="">Seleccione</option>
+                                                    <option value="SALUD">SALUD</option>
+                                                    <option value="PENSION">PENSIÓN</option>
+                                                    <option value="ARL">ARL</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={af.nombreEntidad !== undefined && af.nombreEntidad !== null ? af.nombreEntidad : ""}
+                                                    onChange={(e) => handleAfiliacionChange(idx, "nombreEntidad", e.target.value)}
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    value={af.fechaAfiliacion !== undefined && af.fechaAfiliacion !== null ? af.fechaAfiliacion : ""}
+                                                    onChange={(e) => handleAfiliacionChange(idx, "fechaAfiliacion", e.target.value)}
+                                                />
+                                            </td>
+                                            <td className="d-flex justify-content-between">
+                                                <button
+                                                    className="btn btn-success btn-sm me-2"
+                                                    onClick={() => actualizarAfiliacion(af)}
+                                                >
+                                                    Actualizar
+                                                </button>
+                                                <button
+                                                    className="btn btn-outline-danger btn-sm"
+                                                    onClick={() => eliminarAfiliacion(af.id)}
+                                                    title="Eliminar"
+                                                >
+                                                    <i className="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {contratoMasReciente?.continua === true && (
+                            <div>
+                                <hr />
+                                <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
+                                    <h5 className="alinearTexto  mb-0">Registrar Documentos</h5>
+                                    <div>
+                                        <button
+                                            className="btn btn-outline-secondary me-2"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#tablaDocumentos"
+                                            aria-expanded="false"
+                                            aria-controls="tablaDocumentos"
+                                        >
+                                            Mostrar/Ocultar Documentos
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="collapse" id="tablaDocumentos">
+                            <table className="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo de Documento</th>
+                                        <th>Descripción</th>
+                                        <th>Fecha de Registro</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {nuevoDocumento && (
+                                        <tr>
+                                            <td>
+                                                <select
+                                                    className="form-select"
+                                                    value={nuevoDocumento.tipoDocumento}
+                                                    onChange={(e) =>
+                                                        setNuevoDocumento({ ...nuevoDocumento, tipoDocumento: e.target.value })
+                                                    }
+                                                >
+                                                    <option value="">Seleccione</option>
+                                                    <option value="PASADO_JUDICIAL">PASADO JUDICIAL</option>
+                                                    <option value="ANTECEDENTES_PENALES">ANTECENDENTES PENALES</option>
+                                                    <option value="OTRO">OTRO</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    placeholder="Descripción"
+                                                    value={nuevoDocumento.descripcionDocumento}
+                                                    onChange={(e) =>
+                                                        setNuevoDocumento({ ...nuevoDocumento, descripcionDocumento: e.target.value })
+                                                    }
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    placeholder="Fecha de Registro"
+                                                    value={nuevoDocumento.fechaRegistro}
+                                                    onChange={(e) =>
+                                                        setNuevoDocumento({ ...nuevoDocumento, fechaRegistro: e.target.value })
+                                                    }
+                                                />
+                                            </td>
+                                            <td>
+                                                <button className="btn btn-primary btn-sm"
+                                                    onClick={registrarNuevoDocumento}
+                                                >
+                                                    Agregar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    )}
+                                    {documentos.map((d, idx) => (
+                                        <tr key={d.id || idx}>
+                                            <td>
+                                                <select
+                                                    className="form-select"
+                                                    value={d.tipoDocumento !== undefined && d.tipoDocumento !== null ? d.tipoDocumento : ""}
+                                                    onChange={(e) => handleDocumentoChange(idx, "tipoDocumento", e.target.value)}
+                                                >
+                                                    <option value="">Seleccione</option>
+                                                    <option value="PASADO_JUDICIAL">PASADO JUDICIAL</option>
+                                                    <option value="ANTECEDENTES_PENALES">ANTECEDENTES PENALES</option>
+                                                    <option value="OTRO">OTRO</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    value={d.descripcionDocumento !== undefined && d.descripcionDocumento !== null ? d.descripcionDocumento : ""}
+                                                    onChange={(e) => handleDocumentoChange(idx, "descripcionDocumento", e.target.value)}
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="date"
+                                                    className="form-control"
+                                                    value={d.fechaRegistro !== undefined && d.fechaRegistro !== null ? d.fechaRegistro : ""}
+                                                    onChange={(e) => handleDocumentoChange(idx, "fechaRegistro", e.target.value)}
+                                                />
+                                            </td>
+                                            <td className="d-flex justify-content-between">
+                                                <button
+                                                    className="btn btn-success btn-sm me-2"
+                                                    onClick={() => actualizarDocumento(d)}
+                                                >
+                                                    Actualizar
+                                                </button>
+                                                <button
+                                                    className="btn btn-outline-danger btn-sm"
+                                                    onClick={() => eliminarDocumento(d.id)}
+                                                    title="Eliminar"
+                                                >
+                                                    <i className="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
 
                         <hr />
                         <div className="mt-1">
@@ -1558,7 +2078,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                         className="btn btn-success btn-sm"
                                                         onClick={() => actualizarContrato(c)}
                                                     >
-                                                        Guardar Contrato
+                                                        Guardar/Actualizar
                                                     </button>
 
                                                     {c.id && (
@@ -1616,6 +2136,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                     </button>
                                 </div>
                             </div>
+                            <hr />
                             <button onClick={() => {
                                 Swal.fire({
                                     title: "¿Quieres guardar los cambios?",

@@ -4,12 +4,17 @@ export function CuadrosSelect({
     nombreinput,
     idinput,
     value,
-    onChange, 
+    onChange,
+    required,
     opciones = []
 }) {
     return (
         <div className={`${tamanoinput} mb-2`}>
-            <label htmlFor={titulolabel}className="form-label"><strong>{titulolabel}</strong></label>
+            <label htmlFor={titulolabel} className="form-label">
+                <strong>
+                    {required && <span className="text-danger">*</span>} {titulolabel}
+                </strong>
+            </label>
             <select name={nombreinput}
                 id={idinput}
                 className="form-control"

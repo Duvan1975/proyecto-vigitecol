@@ -4,7 +4,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -547,5 +546,10 @@ public class EmpleadoService {
     public Page<DatosEmpleadoConAfiliaciones> findConAfiliaciones(Pageable pageable) {
         return empleadoRepository.findEmpleadosConAfiliaciones(pageable)
                 .map(DatosEmpleadoConAfiliaciones::new);
+    }
+
+    public Page<DatosEmpleadoConDocumentos> findConDocumentos(Pageable pageable) {
+        return empleadoRepository.findEmpleadosConDocumentos(pageable)
+                .map(DatosEmpleadoConDocumentos::new);
     }
 }

@@ -71,4 +71,16 @@ public class Afiliacion {
     }
 
     public Afiliacion(){}
+
+    public void actualizarDatos(DatosActualizarAfiliacion datos) {
+        if (datos.tipoAfiliacion() != null) {
+            this.tipoAfiliacion = datos.tipoAfiliacion();
+        }
+        if (datos.nombreEntidad() != null) {
+            this.nombreEntidad = datos.nombreEntidad();
+        }
+        if (datos.fechaAfiliacion() != null) {
+            this.fechaAfiliacion = datos.fechaAfiliacion();
+        }
+    }
 }

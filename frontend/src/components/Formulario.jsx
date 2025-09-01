@@ -3,7 +3,7 @@ import { CuadrosSelect } from "./CuadrosSelect";
 import { AgregarTabla } from "./AgregarTabla";
 import { useState } from "react";
 
-export function Formulario() {
+export function Formulario({ setVista }) {
 
     const [empleado, setEmpleado] = useState({
         nombres: "",
@@ -61,6 +61,14 @@ export function Formulario() {
         fechaAfiliacion: ""
     });
 
+    //Estados para registrar Documentos
+    const [documentos, setDocumentos] = useState([]);
+    const [documentoActual, setDocumentoActual] = useState({
+        tipoDocumento: "",
+        descripcionDocumento: "",
+        fechaRegistro: ""
+    });
+
     //Estado para registrar Contrato
     const [contrato, setContrato] = useState({
         fechaIngreso: ""
@@ -100,7 +108,6 @@ export function Formulario() {
     const agregarEstudio = () => {
         if (
             estudioActual.tipoEstudio &&
-            estudioActual.nombreEstudio &&
             estudioActual.fechaEstudio
         ) {
             setEstudios([...estudios, { ...estudioActual }]);
@@ -126,7 +133,6 @@ export function Formulario() {
     const agregarAfiliacion = () => {
         if (
             afiliacionActual.tipoAfiliacion &&
-            afiliacionActual.nombreEntidad &&
             afiliacionActual.fechaAfiliacion
         ) {
             setAfiliaciones([...afiliaciones, { ...afiliacionActual }]);
@@ -134,6 +140,20 @@ export function Formulario() {
                 tipoAfiliacion: "",
                 nombreEntidad: "",
                 fechaAfiliacion: ""
+            });
+        }
+    };
+
+    const agregarDocumento = () => {
+        if (
+            documentoActual.tipoDocumento &&
+            documentoActual.fechaRegistro
+        ) {
+            setDocumentos([...documentos, { ...documentoActual }]);
+            setDocumentoActual({
+                tipoDocumento: "",
+                descripcionDocumento: "",
+                fechaRegistro: ""
             });
         }
     };
@@ -191,6 +211,13 @@ export function Formulario() {
             fechaAfiliacion: ""
         });
         setAfiliaciones([]);
+
+        setDocumentoActual({
+            tipoDocumento: "",
+            descripcionDocumento: "",
+            fechaRegistro: ""
+        });
+        setDocumentos([]);
     };
     const eliminarFamiliarTabla = (index) => {
         const nuevosFamiliares = [...familiares];
@@ -217,6 +244,11 @@ export function Formulario() {
         nuevasAfiliaciones.splice(index, 1);
         setAfiliaciones(nuevasAfiliaciones);
     };
+    const eliminarDocumentoTabla = (index) => {
+        const nuevosDocumentos = [...documentos];
+        nuevosDocumentos.splice(index, 1);
+        setDocumentos(nuevosDocumentos);
+    };
 
     return (
         <div>
@@ -231,6 +263,7 @@ export function Formulario() {
                     placeholderinput="Ingrese los nombres"
                     value={empleado.nombres}
                     onChange={(e) => setEmpleado({ ...empleado, nombres: e.target.value })}
+                    required={true}
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-4"
@@ -241,6 +274,8 @@ export function Formulario() {
                     placeholderinput="Ingrese los apellidos"
                     value={empleado.apellidos}
                     onChange={(e) => setEmpleado({ ...empleado, apellidos: e.target.value })}
+                    required={true}
+
                 />
                 <CuadrosSelect
                     tamanoinput="col-md-4"
@@ -249,6 +284,7 @@ export function Formulario() {
                     idinput="tipoDocumento"
                     value={empleado.tipoDocumento}
                     onChange={(e) => setEmpleado({ ...empleado, tipoDocumento: e.target.value })}
+                    required={true}
                     opciones={[
                         { valor: "CC", texto: "CÉDULA DE CIUDADANÍA (CC)" },
                         { valor: "CE", texto: "CÉDULA DE EXTRANJERÍA (CE)" },
@@ -268,6 +304,7 @@ export function Formulario() {
                     placeholderinput="Ingrese el número de documento"
                     value={empleado.numeroDocumento}
                     onChange={(e) => setEmpleado({ ...empleado, numeroDocumento: e.target.value })}
+                    required={true}
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-3"
@@ -278,6 +315,7 @@ export function Formulario() {
                     placeholderinput="Seleccione la fecha de nacimiento"
                     value={empleado.fechaNacimiento}
                     onChange={(e) => setEmpleado({ ...empleado, fechaNacimiento: e.target.value })}
+                    required={true}
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-3"
@@ -288,6 +326,7 @@ export function Formulario() {
                     placeholderinput="Ingrese el lugar de nacimiento"
                     value={empleado.lugarNacimiento}
                     onChange={(e) => setEmpleado({ ...empleado, lugarNacimiento: e.target.value })}
+                    required={true}
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-3"
@@ -298,6 +337,7 @@ export function Formulario() {
                     placeholderinput="Ingrese la ciudad de expedición del documento"
                     value={empleado.ciudadExpedicion}
                     onChange={(e) => setEmpleado({ ...empleado, ciudadExpedicion: e.target.value })}
+                    required={true}
                 />
             </div>
 
@@ -309,6 +349,7 @@ export function Formulario() {
                     idinput="libretaMilitar"
                     value={empleado.libretaMilitar}
                     onChange={(e) => setEmpleado({ ...empleado, libretaMilitar: e.target.value })}
+                    required={true}
                     opciones={[
                         { valor: "PRIMERA", texto: "PRIMERA CLASE" },
                         { valor: "SEGUNDA", texto: "SEGUNDA CLASE" },
@@ -322,6 +363,7 @@ export function Formulario() {
                     idinput="estadoCivil"
                     value={empleado.estadoCivil}
                     onChange={(e) => setEmpleado({ ...empleado, estadoCivil: e.target.value })}
+                    required={true}
                     opciones={[
                         { valor: "CASADO", texto: "CASADO(A)" },
                         { valor: "SOLTERO", texto: "SOLTERO(A)" },
@@ -337,6 +379,7 @@ export function Formulario() {
                     idinput="genero"
                     value={empleado.genero}
                     onChange={(e) => setEmpleado({ ...empleado, genero: e.target.value })}
+                    required={true}
                     opciones={[
                         { valor: "MASCULINO", texto: "MASCULINO" },
                         { valor: "FEMENINO", texto: "FEMENINO" },
@@ -357,6 +400,7 @@ export function Formulario() {
                     placeholderinput="Ingrese la dirección"
                     value={empleado.direccion}
                     onChange={(e) => setEmpleado({ ...empleado, direccion: e.target.value })}
+                    required={true}
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-4"
@@ -367,6 +411,7 @@ export function Formulario() {
                     placeholderinput="Ingrese el número telefónico"
                     value={empleado.telefono}
                     onChange={(e) => setEmpleado({ ...empleado, telefono: e.target.value })}
+                    required={true}
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-4"
@@ -377,6 +422,7 @@ export function Formulario() {
                     placeholderinput="Ingrese el correo electróncio"
                     value={empleado.correo}
                     onChange={(e) => setEmpleado({ ...empleado, correo: e.target.value })}
+                    required={true}
                 />
             </div>
             <br></br>
@@ -384,7 +430,7 @@ export function Formulario() {
 
             <div className='row align-items-center g-2'>
                 <CuadrosSelect
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Tipo de Familiar:"
                     nombreinput="tipoFamiliar"
                     idinput="tipoFamiliar"
@@ -398,7 +444,7 @@ export function Formulario() {
                     ]}
                 />
                 <CuadrosTexto
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Nombres y Apellidos:"
                     tipoinput="text"
                     nombreinput="nombreFamiliar"
@@ -410,7 +456,7 @@ export function Formulario() {
                     }
                 />
                 <CuadrosTexto
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Edad (años):"
                     tipoinput="number"
                     nombreinput="edadFamiliar"
@@ -421,15 +467,23 @@ export function Formulario() {
                         setFamiliarActual({ ...familiarActual, edadFamiliar: e.target.value })
                     }
                 />
+                <div className="col-md-2 d-flex align-items-end">
+                    <button
+                        type="button"
+                        className="btn btn-secondary w-100"
+                        onClick={agregarFamiliar}
+                        disabled={ // condición para deshabilitar
+                            !familiarActual.tipoFamiliar ||
+                            !familiarActual.nombreFamiliar ||
+                            !familiarActual.edadFamiliar
+                        }
+                        style={{ marginBottom: "-22px" }}
+                    >
+                        Agregar Hijos
+                    </button>
+                </div>
             </div>
 
-            <button type="button"
-                className="btn btn-secondary mb-4"
-                onClick={agregarFamiliar}
-            >
-                Agregar HIJO/HIJASTRO
-            </button>
-            <br />
             {familiares.length > 0 && (
                 <div>
                     <h5>Familiares Registrados:</h5>
@@ -466,7 +520,7 @@ export function Formulario() {
 
             <div className='row align-items-center g-2'>
                 <CuadrosSelect
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Tipo de Curso:"
                     nombreinput="tipoCurso"
                     idinput="tipoCurso"
@@ -480,7 +534,7 @@ export function Formulario() {
                     ]}
                 />
                 <CuadrosSelect
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Categoria:"
                     nombreinput="categoria"
                     idinput="categoria"
@@ -497,7 +551,7 @@ export function Formulario() {
                     ]}
                 />
                 <CuadrosTexto
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Fecha del Curso:"
                     tipoinput="date"
                     nombreinput="fechaCurso"
@@ -507,14 +561,23 @@ export function Formulario() {
                         setCursoActual({ ...cursoActual, fechaCurso: e.target.value })
                     }
                 />
+                <div className="col-md-2 d-flex align-items-end">
+                    <button
+                        type="button"
+                        className="btn btn-secondary w-100"
+                        onClick={agregarCurso}
+                        disabled={ // Deshabilitar si falta algo
+                            !cursoActual.tipoCurso ||
+                            !cursoActual.categoria ||
+                            !cursoActual.fechaCurso
+                        }
+                        style={{ marginBottom: "-22px" }}
+                    >
+                        Agregar Curso
+                    </button>
+                </div>
             </div>
-            <button type="button"
-                className="btn btn-secondary mb-4"
-                onClick={agregarCurso}
-            >
-                Agregar Curso
-            </button>
-            <br />
+
             {cursos.length > 0 && (
                 <div>
                     <h5>Cursos Registrados:</h5>
@@ -551,7 +614,7 @@ export function Formulario() {
 
             <div className='row align-items-center g-2'>
                 <CuadrosSelect
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Tipo de Estudio:"
                     nombreinput="tipoEstudio"
                     idinput="tipoEstudio"
@@ -566,7 +629,7 @@ export function Formulario() {
                     ]}
                 />
                 <CuadrosTexto
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Descripción (Título):"
                     tipoinput="text"
                     nombreinput="nombreEstudio"
@@ -577,7 +640,7 @@ export function Formulario() {
                     }
                 />
                 <CuadrosTexto
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Fecha de Realización:"
                     tipoinput="date"
                     nombreinput="fechaEstudio"
@@ -587,13 +650,21 @@ export function Formulario() {
                         setEstudioActual({ ...estudioActual, fechaEstudio: e.target.value })
                     }
                 />
+                <div className="col-md-2 d-flex align-items-end">
+                    <button
+                        type="button"
+                        className="btn btn-secondary w-100"
+                        onClick={agregarEstudio}
+                        disabled={ // Deshabilitar si falta algo
+                            !estudioActual.tipoEstudio ||
+                            !estudioActual.fechaEstudio
+                        }
+                        style={{ marginBottom: "-22px" }}
+                    >
+                        Agregar Estudio
+                    </button>
+                </div>
             </div>
-            <button type="button"
-                className="btn btn-secondary mb-4"
-                onClick={agregarEstudio}
-            >
-                Agregar Estudio
-            </button>
 
             {estudios.length > 0 && (
                 <div>
@@ -632,7 +703,7 @@ export function Formulario() {
             <div className='row align-items-center g-2'>
 
                 <CuadrosTexto
-                    tamanoinput="col-md-8"
+                    tamanoinput="col-md-9"
                     titulolabel="Experiencia Laboral:"
                     tipoinput="text"
                     nombreinput="descripcionExperiencia"
@@ -642,14 +713,20 @@ export function Formulario() {
                         setExperienciaLaboralActual({ ...experienciaLaboralActual, descripcionExperiencia: e.target.value })
                     }
                 />
+                <div className="col-md-2 d-flex align-items-end">
+                    <button
+                        type="button"
+                        className="btn btn-secondary w-100"
+                        onClick={agregarExperienciaLaboral}
+                        disabled={
+                            !experienciaLaboralActual.descripcionExperiencia
+                        }
+                        style={{ marginBottom: "-22px" }}
+                    >
+                        Agregar Experiencia
+                    </button>
+                </div>
             </div>
-            
-            <button type="button"
-                className="btn btn-secondary mb-4"
-                onClick={agregarExperienciaLaboral}
-            >
-                Agregar Experiencia Laboral
-            </button>
 
             {experienciasLaborales.length > 0 && (
                 <div>
@@ -683,7 +760,7 @@ export function Formulario() {
 
             <div className='row align-items-center g-2'>
                 <CuadrosSelect
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Tipo de Afiliación:"
                     nombreinput="tipoAfiliacion"
                     idinput="tipoAfiliacion"
@@ -698,7 +775,7 @@ export function Formulario() {
                     ]}
                 />
                 <CuadrosTexto
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Nombre de la Entidad:"
                     tipoinput="text"
                     nombreinput="nombreEntidad"
@@ -709,7 +786,7 @@ export function Formulario() {
                     }
                 />
                 <CuadrosTexto
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Fecha de Afiliación:"
                     tipoinput="date"
                     nombreinput="fechaAfiliacion"
@@ -719,13 +796,21 @@ export function Formulario() {
                         setAfiliacionActual({ ...afiliacionActual, fechaAfiliacion: e.target.value })
                     }
                 />
+                <div className="col-md-2 d-flex align-items-end">
+                    <button
+                        type="button"
+                        className="btn btn-secondary w-100"
+                        onClick={agregarAfiliacion}
+                        disabled={
+                            !afiliacionActual.tipoAfiliacion ||
+                            !afiliacionActual.fechaAfiliacion
+                        }
+                        style={{ marginBottom: "-22px" }}
+                    >
+                        Agregar Afiliación
+                    </button>
+                </div>
             </div>
-            <button type="button"
-                className="btn btn-secondary mb-4"
-                onClick={agregarAfiliacion}
-            >
-                Agregar Afiliación
-            </button>
 
             {afiliaciones.length > 0 && (
                 <div>
@@ -759,6 +844,94 @@ export function Formulario() {
                 </div>
             )}
 
+            <h5 className='alinearTexto'>Documentos</h5>
+
+            <div className='row align-items-center g-2'>
+                <CuadrosSelect
+                    tamanoinput="col-md-3"
+                    titulolabel="Tipo de Documento:"
+                    nombreinput="tipoDocumento"
+                    idinput="tipoDocumento"
+                    value={documentoActual.tipoDocumento}
+                    onChange={(e) =>
+                        setDocumentoActual({ ...documentoActual, tipoDocumento: e.target.value })
+                    }
+                    opciones={[
+                        { valor: "PASADO_JUDICIAL", texto: "PASADO JUDICIAL" },
+                        { valor: "ANTECEDENTES_PENALES", texto: "ANTECEDENTES PENALES" },
+                        { valor: "OTRO", texto: "OTRO" },
+                    ]}
+                />
+                <CuadrosTexto
+                    tamanoinput="col-md-3"
+                    titulolabel="Descripción:"
+                    tipoinput="text"
+                    nombreinput="descripcionDocumento"
+                    idinput="descripcionDocumento"
+                    value={documentoActual.descripcionDocumento}
+                    onChange={(e) =>
+                        setDocumentoActual({ ...documentoActual, descripcionDocumento: e.target.value })
+                    }
+                />
+                <CuadrosTexto
+                    tamanoinput="col-md-3"
+                    titulolabel="Fecha de Registro:"
+                    tipoinput="date"
+                    nombreinput="fechaRegistro"
+                    idinput="fechaRegistro"
+                    value={documentoActual.fechaRegistro}
+                    onChange={(e) =>
+                        setDocumentoActual({ ...documentoActual, fechaRegistro: e.target.value })
+                    }
+                />
+                <div className="col-md-2 d-flex align-items-end">
+                    <button
+                        type="button"
+                        className="btn btn-secondary w-100"
+                        onClick={agregarDocumento}
+                        disabled={
+                            !documentoActual.tipoDocumento ||
+                            !documentoActual.fechaRegistro
+                        }
+                        style={{ marginBottom: "-22px" }}
+                    >
+                        Agregar Documento
+                    </button>
+                </div>
+            </div>
+
+            {documentos.length > 0 && (
+                <div>
+                    <h4>Documentos Registrados:</h4>
+                    <table className="table table-bordered border-black">
+                        <thead className="table-primary border-black">
+                            <tr>
+                                <th>Tipo de Documento</th>
+                                <th>Descripción</th>
+                                <th>Fecha de Registro</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {documentos.map((d, idx) => (
+                                <tr key={idx}>
+                                    <td>{d.tipoDocumento}</td>
+                                    <td>{d.descripcionDocumento}</td>
+                                    <td>{d.fechaRegistro}</td>
+                                    <td><button
+                                        className="btn btn-outline-danger btn-sm"
+                                        onClick={() => eliminarDocumentoTabla(idx)}
+                                        title="Eliminar"
+                                    >
+                                        <i className="bi bi-trash"></i>
+                                    </button></td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
             <h5 className='alinearTexto'>Asignar Cargo</h5>
 
             <div className='row align-items-center g-2'>
@@ -769,6 +942,7 @@ export function Formulario() {
                     idinput="tipoEmpleado"
                     value={empleado.tipoEmpleado}
                     onChange={(e) => setEmpleado({ ...empleado, tipoEmpleado: e.target.value })}
+                    required={true}
                     opciones={[
                         { valor: "OPERATIVO", texto: "OPERATIVO" },
                         { valor: "ADMINISTRATIVO", texto: "ADMINISTRATIVO" },
@@ -783,6 +957,7 @@ export function Formulario() {
                     placeholderinput="Ingrese el cargo a ocupar"
                     value={empleado.cargo}
                     onChange={(e) => setEmpleado({ ...empleado, cargo: e.target.value })}
+                    required={true}
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-4"
@@ -799,17 +974,25 @@ export function Formulario() {
             <div className='col-md-auto'>
                 <button
                     onClick={() => AgregarTabla(
-                        contrato, 
-                        familiares, 
-                        cursos, 
-                        estudios, 
-                        experienciasLaborales, 
-                        afiliaciones, 
-                        empleado, 
+                        contrato,
+                        familiares,
+                        cursos,
+                        estudios,
+                        experienciasLaborales,
+                        afiliaciones,
+                        documentos,
+                        empleado,
                         limpiarFormulario)}
-                    className="botonregistrar btn btn-success"
+                    className=" btn btn-success me-2"
                 >
-                    Registrar
+                    Registrar Empleado
+                </button>
+                <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setVista("tabla")}
+                >
+                    Cancelar
                 </button>
             </div>
         </div>

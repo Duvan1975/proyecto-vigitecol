@@ -8,6 +8,7 @@ import proyectoVigitecolSpringBoot.domain.curso.Curso;
 import proyectoVigitecolSpringBoot.domain.estudio.Estudio;
 import proyectoVigitecolSpringBoot.domain.experienciaLaboral.ExperienciaLaboral;
 import proyectoVigitecolSpringBoot.domain.familia.Familiar;
+import proyectoVigitecolSpringBoot.domain.otroDocumento.OtroDocumento;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -73,6 +74,9 @@ public class Empleado {
 
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Afiliacion> afiliaciones = new ArrayList<>();
+
+    @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OtroDocumento> documentos = new ArrayList<>();
 
     //Constructor para registrar empleado
     public Empleado(DatosRegistroEmpleado datos) {
@@ -285,6 +289,15 @@ public class Empleado {
     public void setAfiliaciones(List<Afiliacion> afiliaciones) {
         this.afiliaciones = afiliaciones;
     }
+
+    public List<OtroDocumento> getDocumentos() {
+        return documentos;
+    }
+
+    public void setDocumentos(List<OtroDocumento> documentos) {
+        this.documentos = documentos;
+    }
+
     /*public Long getEmpleadoId() {
         return id;
     }*/

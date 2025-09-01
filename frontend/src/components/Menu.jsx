@@ -57,7 +57,7 @@ export function Menu() {
                 </button>
 
             </div>
-            {vista === "formulario" && <Formulario />}
+            {vista === "formulario" && <Formulario setVista={setVista} />}
             {vista === "tabla" && <Tabla mostrarInactivos={false} />}
             {vista === "inactivas" && <Tabla mostrarInactivos={true} />}
             {vista === "administrativos" && <Tabla mostrarAdministrativos={true} />}

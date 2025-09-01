@@ -1,15 +1,14 @@
 package proyectoVigitecolSpringBoot.controller;
 
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import proyectoVigitecolSpringBoot.domain.afiliacion.Afiliacion;
-import proyectoVigitecolSpringBoot.domain.afiliacion.AfiliacionService;
-import proyectoVigitecolSpringBoot.domain.afiliacion.DatosListadoAfiliacion;
-import proyectoVigitecolSpringBoot.domain.afiliacion.DatosRegistroAfiliacion;
+import proyectoVigitecolSpringBoot.domain.afiliacion.*;
 
 import java.util.List;
 
@@ -26,13 +25,8 @@ public class AfiliacionController {
             @PathVariable Long empleadoId,
             @RequestBody List<DatosRegistroAfiliacion> listaDatos) {
         afiliacionService.registrarAfiliacion(empleadoId, listaDatos);
-        return ResponseEntity.ok("Afiliación Registrada con Éxito");
+        return ResponseEntity.ok(listaDatos);
     }
-
-    /*@GetMapping
-    public List<Afiliacion> listadoAfiliaciones() {
-        return afiliacionService.listarAfiliaciones();
-    }*/
 
     @GetMapping
     public ResponseEntity<Page<DatosListadoAfiliacion>> listadoAfiliaciones(
@@ -49,5 +43,20 @@ public class AfiliacionController {
             @PathVariable Long empleadoId) {
         var afiliaciones = afiliacionService.obtenerAfiliacionesPorEmpleadoActivo(empleadoId);
         return ResponseEntity.ok(afiliaciones);
+    }
+
+    @PutMapping
+    @Transactional
+    public ResponseEntity<DatosRespuestaAfiliacion> actualizarAfiliacion(
+            @RequestBody @Valid DatosActualizarAfiliacion datos) {
+        DatosRespuestaAfiliacion respuesta = afiliacionService.actualizarAfiliacion(datos);
+
+        return ResponseEntity.ok(respuesta);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarAfiliacion(@PathVariable Long id) {
+        afiliacionService.eliminarAfiliacion(id);
+        return ResponseEntity.noContent().build(); // Devuelve 204 No Content
     }
 }

@@ -583,7 +583,7 @@ export function Tabla({
 
                     </div>
                 </div>
-            </div>
+            </div> 
 
             {tipoBusqueda !== "conContrato" &&
                 tipoBusqueda !== "conFamiliares" &&

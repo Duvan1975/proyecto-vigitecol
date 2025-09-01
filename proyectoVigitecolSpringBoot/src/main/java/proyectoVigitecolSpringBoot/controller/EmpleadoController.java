@@ -246,4 +246,14 @@ public class EmpleadoController {
 
         return ResponseEntity.ok(resultado);
     }
+
+    @GetMapping("/con-documentos")
+    public ResponseEntity<Page<DatosEmpleadoConDocumentos>> empleadosConDocumentos(
+            @PageableDefault(size = 10, sort = "apellidos") Pageable pageable) {
+
+        Page<DatosEmpleadoConDocumentos> resultado = empleadoService
+                .findConDocumentos(pageable);
+
+        return ResponseEntity.ok(resultado);
+    }
 }
