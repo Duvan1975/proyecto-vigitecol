@@ -42,7 +42,7 @@ public class TratadorDeErrores {
         Map<String, String> error = new HashMap<>();
 
         if (causa instanceof DateTimeParseException || causa.getMessage().contains("LocalDate")) {
-            error.put("error", "Error en el formato de fecha");
+            error.put("error", "Error en el formato de fecha, campo año");
             error.put("detalle", "Verifica que las fechas tengan el formato correcto (yyyy-MM-dd)");
         } else {
             // Validación para errores en enums

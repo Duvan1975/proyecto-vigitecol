@@ -5,7 +5,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -25,24 +24,34 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response, FilterChain filterChain)
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
             throws ServletException, IOException {
-        System.out.println("El filtro ya ESTÁ siendo llamado");
-        //Obtener el token del header
+
         var authHeader = request.getHeader("Authorization");
 
         if (authHeader != null) {
             var token = authHeader.replace("Bearer ", "");
-            var subject = tokenService.getSubject(token);
 
-            if (subject != null) {
-                //token válido
-                var usuario = usuarioRepository.findByAdmin(subject);
-                var authentication = new UsernamePasswordAuthenticationToken(
-                        usuario, null, usuario.getAuthorities());//Forzamos el inicio de sesión
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }else {
-                throw new RuntimeException("El token enviado NO es válido");
+            try {
+                var subject = tokenService.getSubject(token);
+
+                if (subject != null) {
+                    // Verificar si el usuario está activo
+                    boolean estado = tokenService.getEstadoFromToken(token);
+                    if (!estado) {
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Cuenta desactivada");
+                        return;
+                    }
+
+                    var usuario = usuarioRepository.findByAdmin(subject);
+                    var authentication = new UsernamePasswordAuthenticationToken(
+                            usuario, null, usuario.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } catch (RuntimeException e) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido: " + e.getMessage());
+                return;
             }
         }
         filterChain.doFilter(request, response);

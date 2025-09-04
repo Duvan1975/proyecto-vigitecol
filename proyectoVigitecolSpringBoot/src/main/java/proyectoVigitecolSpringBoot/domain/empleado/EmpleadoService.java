@@ -231,11 +231,18 @@ public class EmpleadoService {
     public ResponseEntity<List<DatosActualizarEmpleado>> buscarEmpleadosActivosPorNombre(String filtro) {
         var empleados = contratoRepository.buscarTodosEmpleadosActivos();
 
-        var palabras = filtro.toLowerCase().split("\\s+");
+        // Normalizar el filtro de búsqueda (quitando tildes y convirtiendo a minúsculas)
+        String filtroNormalizado = quitarTildes(filtro.toLowerCase());
+        var palabras = filtroNormalizado.split("\\s+");
 
         var empleadosFiltrados = empleados.stream()
                 .filter(empleado -> {
-                    String nombreCompleto = quitarTildes((empleado.getNombres() + " " + empleado.getApellidos()).toLowerCase());
+                    // Normalizar el nombre completo del empleado
+                    String nombreCompleto = quitarTildes(
+                            (empleado.getNombres() + " " + empleado.getApellidos()).toLowerCase()
+                    );
+
+                    // Verificar si todas las palabras del filtro están en el nombre
                     return Arrays.stream(palabras).allMatch(nombreCompleto::contains);
                 })
                 .map(empleado -> new DatosActualizarEmpleado(
@@ -296,11 +303,17 @@ public class EmpleadoService {
     public ResponseEntity<List<DatosActualizarEmpleado>> buscarEmpleadosInactivosPorNombre(String filtro) {
         var empleados = contratoRepository.buscarTodosEmpleadosInactivos();
 
-        var palabras = filtro.toLowerCase().split("\\s+");
+        String filtroNormalizado = quitarTildes(filtro.toLowerCase());
+        var palabras = filtroNormalizado.split("\\s+");
 
         var empleadosFiltrados = empleados.stream()
                 .filter(empleado -> {
-                    String nombreCompleto = quitarTildes((empleado.getNombres() + " " + empleado.getApellidos()).toLowerCase());
+                    // Normalizar el nombre completo del empleado
+                    String nombreCompleto = quitarTildes(
+                            (empleado.getNombres() + " " + empleado.getApellidos()).toLowerCase()
+                    );
+
+                    // Verificar si todas las palabras del filtro están en el nombre
                     return Arrays.stream(palabras).allMatch(nombreCompleto::contains);
                 })
                 .map(empleado -> new DatosActualizarEmpleado(

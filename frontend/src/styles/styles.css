@@ -1,6 +1,165 @@
 .alinearTexto{
-    color: blue;
+    color: #273578;
 }
 .botonregistrar{
     margin-left: 45%;
+}
+
+/* styles.css */
+.navbar-brand {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.btn {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.sticky-top {
+    z-index: 1020;
+}
+
+/* Responsive para el header */
+
+:root {
+  --bs-primary: #084298;
+  --bs-primary-dark: #084298;
+}
+
+/* Header con el mismo gradient que el footer */
+.navbar-custom {
+    background: linear-gradient(135deg, #273578 0%, #2d2d2d 100%) !important;
+    border-bottom: 3px solid #fadc24 !important;
+}
+
+/* Asegurar que el texto sea visible sobre el gradient */
+.navbar-custom .navbar-brand,
+.navbar-custom .text-white,
+.navbar-custom .text-warning {
+    color: #ffffff !important;
+}
+
+.navbar-custom .btn-outline-warning {
+    border-color: #fadc24;
+    color: #fadc24;
+}
+
+.navbar-custom .btn-outline-warning:hover {
+    background-color: #fadc24;
+    color: #000000;
+}
+
+/* Efecto hover */
+.navbar-custom .navbar-brand:hover,
+.navbar-custom .text-white:hover {
+    color: #fadc24 !important;
+}
+
+/* Footer (mantienes tu estilo actual) */
+footer {
+    background: linear-gradient(135deg, #273578 0%, #2d2d2d 100%);
+    border-top: 3px solid #fadc24;
+}
+
+footer h5, footer h6 {
+    color: #fadc24 !important;
+}
+
+footer .bi {
+    color: #fadc24;
+}
+
+footer a {
+    color: #ffffff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: #fadc24;
+}
+
+/* Utilidades generales */
+.min-vh-100 {
+    min-height: 100vh;
+}
+
+.flex-grow-1 {
+    flex-grow: 1;
+}
+
+.mt-auto {
+    margin-top: auto;
+}
+
+/* Responsive para ambos */
+@media (max-width: 768px) {
+    /* Header responsive */
+    .navbar-custom .navbar-brand {
+        font-size: 1rem;
+    }
+    
+    .navbar-custom .container {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .navbar-custom .d-flex {
+        margin-top: 10px;
+    }
+    
+    /* Footer responsive */
+    footer .row {
+        text-align: center;
+    }
+    
+    footer .col-md-6 {
+        margin-bottom: 1.5rem;
+    }
+}
+.active-option {
+    border-bottom: 3px solid #0d6efd !important;
+    font-weight: 600;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.active-tab {
+    background-color: #273578 !important;
+    color: white !important;
+}
+
+.active-tab-indicator {
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #233775;
+}
+
+.active-tab-indicator-warning {
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #fadc24;
+}
+
+.active-tab-warning {
+    background-color: #fadc24 !important;
+    color: black !important;
 }

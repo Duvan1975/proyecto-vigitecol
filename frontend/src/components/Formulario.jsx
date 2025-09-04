@@ -470,7 +470,7 @@ export function Formulario({ setVista }) {
                 <div className="col-md-2 d-flex align-items-end">
                     <button
                         type="button"
-                        className="btn btn-secondary w-100"
+                        className="btn btn-primary w-100"
                         onClick={agregarFamiliar}
                         disabled={ // condición para deshabilitar
                             !familiarActual.tipoFamiliar ||
@@ -564,7 +564,7 @@ export function Formulario({ setVista }) {
                 <div className="col-md-2 d-flex align-items-end">
                     <button
                         type="button"
-                        className="btn btn-secondary w-100"
+                        className="btn btn-primary w-100"
                         onClick={agregarCurso}
                         disabled={ // Deshabilitar si falta algo
                             !cursoActual.tipoCurso ||
@@ -653,7 +653,7 @@ export function Formulario({ setVista }) {
                 <div className="col-md-2 d-flex align-items-end">
                     <button
                         type="button"
-                        className="btn btn-secondary w-100"
+                        className="btn btn-primary w-100"
                         onClick={agregarEstudio}
                         disabled={ // Deshabilitar si falta algo
                             !estudioActual.tipoEstudio ||
@@ -716,7 +716,7 @@ export function Formulario({ setVista }) {
                 <div className="col-md-2 d-flex align-items-end">
                     <button
                         type="button"
-                        className="btn btn-secondary w-100"
+                        className="btn btn-primary w-100"
                         onClick={agregarExperienciaLaboral}
                         disabled={
                             !experienciaLaboralActual.descripcionExperiencia
@@ -799,10 +799,11 @@ export function Formulario({ setVista }) {
                 <div className="col-md-2 d-flex align-items-end">
                     <button
                         type="button"
-                        className="btn btn-secondary w-100"
+                        className="btn btn-primary w-100"
                         onClick={agregarAfiliacion}
                         disabled={
                             !afiliacionActual.tipoAfiliacion ||
+                            !afiliacionActual.nombreEntidad ||
                             !afiliacionActual.fechaAfiliacion
                         }
                         style={{ marginBottom: "-22px" }}
@@ -887,7 +888,7 @@ export function Formulario({ setVista }) {
                 <div className="col-md-2 d-flex align-items-end">
                     <button
                         type="button"
-                        className="btn btn-secondary w-100"
+                        className="btn btn-primary w-100"
                         onClick={agregarDocumento}
                         disabled={
                             !documentoActual.tipoDocumento ||
