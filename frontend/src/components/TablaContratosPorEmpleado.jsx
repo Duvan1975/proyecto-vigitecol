@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { exportarAExcel } from "../utils/exportarExcel";
 import { authFetch } from "../utils/authFetch";
 
-
 export function TablaContratosPorEmpleado({ empleadoId, actualizar, onClose }) {
     const [contratos, setContratos] = useState([]);
     const [cargando, setCargando] = useState(true);

@@ -8,6 +8,8 @@ import { TablaFamiliar } from "./TablaFamiliar";
 import { TablaCurso } from "./TablaCurso";
 import { TablaContratoConPeriodoDePrueba } from "./TablaContratoConPeriodoDePrueba";
 import { authFetch } from "../utils/authFetch";
+import ProtectedElement from "../utils/ProtectedElement";
+import ExportModal from "./ExportModal";
 
 export function Tabla({
     mostrarInactivos = false,
@@ -19,7 +21,7 @@ export function Tabla({
 
     //Estados para seleccionar empleado mostrar Modal y actualizar
     const [empleados, setEmpleados] = useState([]);
-    const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState(null);
+    const [empleadoSeleccionado, setEmpleadoSeleccionado] = useState([]);
     const [mostrarModal, setMostrarModal] = useState(false);
 
     //Estado para buscar por nombre
@@ -50,6 +52,10 @@ export function Tabla({
     const [libretaMilitarBuscar, setLibretaMilitarBuscar] = useState("");
     const [cargoBuscar, setCargoBuscar] = useState("");
 
+    //Estados para mostrar Modal y exportar a Excel
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [empleadosExport, setEmpleadosExport] = useState([]);
+
     useEffect(() => {
         cargarEmpleados(paginaActual);
         // eslint-disable-next-line
@@ -79,15 +85,16 @@ export function Tabla({
         // eslint-disable-next-line
     }, [tipoBusqueda, paginaActual]);
 
-    //Cargando el listado de Empleados activos, retirados, operativos, supervisores y administrativos
-    const cargarEmpleados = (pagina = 0) => {
+
+    // 👉 Función que construye la URL según filtros
+    const construirUrlEmpleados = (pagina = 0, exportar = false) => {
+        let baseUrl = "http://localhost:8080/empleados";
         let url;
 
         if (sinContrato || tipoBusqueda === "sinContrato") {
-            url = `http://localhost:8080/empleados/sin-contrato?page=${pagina}`;
-
+            url = `${baseUrl}/sin-contrato?page=${pagina}`;
         } else if (tipoBusqueda === "personalMayorDe50") {
-            url = `http://localhost:8080/empleados/activos/mayores-de-50?&page=${pagina}`;
+            url = `${baseUrl}/activos/mayores-de-50?page=${pagina}`;
 
             // Agregar filtro por tipo de empleado si está activo
             if (mostrarAdministrativos) {
@@ -97,20 +104,17 @@ export function Tabla({
             }
 
         } else if (tipoBusqueda === "conFamiliares") {
-            url = `http://localhost:8080/empleados/con-familiares-menores?&page=${pagina}`;
+            url = `${baseUrl}/con-familiares-menores?page=${pagina}`;
 
-            // Agregar filtro por tipo de empleado si está activo
             if (mostrarAdministrativos) {
                 url += `&tipoEmpleado=ADMINISTRATIVO`;
             } else if (mostrarOperativos) {
                 url += `&tipoEmpleado=OPERATIVO`;
             }
 
-        }
-        else if (tipoBusqueda === "estadoCivil" && estadoCivilBuscar) {
-            url = `http://localhost:8080/empleados/estado-civil?estadoCivil=${estadoCivilBuscar}&page=${pagina}`;
+        } else if (tipoBusqueda === "estadoCivil" && estadoCivilBuscar) {
+            url = `${baseUrl}/estado-civil?estadoCivil=${estadoCivilBuscar}&page=${pagina}`;
 
-            // Agregar filtro por tipo de empleado si está activo
             if (mostrarAdministrativos) {
                 url += `&tipoEmpleado=ADMINISTRATIVO`;
             } else if (mostrarOperativos) {
@@ -118,19 +122,17 @@ export function Tabla({
             }
 
         } else if (tipoBusqueda === "genero" && generoBuscar) {
-            url = `http://localhost:8080/empleados/genero?genero=${generoBuscar}&page=${pagina}`;
+            url = `${baseUrl}/genero?genero=${generoBuscar}&page=${pagina}`;
 
-            // Agregar filtro por tipo de empleado si está activo
             if (mostrarAdministrativos) {
                 url += `&tipoEmpleado=ADMINISTRATIVO`;
             } else if (mostrarOperativos) {
                 url += `&tipoEmpleado=OPERATIVO`;
             }
-        }
-        else if (tipoBusqueda === "familiaresPorGenero" && generoBuscarFamiliares) {
-            url = `http://localhost:8080/empleados/conFamiliares/genero?genero=${generoBuscarFamiliares}&page=${pagina}`;
 
-            // Agregar filtro por tipo de empleado si está activo
+        } else if (tipoBusqueda === "familiaresPorGenero" && generoBuscarFamiliares) {
+            url = `${baseUrl}/conFamiliares/genero?genero=${generoBuscarFamiliares}&page=${pagina}`;
+
             if (mostrarAdministrativos) {
                 url += `&tipoEmpleado=ADMINISTRATIVO`;
             } else if (mostrarOperativos) {
@@ -138,9 +140,8 @@ export function Tabla({
             }
 
         } else if (tipoBusqueda === "libretaMilitar" && libretaMilitarBuscar) {
-            url = `http://localhost:8080/empleados/libreta-militar?libretaMilitar=${libretaMilitarBuscar}&page=${pagina}`;
+            url = `${baseUrl}/libreta-militar?libretaMilitar=${libretaMilitarBuscar}&page=${pagina}`;
 
-            // Agregar filtro por tipo de empleado si está activo
             if (mostrarAdministrativos) {
                 url += `&tipoEmpleado=ADMINISTRATIVO`;
             } else if (mostrarOperativos) {
@@ -148,9 +149,8 @@ export function Tabla({
             }
 
         } else if (tipoBusqueda === "cargo" && cargoBuscar) {
-            url = `http://localhost:8080/empleados/por-cargo?cargo=${cargoBuscar}&page=${pagina}`;
+            url = `${baseUrl}/por-cargo?cargo=${cargoBuscar}&page=${pagina}`;
 
-            // Agregar filtro por tipo de empleado si está activo
             if (mostrarAdministrativos) {
                 url += `&tipoEmpleado=ADMINISTRATIVO`;
             } else if (mostrarOperativos) {
@@ -158,16 +158,31 @@ export function Tabla({
             }
 
         } else if (mostrarAdministrativos) {
-            url = `http://localhost:8080/empleados/administrativos/activos?page=${pagina}`;
+            url = `${baseUrl}/administrativos/activos?page=${pagina}`;
         } else if (mostrarOperativos) {
-            url = `http://localhost:8080/empleados/operativos/activos?page=${pagina}`;
+            url = `${baseUrl}/operativos/activos?page=${pagina}`;
         } else if (mostrarSupervisores) {
-            url = `http://localhost:8080/empleados/supervisores/activos?page=${pagina}`;
+            url = `${baseUrl}/supervisores/activos?page=${pagina}`;
         } else {
             url = mostrarInactivos
-                ? `http://localhost:8080/empleados/inactivos?page=${pagina}`
-                : `http://localhost:8080/empleados/activos?page=${pagina}`;
+                ? `${baseUrl}/inactivos?page=${pagina}`
+                : `${baseUrl}/activos?page=${pagina}`;
         }
+
+        // 👉 Si es exportación, agregamos un flag al backend para indicar que es exportación
+        if (exportar) {
+            if (url.includes("?")) {
+                url += "&exportar=true";
+            } else {
+                url += "?exportar=true";
+            }
+        }
+
+        return url;
+    };
+
+    const cargarEmpleados = (pagina = 0) => {
+        const url = construirUrlEmpleados(pagina);
 
         authFetch(url)
             .then((response) => response.json())
@@ -360,7 +375,7 @@ export function Tabla({
         if (tipoBusqueda === "conFamiliares") {
             if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO CON HIJOS MENORES DE 12 (total = ${totalElementos} PADRES)`;
             if (mostrarOperativos) return `PERSONAL OPERATIVO CON HIJOS MENORES DE 12 (total = ${totalElementos} PADRES)`;
-            return `PERSONAL ACTIVO CON HIJOS MENORES DE 12 (total = ${totalElementos} PADRES)`;
+            return `PERSONAL ACTIVO CON HIJOS MENORES DE 12 AÑOS (total = ${totalElementos} PADRES)`;
         }
         if (tipoBusqueda === "estadoCivil") {
             if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO CON ESTADO CIVIL: ${estadoCivilBuscar}(total = ${totalElementos})`;
@@ -405,6 +420,37 @@ export function Tabla({
         if (mostrarInactivos) return `PERSONAL RETIRADO (total = ${totalElementos})`;
 
         return `PERSONAL ACTIVO (Administrativos, Operativos, Supervisores total = ${totalElementos})`;
+    };
+
+    const prepararExportacion = async () => {
+        try {
+            let pagina = 0;
+            let empleadosTemp = [];
+            let continuar = true;
+
+            while (continuar) {
+                const url = construirUrlEmpleados(pagina);
+                const response = await authFetch(url);
+                if (!response.ok) throw new Error(`Error en la página ${pagina}: ${response.status}`);
+
+                const data = await response.json();
+                empleadosTemp = [...empleadosTemp, ...data.content];
+
+                continuar = !data.last;
+                pagina++;
+            }
+
+            setEmpleadosExport(empleadosTemp); // Guardamos los datos en estado
+            setIsModalOpen(true); // Abrimos el modal
+
+        } catch (error) {
+            console.error("Error exportando empleados:", error);
+        }
+    };
+
+    const exportarEmpleadoIndividual = (emp) => {
+        setEmpleadosExport([emp]); // lo envolvemos en array
+        setIsModalOpen(true);      // abrimos el modal
     };
 
     return (
@@ -583,7 +629,7 @@ export function Tabla({
 
                     </div>
                 </div>
-            </div> 
+            </div>
 
             {tipoBusqueda !== "conContrato" &&
                 tipoBusqueda !== "conFamiliares" &&
@@ -594,6 +640,14 @@ export function Tabla({
                         <h4 className="alinearTexto">
                             {obtenerTitulo()}
                         </h4>
+
+                        <button
+                            className="btn btn-success mb-3"
+                            onClick={prepararExportacion}
+                        >
+                            <i className="bi bi-file-excel"></i> Exportar a Excel
+                        </button>
+
 
                         {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
                             <Paginacion
@@ -658,6 +712,17 @@ export function Tabla({
                 </div>
             )}
 
+            <ExportModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                datos={empleadosExport}
+                tituloExportacion={
+                    empleadosExport.length === 1
+                        ? `Empleado_${empleadosExport[0].nombres}_${empleadosExport[0].apellidos}`
+                        : obtenerTitulo()
+                }
+            />
+
             {tipoBusqueda !== "conContrato" &&
                 tipoBusqueda !== "conFamiliares" &&
                 tipoBusqueda !== "cursosPorVencer" &&
@@ -665,7 +730,7 @@ export function Tabla({
                 tipoBusqueda !== "familiaresPorGenero" && (
                     <>
                         <table className={`table table-bordered border-primary table-striped table-hover 
-    ${tipoBusqueda === "sinContrato"
+${tipoBusqueda === "sinContrato"
                                 ? "table-info"
                                 : mostrarInactivos
                                     ? "table-warning"
@@ -699,16 +764,22 @@ export function Tabla({
                                             <td>{emp.cargo}</td>
                                             <td>
                                                 <div className="d-flex justify-content-center gap-2">
-                                                    <button
-                                                        onClick={() => {
-                                                            setEmpleadoSeleccionado(emp);
-                                                            setMostrarModal(true);
-                                                        }}
-                                                        className="btn btn-sm btn-outline-primary me-2"
-                                                        title="Editar"
-                                                    >
-                                                        <i className="bi bi-pencil-fill"></i>
-                                                    </button>
+                                                    {console.log('Emp actual:', emp, 'Rol:', localStorage.getItem("rol"))}
+
+                                                    <ProtectedElement allowedRoles={["RRHH", "ADMIN"]}>
+                                                        <button
+                                                            onClick={() => {
+                                                                console.log('Click en botón, emp:', emp);
+                                                                setEmpleadoSeleccionado(emp);
+                                                                setMostrarModal(true);
+                                                            }}
+                                                            className="btn btn-sm btn-outline-primary me-2"
+                                                            title="Editar"
+                                                        >
+                                                            <i className="bi bi-pencil-fill"></i>
+                                                        </button>
+                                                    </ProtectedElement>
+
                                                     <button
                                                         onClick={() => {
                                                             setEmpleadoParaHistorial(emp.id);
@@ -747,10 +818,17 @@ export function Tabla({
                                                         >
                                                             <i className="bi bi-trash-fill"></i>
                                                         </button>
+
                                                     )}
 
+                                                    <button
+                                                        onClick={() => exportarEmpleadoIndividual(emp)}
+                                                        className="btn btn-sm btn-outline-success ms-2"
+                                                        title="Exportar empleado"
+                                                    >
+                                                        <i className="bi bi-file-earmark-excel"></i>
+                                                    </button>
                                                 </div>
-
                                             </td>
                                         </tr>
                                     ))
@@ -795,19 +873,19 @@ export function Tabla({
                                                             onClick={() => {
                                                                 Swal.fire({
                                                                     title: '¿Estás seguro?',
-                                                                    text: "Esta acción eliminará al empleado.",
+                                                                    text: "Esta acción desactivará al empleado.",
                                                                     icon: 'warning',
                                                                     showCancelButton: true,
                                                                     confirmButtonColor: '#3085d6',
                                                                     cancelButtonColor: '#d33',
-                                                                    confirmButtonText: 'Sí, eliminar',
+                                                                    confirmButtonText: 'Sí, desactivar',
                                                                     cancelButtonText: 'Cancelar'
                                                                 }).then((result) => {
                                                                     if (result.isConfirmed) {
                                                                         eliminarEmpleado(emp.id);
                                                                         Swal.fire(
-                                                                            'Eliminado',
-                                                                            'La persona ha sido eliminada.',
+                                                                            'Desactivado',
+                                                                            'La persona ha sido desactivada.',
                                                                             'success'
                                                                         );
                                                                     }
@@ -819,6 +897,7 @@ export function Tabla({
                                                             <i className="bi bi-trash-fill"></i>
                                                         </button>
                                                     )}
+
                                                 </div>
                                             </td>
                                         </tr>
@@ -826,12 +905,13 @@ export function Tabla({
                                 )}
                             </tbody>
                         </table>
+
                     </>
                 )}
             {tipoBusqueda !== "conContrato" &&
                 tipoBusqueda !== "conFamiliares" &&
-                tipoBusqueda !== "cursosPorVencer" && 
-                tipoBusqueda !== "periodoDePrueba" && 
+                tipoBusqueda !== "cursosPorVencer" &&
+                tipoBusqueda !== "periodoDePrueba" &&
                 tipoBusqueda !== "familiaresPorGenero" && (
                     <>
                         {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (

@@ -3,6 +3,8 @@ import { Formulario } from "./Formulario";
 import { Tabla } from "./Tabla";
 import { Login } from "./Login";
 import logoVigitecol from '../img/vigitecol.png'; // Ajusta la ruta según tu estructura
+import ProtectedElement from "../utils/ProtectedElement";
+import UserManagement from "./UserManagement";
 
 export function Menu() {
     const [vista, setVista] = useState("login");
@@ -133,13 +135,26 @@ export function Menu() {
                                     <i className="bi bi-house me-1"></i><strong>Inicio</strong>
                                     {vista === "menu" && <div className="active-tab-indicator"></div>}
                                 </button>
-                                <button
-                                    className={`btn btn-outline-primary position-relative ${vista === "formulario" ? "active-tab" : ""}`}
-                                    onClick={() => setVista("formulario")}
-                                >
-                                    {vista === "formulario" && <div className="active-tab-indicator"></div>}
-                                    <strong>Registrar Empleado</strong>
-                                </button>
+
+                                <ProtectedElement allowedRoles={["RRHH"]}>
+                                    <button
+                                        className={`btn btn-outline-primary position-relative ${vista === "formulario" ? "active-tab" : ""}`}
+                                        onClick={() => setVista("formulario")}
+                                    >
+                                        {vista === "formulario" && <div className="active-tab-indicator"></div>}
+                                        <strong>Registrar Empleado</strong>
+                                    </button>
+                                </ProtectedElement>
+
+                                <ProtectedElement allowedRoles={["ADMIN"]}>
+                                    <button
+                                        className="btn btn-outline-dark"
+                                        onClick={() => setVista("gestionUsuarios")}
+                                    >
+                                        👥 Gestión de Usuarios
+                                    </button>
+                                </ProtectedElement>
+
                                 <button
                                     className={`btn btn-outline-primary position-relative ${vista === "tabla" ? "active-tab" : ""}`}
                                     onClick={() => setVista("tabla")}
@@ -194,6 +209,7 @@ export function Menu() {
                     {vista === "administrativos" && <Tabla mostrarAdministrativos={true} />}
                     {vista === "operativos" && <Tabla mostrarOperativos={true} />}
                     {vista === "supervisores" && <Tabla mostrarSupervisores={true} />}
+                    {vista === "gestionUsuarios" && <UserManagement />}
 
                     {vista === "login" && (
                         <Login onLoginSuccess={handleLoginSuccess} />

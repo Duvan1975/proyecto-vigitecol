@@ -256,4 +256,14 @@ public class EmpleadoController {
 
         return ResponseEntity.ok(resultado);
     }
+
+    @GetMapping("/todos-activos")
+    public ResponseEntity<List<DatosListadoEmpleado>> obtenerTodosEmpleadosActivos() {
+        return empleadoService.obtenerTodosActivos();
+    }
+
+    /*@GetMapping("/empleados/todos-activos")
+    public ResponseEntity<List<Empleado>> obtenerTodosEmpleadosActivos() {
+        return ResponseEntity.ok(empleadoService.obtenerTodosActivos());
+    }*/
 }

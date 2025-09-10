@@ -251,4 +251,16 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
             @Param("genero") Genero genero,
             @Param("tipoEmpleado") TipoEmpleado tipoEmpleado,
             Pageable pageable);
+
+    @Query("""
+            SELECT c.empleado
+            FROM Contrato c
+            WHERE c.numeroContrato = (
+                SELECT MAX(c2.numeroContrato)
+                FROM Contrato c2
+                WHERE c2.empleado.id = c.empleado.id
+            )
+            AND c.continua = true ORDER BY c.empleado.apellidos ASC
+            """)
+    List<Empleado> findEmpleadosConContratoActivoList();
 }

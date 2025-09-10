@@ -103,4 +103,6 @@ public class Usuario implements UserDetails {
     public void setEstado(boolean estado) {
         this.estado = estado;
     }
+
+    public Usuario(){}
 }

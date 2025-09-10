@@ -1,53 +1,71 @@
 import { useEffect, useState } from "react";
 import { authFetch } from "../utils/authFetch";
 import Paginacion from "./Paginacion";
+import ExportModalFamiliar from "./ExportModalFamiliar";
 
 export function TablaFamiliar({ tipoEmpleado, titulo, genero, tipoBusqueda }) {
     const [empleadosConFamiliares, setEmpleadosConFamiliares] = useState([]);
-
     const [paginaActual, setPaginaActual] = useState(0);
     const [totalPaginas, setTotalPaginas] = useState(0);
     const [totalElementos, setTotalElementos] = useState(0);
     const [tamanoPagina, setTamanoPagina] = useState(0);
-
     const [totalFamiliares, setTotalFamiliares] = useState(0);
-
     const [cargando, setCargando] = useState(true);
+    const [isExportOpen, setIsExportOpen] = useState(false);
 
     useEffect(() => {
         cargarEmpleadosConFamiliares(paginaActual);
         // eslint-disable-next-line
-    }, [paginaActual]);
+    }, [paginaActual, tipoEmpleado, genero, tipoBusqueda]); // Agregar las dependencias aquí
 
-    useEffect(() => {
-        setPaginaActual();
-    }, [genero, tipoEmpleado]);
+    // FUNCIÓN NUEVA Y SIMPLE para cargar TODAS las páginas
+    const cargarTodasLasPaginas = async () => {
+        try {
+            let todosLosDatos = [];
+            
+            // Recorremos todas las páginas
+            for (let pagina = 0; pagina < totalPaginas; pagina++) {
+                let url;
+                if (tipoBusqueda === "conFamiliares") {
+                    url = `http://localhost:8080/empleados/con-familiares-menores?page=${pagina}`;
+                    if (tipoEmpleado) url += `&tipoEmpleado=${tipoEmpleado}`;
+                } else if (tipoBusqueda === "familiaresPorGenero") {
+                    url = `http://localhost:8080/empleados/conFamiliares/genero?page=${pagina}`;
+                    if (genero) url += `&genero=${genero}`;
+                    if (tipoEmpleado) url += `&tipoEmpleado=${tipoEmpleado}`;
+                } else {
+                    continue;
+                }
 
+                const response = await authFetch(url);
+                const data = await response.json();
+                todosLosDatos = [...todosLosDatos, ...data.content];
+            }
+            
+            return todosLosDatos;
+        } catch (error) {
+            console.error("Error al cargar todas las páginas:", error);
+            throw error;
+        }
+    };
 
     const cargarEmpleadosConFamiliares = (pagina = 0) => {
         setCargando(true);
 
         let url;
         if (tipoBusqueda === "conFamiliares") {
-            // MENORES DE 12
             url = `http://localhost:8080/empleados/con-familiares-menores?page=${pagina}`;
             if (tipoEmpleado) url += `&tipoEmpleado=${tipoEmpleado}`;
         } else if (tipoBusqueda === "familiaresPorGenero") {
-            // POR GÉNERO (si genero == null => trae todos padres y madres)
             url = `http://localhost:8080/empleados/conFamiliares/genero?page=${pagina}`;
             if (genero) url += `&genero=${genero}`;
             if (tipoEmpleado) url += `&tipoEmpleado=${tipoEmpleado}`;
         } else {
-            // fallback opcional
             setCargando(false);
             return;
         }
 
-        authFetch(url, {
-            headers: {
-
-            },
-        })
+        authFetch(url)
             .then((res) => res.json())
             .then((data) => {
                 const totalFamiliares = data.content.reduce(
@@ -63,7 +81,7 @@ export function TablaFamiliar({ tipoEmpleado, titulo, genero, tipoBusqueda }) {
                 setCargando(false);
             })
             .catch((error) => {
-                console.error("Error al cargar personas con familiares:", error);
+                console.error("Error al cargar empleados con familiares:", error);
                 setCargando(false);
             });
     };
@@ -76,8 +94,30 @@ export function TablaFamiliar({ tipoEmpleado, titulo, genero, tipoBusqueda }) {
         return <p className="text-center text-muted">No hay personal con hijos o hijastros registrados.</p>;
     }
 
+    const tituloExportacion = 
+  tipoBusqueda === "conFamiliares"
+    ? `${titulo}`
+    : `${titulo} ${totalElementos}`;
+
+
     return (
         <div>
+            <button className="btn btn-success mb-3" 
+                onClick={() => setIsExportOpen(true)}
+            >
+                Exportar a Excel
+            </button>
+
+            <ExportModalFamiliar
+                isOpen={isExportOpen}
+                onClose={() => setIsExportOpen(false)}
+                datos={empleadosConFamiliares}
+                tituloExportacion={tituloExportacion}
+                totalPaginas={totalPaginas}
+                cargarTodasLasPaginas={cargarTodasLasPaginas}
+                totalElementos={totalElementos}
+            />
+
             <h4 className="alinearTexto">
                 {tipoBusqueda === "conFamiliares"
                     ? `${titulo} (hijos/hijastros: ${totalFamiliares} en esta página)`
@@ -96,6 +136,7 @@ export function TablaFamiliar({ tipoEmpleado, titulo, genero, tipoBusqueda }) {
                     total de registros: {totalElementos} | total hijos/hijastros: {totalFamiliares}
                 </small>
             </div>
+
             <table className="table table-bordered table-hover table-striped">
                 <thead className="table-primary">
                     <tr>
@@ -146,4 +187,4 @@ export function TablaFamiliar({ tipoEmpleado, titulo, genero, tipoBusqueda }) {
             </div>
         </div>
     )
-} 
+}

@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class EmpleadoService {
@@ -565,4 +566,14 @@ public class EmpleadoService {
         return empleadoRepository.findEmpleadosConDocumentos(pageable)
                 .map(DatosEmpleadoConDocumentos::new);
     }
+
+    public ResponseEntity<List<DatosListadoEmpleado>> obtenerTodosActivos() {
+        // Obtener todos sin paginación
+        List<Empleado> empleados = contratoRepository.findEmpleadosConContratoActivoList();
+        List<DatosListadoEmpleado> respuesta = empleados.stream()
+                .map(DatosListadoEmpleado::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(respuesta);
+    }
+
 }

@@ -38,13 +38,47 @@ public class SecurityConfigurations {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Endpoints públicos
                         .requestMatchers("/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
+                        .requestMatchers("/test/public").permitAll()
 
-                        // Protección por roles
-                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/rrhh/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_RRHH")
-                        .requestMatchers("/user/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_RRHH", "ROLE_USER")
+                        // ==================== EMPLEADOS ====================
+                        // LECTURA - Todos los autenticados
+                        .requestMatchers(HttpMethod.GET, "/empleados").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/empleados/{id}").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/empleados/buscar").authenticated()
+
+                        // ESCRITURA - Solo RRHH
+                        .requestMatchers(HttpMethod.POST, "/empleados").hasAuthority("ROLE_RRHH")
+                        .requestMatchers(HttpMethod.PUT, "/empleados/**").hasAuthority("ROLE_RRHH")
+                        .requestMatchers(HttpMethod.DELETE, "/empleados/**").hasAuthority("ROLE_RRHH")
+
+                        // ==================== CONTRATOS ====================
+                        .requestMatchers(HttpMethod.POST, "/contratos").hasAuthority("ROLE_RRHH")
+                        .requestMatchers(HttpMethod.PUT, "/contratos/**").hasAuthority("ROLE_RRHH")
+                        .requestMatchers(HttpMethod.DELETE, "/contratos/**").hasAuthority("ROLE_RRHH")
+                        // LECTURA - ADMIN y RRHH
+                        .requestMatchers(HttpMethod.GET, "/contratos").hasAnyAuthority("ROLE_ADMIN", "ROLE_RRHH")
+                        .requestMatchers(HttpMethod.GET, "/contratos/{id}").hasAnyAuthority("ROLE_ADMIN", "ROLE_RRHH")
+
+                        // ESCRITURA - Solo RRHH
+                        .requestMatchers(HttpMethod.POST, "/contratos").hasAuthority("ROLE_RRHH")
+                        .requestMatchers(HttpMethod.PUT, "/contratos/**").hasAuthority("ROLE_RRHH")
+
+                        // ==================== USUARIOS ====================
+                        // Solo ADMIN puede gestionar usuarios
+                        .requestMatchers(HttpMethod.GET, "/usuarios").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/usuarios").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/usuarios/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/usuarios/**").hasAuthority("ROLE_ADMIN")
+
+                        // ==================== REPORTES ====================
+                        .requestMatchers(HttpMethod.GET, "/reportes/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_RRHH")
+
+                        // Endpoints de prueba
+                        .requestMatchers("/test/admin").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/test/rrhh").hasAnyAuthority("ROLE_ADMIN", "ROLE_RRHH")
+                        .requestMatchers("/test/user").hasAnyAuthority("ROLE_ADMIN", "ROLE_RRHH", "ROLE_USER")
 
                         .anyRequest().authenticated()
                 )
@@ -53,7 +87,8 @@ public class SecurityConfigurations {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authenticationConfiguration)
             throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
