@@ -5,7 +5,7 @@ const ExportModalFamiliar = ({
     isOpen,
     onClose,
     tituloExportacion,
-    cargarTodasLasPaginas, // siempre lo usaremos
+    cargarTodasLasPaginas, 
     totalElementos
 }) => {
     const [columnasSeleccionadas, setColumnasSeleccionadas] = useState({
@@ -35,7 +35,7 @@ const ExportModalFamiliar = ({
         setExportando(true);
 
         try {
-            // SIEMPRE exportamos todas las páginas
+            // Exportamos todas las páginas
             const datosAExportar = await cargarTodasLasPaginas();
 
             if (!datosAExportar || datosAExportar.length === 0) {
@@ -60,13 +60,12 @@ const ExportModalFamiliar = ({
                     filtrado["Familiares"] = familiares
                         .map(f => `• ${f.tipoFamiliar}: ${f.nombreFamiliar} (${f.edadFamiliar} años)`)
                         .join("\n");
-
                 }
 
                 return filtrado;
             });
 
-            exportarAExcel(datosFiltrados, `${tituloExportacion} `);
+            exportarAExcel(datosFiltrados, `${tituloExportacion}`);
 
         } catch (error) {
             console.error("Error al exportar:", error);

@@ -16,13 +16,13 @@ export function TablaFamiliar({ tipoEmpleado, titulo, genero, tipoBusqueda }) {
     useEffect(() => {
         cargarEmpleadosConFamiliares(paginaActual);
         // eslint-disable-next-line
-    }, [paginaActual, tipoEmpleado, genero, tipoBusqueda]); // Agregar las dependencias aquí
+    }, [paginaActual, tipoEmpleado, genero, tipoBusqueda]);
 
-    // FUNCIÓN NUEVA Y SIMPLE para cargar TODAS las páginas
+    // Función para cargar todas las páginas
     const cargarTodasLasPaginas = async () => {
         try {
             let todosLosDatos = [];
-            
+
             // Recorremos todas las páginas
             for (let pagina = 0; pagina < totalPaginas; pagina++) {
                 let url;
@@ -41,7 +41,7 @@ export function TablaFamiliar({ tipoEmpleado, titulo, genero, tipoBusqueda }) {
                 const data = await response.json();
                 todosLosDatos = [...todosLosDatos, ...data.content];
             }
-            
+
             return todosLosDatos;
         } catch (error) {
             console.error("Error al cargar todas las páginas:", error);
@@ -94,19 +94,21 @@ export function TablaFamiliar({ tipoEmpleado, titulo, genero, tipoBusqueda }) {
         return <p className="text-center text-muted">No hay personal con hijos o hijastros registrados.</p>;
     }
 
-    const tituloExportacion = 
-  tipoBusqueda === "conFamiliares"
-    ? `${titulo}`
-    : `${titulo} ${totalElementos}`;
-
+    //Función para exportar título al Modal
+    const tituloExportacion =
+        tipoBusqueda === "conFamiliares"
+            ? `${titulo}`
+            : `${titulo} ${totalElementos}`;
 
     return (
         <div>
-            <button className="btn btn-success mb-3" 
-                onClick={() => setIsExportOpen(true)}
-            >
-                Exportar a Excel
-            </button>
+            <div className="d-flex justify-content-between align-items-center mb-1">
+                <h4 className="alinearTexto">
+                    {tipoBusqueda === "conFamiliares"
+                        ? `${titulo} (hijos/hijastros ${totalFamiliares} en esta página)`
+                        : `${titulo} ${totalElementos} (hijos/hijastros ${totalFamiliares} en esta página)`}
+                </h4>
+            </div>
 
             <ExportModalFamiliar
                 isOpen={isExportOpen}
@@ -117,19 +119,24 @@ export function TablaFamiliar({ tipoEmpleado, titulo, genero, tipoBusqueda }) {
                 cargarTodasLasPaginas={cargarTodasLasPaginas}
                 totalElementos={totalElementos}
             />
+            <div className="row align-items-center mb-1">
+                <div className="col text-start"></div> {/* espacio vacío para balancear */}
+                <div className="col text-center">
+                    <Paginacion
+                        paginaActual={paginaActual}
+                        totalPaginas={totalPaginas}
+                        onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
+                    />
+                </div>
+                <div className="col text-end d-flex align-items-center justify-content-end">
+                    <button className="btn btn-success"
+                        onClick={() => setIsExportOpen(true)}
+                    >
+                        Exportar a Excel
+                    </button>
+                </div>
 
-            <h4 className="alinearTexto">
-                {tipoBusqueda === "conFamiliares"
-                    ? `${titulo} (hijos/hijastros: ${totalFamiliares} en esta página)`
-                    : `${titulo} ${totalElementos} (hijos/hijastros: ${totalFamiliares} en esta página)`}
-            </h4>
-
-            <Paginacion
-                paginaActual={paginaActual}
-                totalPaginas={totalPaginas}
-                totalFamiliares={totalFamiliares}
-                onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
-            />
+            </div>
             <div className="mt-2 text-center">
                 <small>
                     Mostrando página {paginaActual + 1} de {totalPaginas} — {tamanoPagina} por página,

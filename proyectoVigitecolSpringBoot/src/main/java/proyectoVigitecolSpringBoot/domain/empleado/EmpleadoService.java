@@ -8,10 +8,23 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
+import proyectoVigitecolSpringBoot.domain.afiliacion.AfiliacionRepository;
+import proyectoVigitecolSpringBoot.domain.afiliacion.DatosListadoAfiliacion;
 import proyectoVigitecolSpringBoot.domain.contrato.Contrato;
 import proyectoVigitecolSpringBoot.domain.contrato.ContratoRepository;
 import proyectoVigitecolSpringBoot.domain.contrato.DatosContratoDTO;
+import proyectoVigitecolSpringBoot.domain.contrato.DatosListadoContrato;
 import proyectoVigitecolSpringBoot.domain.curso.Curso;
+import proyectoVigitecolSpringBoot.domain.curso.CursoRepository;
+import proyectoVigitecolSpringBoot.domain.curso.DatosListadoCurso;
+import proyectoVigitecolSpringBoot.domain.estudio.DatosListadoEstudio;
+import proyectoVigitecolSpringBoot.domain.estudio.EstudioRepository;
+import proyectoVigitecolSpringBoot.domain.experienciaLaboral.DatosListadoExperienciaLaboral;
+import proyectoVigitecolSpringBoot.domain.experienciaLaboral.ExperienciaLaboralRepository;
+import proyectoVigitecolSpringBoot.domain.familia.DatosListadoFamiliar;
+import proyectoVigitecolSpringBoot.domain.familia.FamiliarRepository;
+import proyectoVigitecolSpringBoot.domain.otroDocumento.DatosListadoOtroDocumento;
+import proyectoVigitecolSpringBoot.domain.otroDocumento.OtroDocumentoRepository;
 
 import java.text.Normalizer;
 import java.time.LocalDate;
@@ -23,17 +36,36 @@ import java.util.stream.Collectors;
 @Service
 public class EmpleadoService {
 
-    /*@Autowired
-    EmpleadoRepository empleadoRepository;*/
-
-    private final EmpleadoRepository empleadoRepository;
-
-    public EmpleadoService(EmpleadoRepository empleadoRepository) {
-        this.empleadoRepository = empleadoRepository;
-    }
-
     @Autowired
     ContratoRepository contratoRepository;
+
+    private final EmpleadoRepository empleadoRepository;
+    //private final ContratoRepository contratoRepository;
+    private final FamiliarRepository familiarRepository;
+    private final CursoRepository cursoRepository;
+    private final EstudioRepository estudioRepository;
+    private final ExperienciaLaboralRepository experienciaLaboralRepository;
+    private final AfiliacionRepository afiliacionRepository;
+    private final OtroDocumentoRepository otroDocumentoRepository;
+
+    public EmpleadoService(EmpleadoRepository empleadoRepository,
+                           FamiliarRepository familiarRepository,
+                           CursoRepository cursoRepository,
+                           EstudioRepository estudioRepository,
+                           ExperienciaLaboralRepository experienciaLaboralRepository,
+                           AfiliacionRepository afiliacionRepository,
+                           OtroDocumentoRepository otroDocumentoRepository)
+    {
+        this.empleadoRepository = empleadoRepository;
+        this.familiarRepository = familiarRepository;
+        this.cursoRepository = cursoRepository;
+        this.estudioRepository = estudioRepository;
+        this.experienciaLaboralRepository = experienciaLaboralRepository;
+        this.afiliacionRepository = afiliacionRepository;
+        this.otroDocumentoRepository = otroDocumentoRepository;
+    }
+
+
 
     public ResponseEntity<DatosRespuestaEmpleado> registrarEmpleado(
             DatosRegistroEmpleado datos, UriComponentsBuilder uriComponentsBuilder) {
@@ -492,7 +524,6 @@ public class EmpleadoService {
                 .map(DatosEmpleadoConCurso::new);
     }
 
-
     public Page<DatosEmpleadoConCurso> findEmpleadosConCursosPorVencer(Pageable pageable) {
         LocalDate hoy = LocalDate.now();
         LocalDate fechaLimite = hoy.plusDays(30);
@@ -524,7 +555,7 @@ public class EmpleadoService {
     }
 
     public Page<DatosEmpleadoConPeriodoDePrueba> findEmpleadosEnPeriodoDePrueba(Pageable pageable) {
-        LocalDate fechaMin = LocalDate.now().minusDays(60);
+        LocalDate fechaMin = LocalDate.now().minusDays(59);
         LocalDate fechaMax = LocalDate.now().minusDays(45);
 
         return empleadoRepository.findEmpleadosEnPeriodoDePruebaVencido(fechaMin, fechaMax, pageable)
@@ -574,6 +605,45 @@ public class EmpleadoService {
                 .map(DatosListadoEmpleado::new)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(respuesta);
+    }
+
+    public DatosEmpleadoCompletoDTO obtenerEmpleadoCompleto(Long id) {
+        Empleado empleado = empleadoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
+
+        DatosListadoEmpleado empleadoDTO = new DatosListadoEmpleado(empleado);
+
+        List<DatosListadoContrato> contratos = contratoRepository.findByEmpleadoId(id)
+                .stream().map(DatosListadoContrato::new).toList();
+
+        List<DatosListadoFamiliar> familiares = familiarRepository.findByEmpleadoId(id)
+                .stream().map(DatosListadoFamiliar::new).toList();
+
+        List<DatosListadoCurso> cursos = cursoRepository.findByEmpleadoId(id)
+                .stream().map(DatosListadoCurso::new).toList();
+
+        List<DatosListadoEstudio> estudios = estudioRepository.findByEmpleadoId(id)
+                .stream().map(DatosListadoEstudio::new).toList();
+
+        List<DatosListadoExperienciaLaboral> experiencias = experienciaLaboralRepository.findByEmpleadoId(id)
+                .stream().map(DatosListadoExperienciaLaboral::new).toList();
+
+        List<DatosListadoAfiliacion> afiliaciones = afiliacionRepository.findByEmpleadoId(id)
+                .stream().map(DatosListadoAfiliacion::new).toList();
+
+        List<DatosListadoOtroDocumento> documentos = otroDocumentoRepository.findByEmpleadoId(id)
+                .stream().map(DatosListadoOtroDocumento::new).toList();
+
+        return new DatosEmpleadoCompletoDTO(
+                empleadoDTO,
+                contratos,
+                familiares,
+                cursos,
+                estudios,
+                experiencias,
+                afiliaciones,
+                documentos
+        );
     }
 
 }

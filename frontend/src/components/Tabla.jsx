@@ -10,6 +10,7 @@ import { TablaContratoConPeriodoDePrueba } from "./TablaContratoConPeriodoDePrue
 import { authFetch } from "../utils/authFetch";
 import ProtectedElement from "../utils/ProtectedElement";
 import ExportModal from "./ExportModal";
+import * as XLSX from "xlsx";
 
 export function Tabla({
     mostrarInactivos = false,
@@ -373,8 +374,8 @@ export function Tabla({
             return `PERSONAL ACTIVO MAYOR DE 50 AÑOS (total = ${totalElementos})`;
         }
         if (tipoBusqueda === "conFamiliares") {
-            if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO CON HIJOS MENORES DE 12 (total = ${totalElementos} PADRES)`;
-            if (mostrarOperativos) return `PERSONAL OPERATIVO CON HIJOS MENORES DE 12 (total = ${totalElementos} PADRES)`;
+            if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO CON HIJOS MENORES DE 12 AÑOS (total = ${totalElementos} PADRES)`;
+            if (mostrarOperativos) return `PERSONAL OPERATIVO CON HIJOS MENORES DE 12 AÑOS (total = ${totalElementos} PADRES)`;
             return `PERSONAL ACTIVO CON HIJOS MENORES DE 12 AÑOS (total = ${totalElementos} PADRES)`;
         }
         if (tipoBusqueda === "estadoCivil") {
@@ -448,9 +449,123 @@ export function Tabla({
         }
     };
 
-    const exportarEmpleadoIndividual = (emp) => {
-        setEmpleadosExport([emp]); // lo envolvemos en array
-        setIsModalOpen(true);      // abrimos el modal
+    function autoWidth(ws, data) {
+        if (!data || data.length === 0) return;
+
+        const colWidths = Object.keys(data[0]).map((key) => ({
+            wch: key.length + 2, // espacio adicional para los headers
+        }));
+
+        data.forEach((row) => {
+            Object.keys(row).forEach((key, i) => {
+                const val = row[key] ? row[key].toString() : "";
+                const len = val.length + 2; // +2 para que no quede tan justo
+                if (len > colWidths[i].wch) {
+                    colWidths[i].wch = len;
+                }
+            });
+        });
+
+        ws["!cols"] = colWidths;
+    }
+
+    const exportarEmpleadoIndividual = async (emp) => {
+        try {
+            const response = await authFetch(`http://localhost:8080/empleados/${emp.id}/completo`);
+            if (!response.ok) {
+                throw new Error("Error al obtener datos completos del empleado");
+            }
+
+            const datos = await response.json();
+
+            const wb = XLSX.utils.book_new();
+
+            // Hoja principal
+            const hojaEmpleado = XLSX.utils.json_to_sheet([datos.empleado]);
+            autoWidth(hojaEmpleado, [datos.empleado]);
+            XLSX.utils.book_append_sheet(wb, hojaEmpleado, "Empleado");
+
+            if (datos.contrato?.length > 0) {
+                const contratosLimpios = datos.contrato.map(c => ({
+                    "Contrato": c.numeroContrato,
+                    "Fecha de Ingreso": c.fechaIngreso,
+                    "Fecha de Retiro": c.fechaRetiro,
+                    "Fecha de Renuncia": c.fechaRenuncia,
+                    "Otro Si": c.fechaOtroSi,
+                    "Omiso": c.omiso,
+                    "Continua": c.continua,
+                    "Terminación de Contrato Desde": c.vacacionesDesde,
+                    "Terminación de Contrato Hasta": c.vacacionesHasta
+                }));
+                const hojaContratos = XLSX.utils.json_to_sheet(contratosLimpios);
+                autoWidth(hojaContratos, contratosLimpios);
+                XLSX.utils.book_append_sheet(wb, hojaContratos, "Contratos");
+            }
+
+            if (datos.familiar?.length > 0) {
+                const familiaresLimpios = datos.familiar.map(f => ({
+                    "Tipo de Familiar": f.tipoFamiliar,
+                    "Nombre": f.nombreFamiliar,
+                    "Edad": f.edadFamiliar
+                }));
+                const hojaFamiliares = XLSX.utils.json_to_sheet(familiaresLimpios);
+                autoWidth(hojaFamiliares, familiaresLimpios);
+                XLSX.utils.book_append_sheet(wb, hojaFamiliares, "Familiares");
+            }
+            if (datos.curso?.length > 0) {
+                const cursosLimpios = datos.curso.map(cu => ({
+                    "Tipo de Curso": cu.tipoCurso,
+                    "Especialidad": cu.categoria,
+                    "Fecha del Curso": cu.fechaCurso
+                }));
+                const hojaCursos = XLSX.utils.json_to_sheet(cursosLimpios);
+                autoWidth(hojaCursos, cursosLimpios);
+                XLSX.utils.book_append_sheet(wb, hojaCursos, "Cursos");
+            }
+            if (datos.estudio?.length > 0) {
+                const estudiosLimpios = datos.estudio.map(es => ({
+                    "Tipo de Estudio": es.tipoEstudio,
+                    "Título": es.nombreEstudio,
+                    "Fecha de Realización": es.fechaEstudio
+                }));
+                const hojaEstudios = XLSX.utils.json_to_sheet(estudiosLimpios);
+                autoWidth(hojaEstudios, estudiosLimpios);
+                XLSX.utils.book_append_sheet(wb, hojaEstudios, "Estudios");
+            }
+            if (datos.experienciaLaboral?.length > 0) {
+                const experienciaLimpio = datos.experienciaLaboral.map(ex => ({
+                    "Descripción": ex.descripcionExperiencia
+                }));
+                const hojaExperiencia = XLSX.utils.json_to_sheet(experienciaLimpio);
+                autoWidth(hojaExperiencia, experienciaLimpio);
+                XLSX.utils.book_append_sheet(wb, hojaExperiencia, "Experiencia");
+            }
+            if (datos.afiliacion?.length > 0) {
+                const afiliacionLimpia = datos.afiliacion.map(af => ({
+                    "Tipo de Afiliación": af.tipoAfiliacion,
+                    "Entidad": af.nombreEntidad,
+                    "Fecha de Afiliación": af.fechaAfiliacion
+                }));
+                const hojaAfiliaciones = XLSX.utils.json_to_sheet(afiliacionLimpia);
+                autoWidth(hojaAfiliaciones, afiliacionLimpia);
+                XLSX.utils.book_append_sheet(wb, hojaAfiliaciones, "Afiliaciones");
+            }
+            if (datos.otroDocumento?.length > 0) {
+                const documentosLimpios = datos.otroDocumento.map(d => ({
+                    "Tipo de Documento": d.tipoDocumento,
+                    "Descripción": d.descripcionDocumento,
+                    "Fecha de Registro": d.fechaRegistro
+                }));
+                const hojaDocumentos = XLSX.utils.json_to_sheet(documentosLimpios);
+                autoWidth(hojaDocumentos, documentosLimpios);
+                XLSX.utils.book_append_sheet(wb, hojaDocumentos, "Documentos");
+            }
+
+            XLSX.writeFile(wb, `Empleado_${emp.nombres}_${emp.apellidos}.xlsx`);
+        } catch (error) {
+            console.error("Error exportando empleado:", error);
+            alert("No se pudo exportar el empleado");
+        }
     };
 
     return (
@@ -637,34 +752,42 @@ export function Tabla({
                 tipoBusqueda !== "periodoDePrueba" &&
                 tipoBusqueda !== "familiaresPorGenero" && (
                     <>
-                        <h4 className="alinearTexto">
-                            {obtenerTitulo()}
-                        </h4>
+                        <div>
+                            <h4 className="alinearTexto">
+                                {obtenerTitulo()}
+                            </h4>
 
-                        <button
-                            className="btn btn-success mb-3"
-                            onClick={prepararExportacion}
-                        >
-                            <i className="bi bi-file-excel"></i> Exportar a Excel
-                        </button>
+                            {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
+                                <div className="row align-items-center mb-1">
+                                    <div className="col text-start"></div> {/* espacio vacío para balancear */}
+                                    <div className="col text-center">
+                                        <Paginacion
+                                            paginaActual={paginaActual}
+                                            totalPaginas={totalPaginas}
+                                            onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
+                                        />
+                                    </div>
+                                    <div className="col text-end d-flex align-items-center justify-content-end">
+                                        <button
+                                            className="btn btn-success"
+                                            onClick={prepararExportacion}
+                                        >
+                                            Exportar a Excel
+                                        </button>
+                                    </div>
 
+                                </div>
+                            )}
 
-                        {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
-                            <Paginacion
-                                paginaActual={paginaActual}
-                                totalPaginas={totalPaginas}
-                                onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
-                            />
-                        )}
-
-                        {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
-                            <div className="mt-2 text-center">
-                                <small>
-                                    Mostrando página {paginaActual + 1} de {totalPaginas} —{" "}
-                                    {tamanoPagina} por página, total de registros: {totalElementos}
-                                </small>
-                            </div>
-                        )}
+                            {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (
+                                <div className="mt-2 text-center">
+                                    <small>
+                                        Mostrando página {paginaActual + 1} de {totalPaginas} —{" "}
+                                        {tamanoPagina} por página, total de registros: {totalElementos}
+                                    </small>
+                                </div>
+                            )}
+                        </div>
                     </>
                 )}
 
@@ -795,19 +918,19 @@ ${tipoBusqueda === "sinContrato"
                                                             onClick={() => {
                                                                 Swal.fire({
                                                                     title: '¿Estás seguro?',
-                                                                    text: "Esta acción eliminará al empleado.",
+                                                                    text: "Esta acción desactivará al empleado.",
                                                                     icon: 'warning',
                                                                     showCancelButton: true,
                                                                     confirmButtonColor: '#3085d6',
                                                                     cancelButtonColor: '#d33',
-                                                                    confirmButtonText: 'Sí, eliminar',
+                                                                    confirmButtonText: 'Sí, desactivar',
                                                                     cancelButtonText: 'Cancelar'
                                                                 }).then((result) => {
                                                                     if (result.isConfirmed) {
                                                                         eliminarEmpleado(emp.id);
                                                                         Swal.fire(
                                                                             'Eliminado',
-                                                                            'La persona ha sido eliminada.',
+                                                                            'El empleado ha sido retirado.',
                                                                             'success'
                                                                         );
                                                                     }
@@ -818,7 +941,6 @@ ${tipoBusqueda === "sinContrato"
                                                         >
                                                             <i className="bi bi-trash-fill"></i>
                                                         </button>
-
                                                     )}
 
                                                     <button
@@ -868,6 +990,14 @@ ${tipoBusqueda === "sinContrato"
                                                         <i className="bi bi-eye-fill"></i>
                                                     </button>
 
+                                                    <button
+                                                        onClick={() => exportarEmpleadoIndividual(emp)}
+                                                        className="btn btn-sm btn-outline-success ms-2"
+                                                        title="Exportar empleado"
+                                                    >
+                                                        <i className="bi bi-file-earmark-excel"></i>
+                                                    </button>
+
                                                     {!mostrarInactivos && tipoBusqueda !== "sinContrato" && (
                                                         <button
                                                             onClick={() => {
@@ -885,7 +1015,7 @@ ${tipoBusqueda === "sinContrato"
                                                                         eliminarEmpleado(emp.id);
                                                                         Swal.fire(
                                                                             'Desactivado',
-                                                                            'La persona ha sido desactivada.',
+                                                                            'El empleado ha sido retirado.',
                                                                             'success'
                                                                         );
                                                                     }
@@ -897,7 +1027,6 @@ ${tipoBusqueda === "sinContrato"
                                                             <i className="bi bi-trash-fill"></i>
                                                         </button>
                                                     )}
-
                                                 </div>
                                             </td>
                                         </tr>

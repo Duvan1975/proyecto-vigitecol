@@ -3,6 +3,7 @@ package proyectoVigitecolSpringBoot.domain.estudio;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Arrays;
 import java.util.List;
 
 public interface EstudioRepository extends JpaRepository<Estudio, Long> {
@@ -20,4 +21,6 @@ public interface EstudioRepository extends JpaRepository<Estudio, Long> {
             AND c.continua = true
             """)
     List<Estudio> findEstudiosByEmpleadoActivo(Long empleadoId);
+
+    List<Estudio> findByEmpleadoId(Long id);
 }

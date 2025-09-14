@@ -13,7 +13,7 @@ public class ActualizacionEdadService {
     @Autowired
     private EmpleadoRepository empleadoRepository;
 
-    @Scheduled(cron = "0 0 0 * * *") // todos los días a las 00:00
+    @Scheduled(cron = "0 00 00 * * *") // todos los días a las 00:00
     public void actualizarEdades() {
         List<Empleado> empleados = empleadoRepository.findAll();
 

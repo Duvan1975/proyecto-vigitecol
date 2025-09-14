@@ -3,6 +3,7 @@ package proyectoVigitecolSpringBoot.domain.afiliacion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Arrays;
 import java.util.List;
 
 public interface AfiliacionRepository extends JpaRepository<Afiliacion, Long> {
@@ -20,4 +21,6 @@ public interface AfiliacionRepository extends JpaRepository<Afiliacion, Long> {
             AND c.continua = true
             """)
     List<Afiliacion> findAfiliacionByEmpleadoActivo(Long empleadoId);
+
+    List<Afiliacion> findByEmpleadoId(Long id);
 }

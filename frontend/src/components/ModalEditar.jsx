@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { authFetch } from "../utils/authFetch";
+import BotonToggle from "./BotonToggle";
 
 export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
@@ -17,8 +18,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     const [afiliaciones, setAfiliaciones] = useState([]);
 
     const [documentos, setDocumentos] = useState([]);
-
-
 
     //Estado para agregar familiares modificado para que siempre sea visible en la tabla familiares
     const [nuevoFamiliar, setNuevoFamiliar] = useState({
@@ -1029,10 +1028,10 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         });
     };
 
-    const contratoMasReciente = contratos.length > 0
+    /*const contratoMasReciente = contratos.length > 0
         ? contratos.reduce((max, c) =>
             c.numeroContrato > max.numeroContrato ? c : max, contratos[0])
-        : null;
+        : null;*/
 
     if (!visible) return null;
 
@@ -1041,6 +1040,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             <div className="modal-dialog modal-lg">
                 <div className="modal-content p-4" style={{ backgroundColor: "#f0f0f0" }}>
                     <h4 className="alinearTexto">Editar Empleado</h4>
+
                     <div className="row">
                         <div className="col-md-4">
                             <label htmlFor=""> <strong>Nombres:</strong></label>
@@ -1221,29 +1221,13 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             />
                         </div>
                     </div>
-
-                    {contratoMasReciente?.continua === true && (
                         <div>
-                            <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
-                                <h5 className="alinearTexto  mb-0">Registrar Actualizar Hijos</h5>
-
-                                <div>
-                                    <button
-                                        className="btn btn-outline-secondary me-2"
-                                        type="button"
-                                        data-bs-toggle="collapse"
-                                        data-bs-target="#tablaFamiliares"
-                                        aria-expanded="false"
-                                        aria-controls="tablaFamiliares"
-                                    >
-                                        Mostrar/Ocultar Familiares
-                                    </button>
-                                </div>
+                            <div className="d-flex justify-content-between align-items-center mt-2 mb-2">
+                                <h5 className="alinearTexto mb-0">Registrar Actualizar Hijos</h5>
+                                <BotonToggle target="#tablaFamiliares" texto="Familiares" />
                             </div>
                         </div>
-                    )}
-
-                    <div className="mt-1">
+                    <div className="mt-0">
                         <div className="collapse" id="tablaFamiliares">
                             <table className="table table-bordered">
                                 <thead>
@@ -1352,26 +1336,13 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             </table>
                         </div>
 
-                        {contratoMasReciente?.continua === true && (
                             <div>
                                 <hr />
-                                <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
-                                    <h5 className="alinearTexto  mb-0">Registrar Cursos</h5>
-                                    <div>
-                                        <button
-                                            className="btn btn-outline-secondary me-2"
-                                            type="button"
-                                            data-bs-toggle="collapse"
-                                            data-bs-target="#tablaCursos"
-                                            aria-expanded="false"
-                                            aria-controls="tablaCursos"
-                                        >
-                                            Mostrar/Ocultar Cursos
-                                        </button>
-                                    </div>
+                                <div className="d-flex justify-content-between align-items-center mt-2 mb-2">
+                                    <h5 className="alinearTexto  mb-0">Registrar Actualizar Cursos</h5>
+                                    <BotonToggle target="#tablaCursos" texto="Cursos" />
                                 </div>
                             </div>
-                        )}
 
                         <div className="collapse" id="tablaCursos">
                             <table className="table table-bordered">
@@ -1492,26 +1463,13 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             </table>
                         </div>
 
-                        {contratoMasReciente?.continua === true && (
                             <div>
                                 <hr />
-                                <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
-                                    <h5 className="alinearTexto  mb-0">Registrar Estudios</h5>
-                                    <div>
-                                        <button
-                                            className="btn btn-outline-secondary me-2"
-                                            type="button"
-                                            data-bs-toggle="collapse"
-                                            data-bs-target="#tablaEstudios"
-                                            aria-expanded="false"
-                                            aria-controls="tablaEstudios"
-                                        >
-                                            Mostrar/Ocultar Estudios
-                                        </button>
-                                    </div>
+                                <div className="d-flex justify-content-between align-items-center mt-1 mb-2">
+                                    <h5 className="alinearTexto  mb-0">Registrar Actualizar Estudios</h5>
+                                    <BotonToggle target="#tablaEstudios" texto="Estudios" />
                                 </div>
                             </div>
-                        )}
 
                         <div className="collapse" id="tablaEstudios">
                             <table className="table table-bordered">
@@ -1622,26 +1580,13 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             </table>
                         </div>
 
-                        {contratoMasReciente?.continua === true && (
                             <div>
                                 <hr />
-                                <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
+                                <div className="d-flex justify-content-between align-items-center mt-2 mb-2">
                                     <h5 className="alinearTexto  mb-0">Registrar Experiencia Laboral</h5>
-                                    <div>
-                                        <button
-                                            className="btn btn-outline-secondary me-2"
-                                            type="button"
-                                            data-bs-toggle="collapse"
-                                            data-bs-target="#tablaExperiencia"
-                                            aria-expanded="false"
-                                            aria-controls="tablaExperiencia"
-                                        >
-                                            Mostrar/Ocultar Experiencia
-                                        </button>
-                                    </div>
+                                    <BotonToggle target="#tablaExperiencia" texto="Experiencia" />
                                 </div>
                             </div>
-                        )}
 
                         <div className="collapse" id="tablaExperiencia">
                             <table className="table table-bordered">
@@ -1707,26 +1652,13 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             </table>
                         </div>
 
-                        {contratoMasReciente?.continua === true && (
                             <div>
                                 <hr />
-                                <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
-                                    <h5 className="alinearTexto  mb-0">Registrar Afiliaciones</h5>
-                                    <div>
-                                        <button
-                                            className="btn btn-outline-secondary me-2"
-                                            type="button"
-                                            data-bs-toggle="collapse"
-                                            data-bs-target="#tablaAfiliaciones"
-                                            aria-expanded="false"
-                                            aria-controls="tablaAfiliaciones"
-                                        >
-                                            Mostrar/Ocultar Afiliaciones
-                                        </button>
-                                    </div>
+                                <div className="d-flex justify-content-between align-items-center mt-2 mb-2">
+                                    <h5 className="alinearTexto  mb-0">Registrar Actualizar Afiliaciones</h5>
+                                    <BotonToggle target="#tablaAfiliaciones" texto="Afiliaciones" />
                                 </div>
                             </div>
-                        )}
 
                         <div className="collapse" id="tablaAfiliaciones">
                             <table className="table table-bordered">
@@ -1837,26 +1769,13 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             </table>
                         </div>
 
-                        {contratoMasReciente?.continua === true && (
                             <div>
                                 <hr />
-                                <div className="d-flex justify-content-between align-items-center mt-4 mb-2">
-                                    <h5 className="alinearTexto  mb-0">Registrar Documentos</h5>
-                                    <div>
-                                        <button
-                                            className="btn btn-outline-secondary me-2"
-                                            type="button"
-                                            data-bs-toggle="collapse"
-                                            data-bs-target="#tablaDocumentos"
-                                            aria-expanded="false"
-                                            aria-controls="tablaDocumentos"
-                                        >
-                                            Mostrar/Ocultar Documentos
-                                        </button>
-                                    </div>
+                                <div className="d-flex justify-content-between align-items-center mt-2 mb-2">
+                                    <h5 className="alinearTexto  mb-0">Registrar Actualizar Documentos</h5>
+                                    <BotonToggle target="#tablaDocumentos" texto="Documentos" />
                                 </div>
                             </div>
-                        )}
 
                         <div className="collapse" id="tablaDocumentos">
                             <table className="table table-bordered">
@@ -2165,6 +2084,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             >
                                 Cancelar
                             </button>
+
                         </div>
                     </div>
                 </div>

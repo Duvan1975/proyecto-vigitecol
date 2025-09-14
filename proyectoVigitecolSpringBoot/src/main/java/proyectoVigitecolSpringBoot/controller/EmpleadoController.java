@@ -209,7 +209,7 @@ public class EmpleadoController {
 
     @GetMapping("/periodo-prueba/vencido")
     public ResponseEntity<Page<DatosEmpleadoConPeriodoDePrueba>> empleadosEnPeriodoDePruebaVencido(
-            @PageableDefault(size = 10, sort = "apellidos") Pageable pageable) {
+            @PageableDefault(size = 10, sort = "c.fechaIngreso") Pageable pageable) {
 
         Page<DatosEmpleadoConPeriodoDePrueba> resultado =
                 empleadoService.findEmpleadosEnPeriodoDePrueba(pageable);
@@ -262,8 +262,10 @@ public class EmpleadoController {
         return empleadoService.obtenerTodosActivos();
     }
 
-    /*@GetMapping("/empleados/todos-activos")
-    public ResponseEntity<List<Empleado>> obtenerTodosEmpleadosActivos() {
-        return ResponseEntity.ok(empleadoService.obtenerTodosActivos());
-    }*/
+    @GetMapping("/{id}/completo")
+    public ResponseEntity<DatosEmpleadoCompletoDTO> obtenerEmpleadoCompleto(@PathVariable Long id) {
+        DatosEmpleadoCompletoDTO dto = empleadoService.obtenerEmpleadoCompleto(id);
+        return ResponseEntity.ok(dto);
+    }
+
 }

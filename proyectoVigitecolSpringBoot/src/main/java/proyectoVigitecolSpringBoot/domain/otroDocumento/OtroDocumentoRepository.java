@@ -3,6 +3,7 @@ package proyectoVigitecolSpringBoot.domain.otroDocumento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Arrays;
 import java.util.List;
 
 public interface OtroDocumentoRepository extends JpaRepository<OtroDocumento, Long> {
@@ -20,4 +21,6 @@ public interface OtroDocumentoRepository extends JpaRepository<OtroDocumento, Lo
             AND c.continua = true
             """)
     List<OtroDocumento> findDocumentosByEmpleadoActivo(Long empleadoId);
+
+    List<OtroDocumento> findByEmpleadoId(Long id);
 }

@@ -1,6 +1,5 @@
 package proyectoVigitecolSpringBoot.domain.empleado;
 
-import jakarta.validation.constraints.NotNull;
 import proyectoVigitecolSpringBoot.domain.curso.Curso;
 
 import java.time.LocalDate;

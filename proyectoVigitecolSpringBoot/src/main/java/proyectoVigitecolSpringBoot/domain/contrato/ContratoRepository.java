@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import proyectoVigitecolSpringBoot.domain.empleado.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -263,4 +264,6 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
             AND c.continua = true ORDER BY c.empleado.apellidos ASC
             """)
     List<Empleado> findEmpleadosConContratoActivoList();
+
+    List<Contrato> findByEmpleadoId(Long id);
 }

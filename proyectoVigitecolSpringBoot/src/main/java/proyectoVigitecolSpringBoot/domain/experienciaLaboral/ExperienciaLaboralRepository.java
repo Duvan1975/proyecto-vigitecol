@@ -3,6 +3,7 @@ package proyectoVigitecolSpringBoot.domain.experienciaLaboral;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Arrays;
 import java.util.List;
 
 public interface ExperienciaLaboralRepository extends JpaRepository<ExperienciaLaboral, Long> {
@@ -20,4 +21,6 @@ public interface ExperienciaLaboralRepository extends JpaRepository<ExperienciaL
             AND c.continua = true
             """)
     List<ExperienciaLaboral> findExperienciaLaboralByEmpleadoActivo(Long empleadoId);
+
+    List<ExperienciaLaboral> findByEmpleadoId(Long id);
 }

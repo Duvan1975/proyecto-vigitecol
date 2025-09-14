@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Paginacion from "./Paginacion";
 import { authFetch } from "../utils/authFetch";
+import * as XLSX from "xlsx";
 
 export function TablaCurso() {
     const [empleadosConCursosPorVencer, setEmpleadosConCursosPorVencer] = useState([]);
@@ -19,9 +20,7 @@ export function TablaCurso() {
         setCargando(true);
 
         authFetch(`http://localhost:8080/empleados/con-cursos/por-vencer?page=${pagina}`, {
-            headers: {
-
-            },
+            headers: {},
         })
             .then((res) => res.json())
             .then((data) => {
@@ -37,6 +36,74 @@ export function TablaCurso() {
                 setCargando(false);
             });
     };
+
+    // Exportar TODOS los registros a Excel con filtros
+    const exportarExcel = () => {
+        setCargando(true);
+
+        authFetch(`http://localhost:8080/empleados/con-cursos/por-vencer?page=0&size=10000`, {
+            headers: {},
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                const empleados = data.content;
+
+                // Preparamos encabezados
+                const headers = [
+                    "Nombres",
+                    "Apellidos",
+                    "Documento",
+                    "Teléfono",
+                    "Cargo",
+                    "Tipo Curso",
+                    "Categoría",
+                    "Fecha de Realización",
+                    "Vencido"
+                ];
+
+                // Preparamos datos (un registro por cada curso)
+                const datosExportar = empleados.flatMap((empleado) =>
+                    empleado.cursosVigentes.map((curso) => [
+                        empleado.nombres,
+                        empleado.apellidos,
+                        empleado.numeroDocumento,
+                        empleado.telefono,
+                        empleado.cargo,
+                        curso.tipoCurso,
+                        curso.categoria,
+                        curso.fechaCurso,
+                        curso.vencido ? "Sí" : "No"
+                    ])
+                );
+
+                // Creamos la hoja
+                const worksheet = XLSX.utils.aoa_to_sheet([headers, ...datosExportar]);
+
+                // Agregar autofiltro
+                worksheet['!autofilter'] = { ref: "A1:I1" };
+
+                // Ajustar ancho de columnas
+                const ajustarColumnas = [headers, ...datosExportar];
+                const colWidths = headers.map((_, i) => ({
+                    wch: Math.max(
+                        ...ajustarColumnas.map(row => (row[i] ? row[i].toString().length : 0))
+                    ) + 2
+                }));
+                worksheet['!cols'] = colWidths;
+
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Cursos por Vencer");
+
+                // Descargar archivo
+                XLSX.writeFile(workbook, `PERSONAL_CON_CURSOS_POR_VENCER (total = ${totalElementos}).xlsx`);
+                setCargando(false);
+            })
+            .catch((error) => {
+                console.error("Error al exportar Excel:", error);
+                setCargando(false);
+            });
+    };
+
     if (cargando) {
         return <p>Cargando listado...</p>;
     }
@@ -48,17 +115,30 @@ export function TablaCurso() {
     return (
         <div>
             <h4 className="alinearTexto">PERSONAL OPERATIVO CON CURSOS POR VENCER O VENCIDOS (total = {totalElementos})</h4>
-            <Paginacion
-                paginaActual={paginaActual}
-                totalPaginas={totalPaginas}
-                onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
-            />
+
+            <div className="row align-items-center mb-1">
+                <div className="col text-start"></div> {/* espacio vacío */}
+                <div className="col text-center">
+                    <Paginacion
+                        paginaActual={paginaActual}
+                        totalPaginas={totalPaginas}
+                        onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
+                    />
+                </div>
+                <div className="col text-end">
+                    <button className="btn btn-success" onClick={exportarExcel}>
+                        Exportar a Excel
+                    </button>
+                </div>
+            </div>
+
             <div className="mt-2 text-center">
                 <small>
                     Mostrando página {paginaActual + 1} de {totalPaginas} — {tamanoPagina} por página,
                     total de registros: {totalElementos}
                 </small>
             </div>
+
             <table className="table table-bordered table-hover table-striped">
                 <thead className="table-primary">
                     <tr>
@@ -72,7 +152,7 @@ export function TablaCurso() {
                 </thead>
                 <tbody>
                     {empleadosConCursosPorVencer
-                        .filter((empleado) => empleado.cursosVigentes.length > 0) // 🔥 solo empleados con cursos
+                        .filter((empleado) => empleado.cursosVigentes.length > 0)
                         .map((empleado) => (
                             <tr key={empleado.id} className={empleado.cursosVigentes.some(c => c.vencido) ? "table-danger" : ""}>
                                 <td>{empleado.nombres}</td>
@@ -108,5 +188,5 @@ export function TablaCurso() {
                 </small>
             </div>
         </div>
-    )
+    );
 }
