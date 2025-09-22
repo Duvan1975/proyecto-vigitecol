@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import proyectoVigitecolSpringBoot.domain.usuarios.Rol;
 import proyectoVigitecolSpringBoot.domain.usuarios.Usuario;
 import proyectoVigitecolSpringBoot.domain.usuarios.UsuarioService;
-import proyectoVigitecolSpringBoot.infra.errores.security.AutenticacionService;
 
 @SpringBootApplication
 @EnableScheduling
@@ -37,12 +36,3 @@ public class SoftwareDeRegistroApplication {
 			};
 		}
 	}
-
-	/*@Bean
-	CommandLineRunner init(AutenticacionService authenticationService) {
-		return args -> {
-			authenticationService.crearUsuariosPrueba();
-		};
-	}*/
-
-

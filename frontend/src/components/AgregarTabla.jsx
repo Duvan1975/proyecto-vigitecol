@@ -9,6 +9,7 @@ export async function AgregarTabla(
     experienciasLaborales,
     afiliaciones,
     documentos,
+    vehiculos,
     empleado,
     limpiarFormulario) {
 
@@ -183,6 +184,32 @@ export async function AgregarTabla(
             if (!responseDocumentos.ok) {
                 const errorData = await responseDocumentos.json();
                 throw new Error(errorData.message || "Error al registrar documentos");
+            }
+        }
+
+        //Enviamos todos los vehículos juntos
+        const vehiculosLimpios = vehiculos.filter(v =>
+            v.tipoVehiculo && v.tecnomecanico && v.soat && v.licencia && v.placa
+        ).map((v) => ({
+            tipoVehiculo: v.tipoVehiculo, 
+            tecnomecanico: v.tecnomecanico, 
+            soat: v.soat, 
+            licencia: v.licencia, 
+            placa: v.placa
+        }));
+
+        if (vehiculosLimpios.length > 0) {
+            const responseVehiculos = await authFetch(`http://localhost:8080/vehiculos/${empleadoId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(vehiculosLimpios)
+            });
+
+            if (!responseVehiculos.ok) {
+                const errorData = await responseVehiculos.json();
+                throw new Error(errorData.message || "Error al registrar vehículos");
             }
         }
 

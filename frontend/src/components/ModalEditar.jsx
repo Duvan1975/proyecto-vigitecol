@@ -19,6 +19,9 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
     const [documentos, setDocumentos] = useState([]);
 
+    const [vehiculos, setVehiculos] = useState([]);
+
+
     //Estado para agregar familiares modificado para que siempre sea visible en la tabla familiares
     const [nuevoFamiliar, setNuevoFamiliar] = useState({
         tipoFamiliar: "",
@@ -58,6 +61,15 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         tipoDocumento: "",
         descripcionDocumento: "",
         fechaRegistro: ""
+    });
+
+    //Estado para agregar vehículos
+    const [nuevoVehiculo, setNuevoVehiculo] = useState({
+        tipoVehiculo: "",
+        tecnomecanico: "",
+        soat: "",
+        licencia: "",
+        placa: ""
     });
 
     //Estado para cargar contratos
@@ -237,6 +249,29 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         }
     }, [empleado]);
 
+    useEffect(() => {
+        if (empleado) {
+            setFormulario(empleado);
+
+            //Obtener vehiculos del empleado por ID
+            authFetch(`http://localhost:8080/vehiculos/por-empleado/${empleado.id}`, {
+
+            })
+                .then(res => res.json())
+                .then(data => {
+                    const vehiculosPreparados = (Array.isArray(data) ? data : []).map(v => ({
+                        id: v.id ?? v.vehiculoId ?? null,
+                        tipoVehiculo: v.tipoVehiculo ?? "",
+                        tecnomecanico: v.tecnomecanico ?? "",
+                        soat: v.soat ?? "",
+                        licencia: v.licencia ?? "",
+                        placa: v.placa ?? ""
+                    }));
+                    setVehiculos(vehiculosPreparados);
+                });
+        }
+    }, [empleado]);
+
     const handleChange = (e) => {
         setFormulario({
             ...formulario,
@@ -304,6 +339,15 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             [field]: value
         };
         setDocumentos(nuevosDocumentos);
+    };
+
+    const handleVehiculoChange = (index, field, value) => {
+        const nuevosVehiculos = [...vehiculos];
+        nuevosVehiculos[index] = {
+            ...nuevosVehiculos[index],
+            [field]: value
+        };
+        setVehiculos(nuevosVehiculos);
     };
 
     const actualizarEmpleado = () => {
@@ -465,6 +509,24 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             .then(res => {
                 if (!res.ok) throw new Error("Error al actualizar el documento. Actualiza los datos generales y vuelve a intentarlo.");
                 Swal.fire("Documento actualizado correctamente", "", "success");
+            })
+            .catch(err => {
+                Swal.fire("Error", err.message, "error");
+            });
+    };
+
+    const actualizarVehiculo = (vehiculo) => {
+
+        authFetch("http://localhost:8080/vehiculo", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(vehiculo)
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("Error al actualizar el vehículo. Actualiza los datos generales y vuelve a intentarlo.");
+                Swal.fire("Vehículo actualizado correctamente", "", "success");
             })
             .catch(err => {
                 Swal.fire("Error", err.message, "error");
@@ -699,7 +761,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             });
     };
 
-    //Function para registrar una nueva afiliación en el Modal
+    //Function para registrar un nuevo documento en el Modal
     const registrarNuevoDocumento = () => {
         // Validar tipoDocumento
         if (!nuevoDocumento.tipoDocumento) {
@@ -736,6 +798,66 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                 setNuevoDocumento({ tipoDocumento: "", descripcionDocumento: "", fechaRegistro: "" });
 
                 Swal.fire("Documento agregado", "El documento ha sido registrado correctamente", "success");
+            })
+            .catch((err) => {
+                Swal.fire("Error", err.message, "error");
+            });
+    };
+
+    //Function para registrar un nuevo vehículo en el Modal
+    const registrarNuevoVehiculo = () => {
+        // Validar tipoVehiculo
+        if (!nuevoVehiculo.tipoVehiculo) {
+            Swal.fire("Campo incompleto", "Por favor selecciona el tipo de vehículo.", "warning");
+            return;
+        }
+
+        if (!nuevoVehiculo.tecnomecanico) {
+            Swal.fire("Campo incompleto", "Por favor ingresa la fecha del tecnomecánico.", "warning");
+            return;
+        }
+
+        if (!nuevoVehiculo.soat) {
+            Swal.fire("Campo incompleto", "Por favor ingresa la fecha del soat.", "warning");
+            return;
+        }
+
+        if (!nuevoVehiculo.licencia) {
+            Swal.fire("Campo incompleto", "Por favor ingresa la fecha de licencia.", "warning");
+            return;
+        }
+
+        if (!nuevoVehiculo.placa) {
+            Swal.fire("Campo incompleto", "Por favor ingresa la placa del vehículo.", "warning");
+            return;
+        }
+
+        // Si todo está correcto, proceder con el fetch
+        authFetch(`http://localhost:8080/vehiculos/${empleado.id}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify([nuevoVehiculo])
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error("Error al registrar el vehículo");
+                return res.json();
+            })
+            .then((vehiculoCreado) => {
+                setVehiculos(prev => [...prev, {
+                    id: vehiculoCreado.id ?? vehiculoCreado.vehiculoId,
+                    tipoVehiculo: nuevoVehiculo.tipoVehiculo,
+                    tecnomecanico: nuevoVehiculo.tecnomecanico,
+                    soat: nuevoVehiculo.soat,
+                    licencia: nuevoVehiculo.licencia,
+                    placa: nuevoVehiculo.placa,
+
+                }]);
+
+                setNuevoVehiculo({ tipoVehiculo: "", tecnomecanico: "", soat: "", licencia: "", placa: "" });
+
+                Swal.fire("Vehículo agregado", "El Vehículo ha sido registrado correctamente", "success");
             })
             .catch((err) => {
                 Swal.fire("Error", err.message, "error");
@@ -1028,6 +1150,33 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         });
     };
 
+    const eliminarVehiculo = (id) => {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Este Registro será eliminado.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                authFetch(`http://localhost:8080/vehiculos/${id}`, {
+                    method: "DELETE",
+
+                })
+                    .then((res) => {
+                        if (!res.ok) throw new Error("Error al eliminar el vehículo, (Debes actualizar los datos para poder eliminar este registro)");
+                        setVehiculos(vehiculos.filter(v => v.id !== id));
+                        Swal.fire("Eliminado", "El vehículo fue eliminado correctamente", "success");
+                    })
+                    .catch((err) => {
+                        Swal.fire("Error", err.message, "error");
+                    });
+            }
+        });
+    };
+
     /*const contratoMasReciente = contratos.length > 0
         ? contratos.reduce((max, c) =>
             c.numeroContrato > max.numeroContrato ? c : max, contratos[0])
@@ -1221,16 +1370,16 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             />
                         </div>
                     </div>
-                        <div>
-                            <div className="d-flex justify-content-between align-items-center mt-2 mb-2">
-                                <h5 className="alinearTexto mb-0">Registrar Actualizar Hijos</h5>
-                                <BotonToggle target="#tablaFamiliares" texto="Familiares" />
-                            </div>
+                    <div>
+                        <div className="d-flex justify-content-between align-items-center mt-2 mb-2">
+                            <h5 className="alinearTexto mb-0">Registrar Actualizar Hijos</h5>
+                            <BotonToggle target="#tablaFamiliares" texto="Familiares" />
                         </div>
+                    </div>
                     <div className="mt-0">
                         <div className="collapse" id="tablaFamiliares">
                             <table className="table table-bordered">
-                                <thead>
+                                <thead className="table-primary">
                                     <tr>
                                         <th>Tipo</th>
                                         <th>Nombre</th>
@@ -1336,17 +1485,17 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             </table>
                         </div>
 
-                            <div>
-                                <hr />
-                                <div className="d-flex justify-content-between align-items-center mt-2 mb-2">
-                                    <h5 className="alinearTexto  mb-0">Registrar Actualizar Cursos</h5>
-                                    <BotonToggle target="#tablaCursos" texto="Cursos" />
-                                </div>
+                        <div>
+                            <hr />
+                            <div className="d-flex justify-content-between align-items-center mt-2 mb-2">
+                                <h5 className="alinearTexto  mb-0">Registrar Actualizar Cursos</h5>
+                                <BotonToggle target="#tablaCursos" texto="Cursos" />
                             </div>
+                        </div>
 
                         <div className="collapse" id="tablaCursos">
                             <table className="table table-bordered">
-                                <thead>
+                                <thead className="table-primary">
                                     <tr>
                                         <th>Tipo Curso</th>
                                         <th>Especialidad</th>
@@ -1463,17 +1612,17 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             </table>
                         </div>
 
-                            <div>
-                                <hr />
-                                <div className="d-flex justify-content-between align-items-center mt-1 mb-2">
-                                    <h5 className="alinearTexto  mb-0">Registrar Actualizar Estudios</h5>
-                                    <BotonToggle target="#tablaEstudios" texto="Estudios" />
-                                </div>
+                        <div>
+                            <hr />
+                            <div className="d-flex justify-content-between align-items-center mt-1 mb-2">
+                                <h5 className="alinearTexto  mb-0">Registrar Actualizar Estudios</h5>
+                                <BotonToggle target="#tablaEstudios" texto="Estudios" />
                             </div>
+                        </div>
 
                         <div className="collapse" id="tablaEstudios">
                             <table className="table table-bordered">
-                                <thead>
+                                <thead className="table-primary">
                                     <tr>
                                         <th>Tipo Estudio</th>
                                         <th>Título Obtenido</th>
@@ -1580,17 +1729,17 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             </table>
                         </div>
 
-                            <div>
-                                <hr />
-                                <div className="d-flex justify-content-between align-items-center mt-2 mb-2">
-                                    <h5 className="alinearTexto  mb-0">Registrar Experiencia Laboral</h5>
-                                    <BotonToggle target="#tablaExperiencia" texto="Experiencia" />
-                                </div>
+                        <div>
+                            <hr />
+                            <div className="d-flex justify-content-between align-items-center mt-2 mb-2">
+                                <h5 className="alinearTexto  mb-0">Registrar Experiencia Laboral</h5>
+                                <BotonToggle target="#tablaExperiencia" texto="Experiencia" />
                             </div>
+                        </div>
 
                         <div className="collapse" id="tablaExperiencia">
                             <table className="table table-bordered">
-                                <thead>
+                                <thead className="table-primary">
                                     <tr>
                                         <th>Descripción Experiencia Laboral</th>
                                         <th>Acción</th>
@@ -1652,17 +1801,17 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             </table>
                         </div>
 
-                            <div>
-                                <hr />
-                                <div className="d-flex justify-content-between align-items-center mt-2 mb-2">
-                                    <h5 className="alinearTexto  mb-0">Registrar Actualizar Afiliaciones</h5>
-                                    <BotonToggle target="#tablaAfiliaciones" texto="Afiliaciones" />
-                                </div>
+                        <div>
+                            <hr />
+                            <div className="d-flex justify-content-between align-items-center mt-2 mb-2">
+                                <h5 className="alinearTexto  mb-0">Registrar Actualizar Afiliaciones</h5>
+                                <BotonToggle target="#tablaAfiliaciones" texto="Afiliaciones" />
                             </div>
+                        </div>
 
                         <div className="collapse" id="tablaAfiliaciones">
                             <table className="table table-bordered">
-                                <thead>
+                                <thead className="table-primary">
                                     <tr>
                                         <th>Tipo de Afiliación</th>
                                         <th>Nombre de la Entidad</th>
@@ -1769,17 +1918,17 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             </table>
                         </div>
 
-                            <div>
-                                <hr />
-                                <div className="d-flex justify-content-between align-items-center mt-2 mb-2">
-                                    <h5 className="alinearTexto  mb-0">Registrar Actualizar Documentos</h5>
-                                    <BotonToggle target="#tablaDocumentos" texto="Documentos" />
-                                </div>
+                        <div>
+                            <hr />
+                            <div className="d-flex justify-content-between align-items-center mt-2 mb-2">
+                                <h5 className="alinearTexto  mb-0">Registrar Actualizar Documentos</h5>
+                                <BotonToggle target="#tablaDocumentos" texto="Documentos" />
                             </div>
+                        </div>
 
                         <div className="collapse" id="tablaDocumentos">
                             <table className="table table-bordered">
-                                <thead>
+                                <thead className="table-primary">
                                     <tr>
                                         <th>Tipo de Documento</th>
                                         <th>Descripción</th>
@@ -1884,6 +2033,178 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                     ))}
                                 </tbody>
                             </table>
+                        </div>
+
+                        <div>
+                            <hr />
+                            <div className="d-flex justify-content-between align-items-center mt-2 mb-2">
+                                <h5 className="alinearTexto  mb-0">Registrar Actualizar Vehículos</h5>
+                                <BotonToggle target="#tablaVehiculos" texto="Vehículos" />
+                            </div>
+                        </div>
+
+                        <div className="collapse" id="tablaVehiculos">
+                            <div className="table-responsive">
+
+                                <table className="table table-hover table-striped mb-0 align-middle text-center">
+                                    <thead className="table-primary">
+                                        <tr>
+                                            <th>Tipo de Vehículo</th>
+                                            <th>Tecnomecánico</th>
+                                            <th>Soat</th>
+                                            <th>Licencia</th>
+                                            <th>Placa</th>
+                                            <th>Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {nuevoVehiculo && (
+                                            <tr>
+                                                <td style={{ minWidth: "150px" }}>
+                                                    <select
+                                                        className="form-select"
+                                                        value={nuevoVehiculo.tipoVehiculo}
+                                                        onChange={(e) =>
+                                                            setNuevoVehiculo({
+                                                                ...nuevoVehiculo,
+                                                                tipoVehiculo: e.target.value,
+                                                            })
+                                                        }
+                                                    >
+                                                        <option value="">Seleccione</option>
+                                                        <option value="MOTO">MOTO</option>
+                                                        <option value="CARRO">CARRO</option>
+                                                    </select>
+                                                </td>
+                                                <td style={{ minWidth: "180px" }}>
+                                                    <input
+                                                        type="date"
+                                                        className="form-control"
+                                                        value={nuevoVehiculo.tecnomecanico}
+                                                        onChange={(e) =>
+                                                            setNuevoVehiculo({
+                                                                ...nuevoVehiculo,
+                                                                tecnomecanico: e.target.value,
+                                                            })
+                                                        }
+                                                    />
+                                                </td>
+                                                <td style={{ minWidth: "180px" }}>
+                                                    <input
+                                                        type="date"
+                                                        className="form-control"
+                                                        value={nuevoVehiculo.soat}
+                                                        onChange={(e) =>
+                                                            setNuevoVehiculo({
+                                                                ...nuevoVehiculo,
+                                                                soat: e.target.value,
+                                                            })
+                                                        }
+                                                    />
+                                                </td>
+                                                <td style={{ minWidth: "180px" }}>
+                                                    <input
+                                                        type="date"
+                                                        className="form-control"
+                                                        value={nuevoVehiculo.licencia}
+                                                        onChange={(e) =>
+                                                            setNuevoVehiculo({
+                                                                ...nuevoVehiculo,
+                                                                licencia: e.target.value,
+                                                            })
+                                                        }
+                                                    />
+                                                </td>
+                                                <td style={{ minWidth: "120px" }}>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        placeholder="Placa"
+                                                        value={nuevoVehiculo.placa}
+                                                        onChange={(e) =>
+                                                            setNuevoVehiculo({
+                                                                ...nuevoVehiculo,
+                                                                placa: e.target.value,
+                                                            })
+                                                        }
+                                                    />
+                                                </td>
+                                                <td style={{ minWidth: "100px" }}>
+                                                    <button
+                                                        className="btn btn-primary btn-sm w-90"
+                                                        onClick={registrarNuevoVehiculo}
+                                                    >
+                                                        Agregar
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        )}
+                                        {vehiculos.map((v, idx) => (
+                                            <tr key={v.id || idx}>
+                                                <td>
+                                                    <select
+                                                        className="form-select"
+                                                        value={v.tipoVehiculo !== undefined && v.tipoVehiculo !== null ? v.tipoVehiculo : ""}
+                                                        onChange={(e) => handleVehiculoChange(idx, "tipoVehiculo", e.target.value)}
+                                                    >
+                                                        <option value="">Seleccione</option>
+                                                        <option value="MOTO">MOTO</option>
+                                                        <option value="CARRO">CARRO</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input
+                                                        type="date"
+                                                        className="form-control"
+                                                        value={v.tecnomecanico !== undefined && v.tecnomecanico !== null ? v.tecnomecanico : ""}
+                                                        onChange={(e) => handleVehiculoChange(idx, "tecnomecanico", e.target.value)}
+                                                    />
+                                                </td>
+                                                <td>
+                                                    <input
+                                                        type="date"
+                                                        className="form-control"
+                                                        value={v.soat !== undefined && v.soat !== null ? v.soat : ""}
+                                                        onChange={(e) => handleVehiculoChange(idx, "soat", e.target.value)}
+                                                    />
+                                                </td>
+                                                <td>
+                                                    <input
+                                                        type="date"
+                                                        className="form-control"
+                                                        value={v.licencia !== undefined && v.licencia !== null ? v.licencia : ""}
+                                                        onChange={(e) => handleVehiculoChange(idx, "licencia", e.target.value)}
+                                                    />
+                                                </td>
+                                                <td>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        value={v.placa !== undefined && v.placa !== null ? v.placa : ""}
+                                                        onChange={(e) => handleVehiculoChange(idx, "placa", e.target.value)}
+                                                    />
+                                                </td>
+                                                <td className="d-flex justify-content-between">
+                                                    <button
+                                                        className="btn btn-success btn-sm me-2"
+                                                        onClick={() => actualizarVehiculo(v)}
+                                                    >
+                                                        Actualizar
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-outline-danger btn-sm"
+                                                        onClick={() => eliminarVehiculo(v.id)}
+                                                        title="Eliminar"
+                                                    >
+                                                        <i className="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
                         </div>
 
                         <hr />

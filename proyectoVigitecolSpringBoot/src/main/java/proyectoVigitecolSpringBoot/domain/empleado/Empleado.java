@@ -9,6 +9,7 @@ import proyectoVigitecolSpringBoot.domain.estudio.Estudio;
 import proyectoVigitecolSpringBoot.domain.experienciaLaboral.ExperienciaLaboral;
 import proyectoVigitecolSpringBoot.domain.familia.Familiar;
 import proyectoVigitecolSpringBoot.domain.otroDocumento.OtroDocumento;
+import proyectoVigitecolSpringBoot.domain.vehiculo.Vehiculo;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -77,6 +78,9 @@ public class Empleado {
 
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OtroDocumento> documentos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Vehiculo> vehiculos = new ArrayList<>();
 
     //Constructor para registrar empleado
     public Empleado(DatosRegistroEmpleado datos) {
@@ -298,7 +302,11 @@ public class Empleado {
         this.documentos = documentos;
     }
 
-    /*public Long getEmpleadoId() {
-        return id;
-    }*/
+    public List<Vehiculo> getVehiculos() {
+        return vehiculos;
+    }
+
+    public void setVehiculos(List<Vehiculo> vehiculos) {
+        this.vehiculos = vehiculos;
+    }
 }

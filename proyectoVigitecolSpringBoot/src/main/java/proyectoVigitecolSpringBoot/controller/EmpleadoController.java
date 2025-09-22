@@ -268,4 +268,14 @@ public class EmpleadoController {
         return ResponseEntity.ok(dto);
     }
 
+    @GetMapping("/con-vehiculos")
+    public ResponseEntity<Page<DatosEmpleadoConVehiculo>> empleadosConVehiculos(
+            @PageableDefault(size = 10, sort = "apellidos") Pageable pageable) {
+
+        Page<DatosEmpleadoConVehiculo> resultado = empleadoService
+                .findConVehiculos(pageable);
+
+        return ResponseEntity.ok(resultado);
+    }
+
 }

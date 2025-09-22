@@ -1,4 +1,4 @@
-package proyectoVigitecolSpringBoot.infra.errores.security;
+package proyectoVigitecolSpringBoot.infra.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -48,6 +48,15 @@ public class AutenticacionService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return usuarioRepository.findByAdmin(username);
+        var usuario = usuarioRepository.findByAdmin(username);
+        if (usuario == null) {
+            throw new UsernameNotFoundException("Usuario o contraseña incorrectos");
+        }
+        return usuario;
     }
+
+    /*@Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return usuarioRepository.findByAdmin(username);
+    }*/
 }

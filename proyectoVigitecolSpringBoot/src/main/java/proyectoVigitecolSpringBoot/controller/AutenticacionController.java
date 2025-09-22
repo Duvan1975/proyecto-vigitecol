@@ -5,12 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import proyectoVigitecolSpringBoot.domain.usuarios.DatosAutenticacionUsuario;
 import proyectoVigitecolSpringBoot.domain.usuarios.Usuario;
-import proyectoVigitecolSpringBoot.infra.errores.security.TokenService;
+import proyectoVigitecolSpringBoot.infra.security.TokenService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,32 +28,42 @@ public class AutenticacionController {
     private TokenService tokenService;
 
     @PostMapping
-    public ResponseEntity autenticarUsuario(@RequestBody @Valid DatosAutenticacionUsuario datosAutenticacionUsuario) {
-        Authentication authToken = new UsernamePasswordAuthenticationToken(
-                datosAutenticacionUsuario.admin(),
-                datosAutenticacionUsuario.clave()
-        );
+    public ResponseEntity<?> autenticarUsuario(@RequestBody @Valid DatosAutenticacionUsuario datosAutenticacionUsuario) {
+        try {
+            Authentication authToken = new UsernamePasswordAuthenticationToken(
+                    datosAutenticacionUsuario.admin(),
+                    datosAutenticacionUsuario.clave()
+            );
 
-        var usuarioAutenticado = authenticationManager.authenticate(authToken);
-        var usuario = (Usuario) usuarioAutenticado.getPrincipal();
+            var usuarioAutenticado = authenticationManager.authenticate(authToken);
+            var usuario = (Usuario) usuarioAutenticado.getPrincipal();
 
-        // Verificar si el usuario está activo
-        if (!usuario.isEnabled()) {
+            // Verificar si el usuario está activo
+            if (!usuario.isEnabled()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Cuenta desactivada. Contacte al administrador."));
+            }
+
+            var JWTtoken = tokenService.generarToken(usuario);
+
+            // Devolver más información en la respuesta
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", JWTtoken);
+            response.put("rol", usuario.getRol().name());
+            response.put("estado", usuario.isEnabled());
+            response.put("admin", usuario.getAdmin());
+
+            return ResponseEntity.ok(response);
+
+        } catch (BadCredentialsException | UsernameNotFoundException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Cuenta desactivada. Contacte al administrador.");
+                    .body(Map.of("error", "Usuario o contraseña incorrectos"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Ocurrió un error inesperado"));
         }
-
-        var JWTtoken = tokenService.generarToken(usuario);
-
-        // Devolver más información en la respuesta
-        Map<String, Object> response = new HashMap<>();
-        response.put("token", JWTtoken);
-        response.put("rol", usuario.getRol().name());
-        response.put("estado", usuario.isEnabled());
-        response.put("admin", usuario.getAdmin());
-
-        return ResponseEntity.ok(response);
     }
+
 
     @GetMapping("/verificar")
     public ResponseEntity<?> verificarToken(@RequestHeader("Authorization") String authHeader) {

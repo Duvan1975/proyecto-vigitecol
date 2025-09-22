@@ -167,4 +167,15 @@ public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
                 WHERE SIZE(e.documentos) > 0
             """)
     Page<Empleado> findEmpleadosConDocumentos(Pageable pageable);
+
+    @Query("""
+                SELECT e FROM Empleado e
+                JOIN Contrato c ON c.empleado = e AND c.numeroContrato = (
+                    SELECT MAX(c2.numeroContrato)
+                    FROM Contrato c2
+                    WHERE c2.empleado = e
+                )AND c.continua = true
+                WHERE SIZE(e.vehiculos) > 0
+            """)
+    Page<Empleado> findEmpleadosConVehiculos(Pageable pageable);
 }

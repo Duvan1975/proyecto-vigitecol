@@ -1,4 +1,4 @@
-package proyectoVigitecolSpringBoot.infra.errores.security;
+package proyectoVigitecolSpringBoot.infra.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -41,6 +41,9 @@ public class SecurityConfigurations {
                         // Endpoints públicos
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/test/public").permitAll()
+                        .requestMatchers("/test-mail").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/password-reset/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/password-reset/**").permitAll()
 
                         // ==================== EMPLEADOS ====================
                         // LECTURA - Todos los autenticados

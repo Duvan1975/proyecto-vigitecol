@@ -1,4 +1,4 @@
-package proyectoVigitecolSpringBoot.infra.errores.security;
+package proyectoVigitecolSpringBoot.infra.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

@@ -5,6 +5,7 @@ import { Login } from "./Login";
 import logoVigitecol from '../img/vigitecol.png'; // Ajusta la ruta según tu estructura
 import ProtectedElement from "../utils/ProtectedElement";
 import UserManagement from "./UserManagement";
+import ResetPassword from "./ResetPassword";
 
 export function Menu() {
     const [vista, setVista] = useState("login");
@@ -13,6 +14,13 @@ export function Menu() {
 
     useEffect(() => {
         const token = localStorage.getItem("token");
+
+        const params = new URLSearchParams(window.location.search);
+        if (window.location.pathname.includes("reset-password") && params.get("token")) {
+            setVista("reset-password");
+            setCargando(false);
+            return;
+        }
 
         if (token) {
             // Verificar si el token es válido
@@ -213,6 +221,9 @@ export function Menu() {
 
                     {vista === "login" && (
                         <Login onLoginSuccess={handleLoginSuccess} />
+                    )}
+                    {vista === "reset-password" && (
+                        <ResetPassword />
                     )}
 
                     {isLoggedIn && vista === "menu" && (

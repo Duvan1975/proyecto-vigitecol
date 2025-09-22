@@ -42,19 +42,6 @@ public class UsuarioController {
         }
     }
 
-    /*@PutMapping("/{id}")
-    public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
-        return ResponseEntity.ok(usuarioService.actualizarUsuario(id, usuario));
-    }*/
-
-    // Solo ADMIN puede desactivar usuarios (no eliminar)
-    /*@PatchMapping("/{id}/estado")
-    public ResponseEntity<Void> cambiarEstado(@PathVariable Long id, @RequestParam boolean estado) {
-        usuarioService.cambiarEstado(id, estado);
-        return ResponseEntity.ok().build();
-    }*/
-
-    // En UsuarioController.java
     @PatchMapping("/{id}/estado")
     public ResponseEntity<Void> cambiarEstado(@PathVariable Long id, @RequestParam boolean estado) {
         try {

@@ -59,17 +59,6 @@ public class UsuarioService {
         return usuarioRepository.save(usuarioExistente);
     }
 
-    /*public Usuario actualizarUsuario(Long id, Usuario usuario) {
-        Usuario usuarioExistente = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        // Actualizar solo los campos permitidos
-        usuarioExistente.setRol(usuario.getRol());
-        usuarioExistente.setEstado(usuario.isEstado());
-
-        return usuarioRepository.save(usuarioExistente);
-    }*/
-
     public void cambiarEstado(Long id, boolean estado) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));

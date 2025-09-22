@@ -1,4 +1,4 @@
-package proyectoVigitecolSpringBoot.infra.errores.security;
+package proyectoVigitecolSpringBoot.infra.security;
 
 public record DatosAutenticacionCompleto(
         String token,

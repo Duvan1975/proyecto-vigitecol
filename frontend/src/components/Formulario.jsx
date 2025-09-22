@@ -69,6 +69,16 @@ export function Formulario({ setVista }) {
         fechaRegistro: ""
     });
 
+    //Estados para registrar Vehículos
+    const [vehiculos, setVehiculos] = useState([]);
+    const [vehiculoActual, setVehiculoActual] = useState({
+        tipoVehiculo: "",
+        tecnomecanico: "",
+        soat: "",
+        licencia: "",
+        placa: ""
+    });
+
     //Estado para registrar Contrato
     const [contrato, setContrato] = useState({
         fechaIngreso: ""
@@ -158,6 +168,25 @@ export function Formulario({ setVista }) {
         }
     };
 
+    const agregarVehiculo = () => {
+        if (
+            vehiculoActual.tipoVehiculo &&
+            vehiculoActual.tecnomecanico &&
+            vehiculoActual.soat &&
+            vehiculoActual.licencia &&
+            vehiculoActual.placa
+        ) {
+            setVehiculos([...vehiculos, { ...vehiculoActual }]);
+            setVehiculoActual({
+                tipoVehiculo: "",
+                tecnomecanico: "",
+                soat: "",
+                licencia: "",
+                placa: "",
+            });
+        }
+    };
+
     const limpiarFormulario = () => {
         setEmpleado({
             nombres: "",
@@ -218,6 +247,15 @@ export function Formulario({ setVista }) {
             fechaRegistro: ""
         });
         setDocumentos([]);
+
+        setVehiculoActual({
+            tipoVehiculo: "",
+            tecnomecanico: "",
+            soat: "",
+            licencia: "",
+            placa: "",
+        });
+        setVehiculos([]);
     };
     const eliminarFamiliarTabla = (index) => {
         const nuevosFamiliares = [...familiares];
@@ -249,13 +287,18 @@ export function Formulario({ setVista }) {
         nuevosDocumentos.splice(index, 1);
         setDocumentos(nuevosDocumentos);
     };
+    const eliminarVehiculoTabla = (index) => {
+        const nuevosVehiculos = [...vehiculos];
+        nuevosVehiculos.splice(index, 1);
+        setVehiculos(nuevosVehiculos);
+    };
 
     return (
         <div>
             <h3 className='alinearTexto'>Formulario de Registro de Empleados</h3>
             <div className='row align-items-center g-2'>
                 <CuadrosTexto
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Nombres:"
                     tipoinput="text"
                     nombreinput="nombres"
@@ -266,7 +309,7 @@ export function Formulario({ setVista }) {
                     required={true}
                 />
                 <CuadrosTexto
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Apellidos:"
                     tipoinput="text"
                     nombreinput="apellidos"
@@ -278,7 +321,7 @@ export function Formulario({ setVista }) {
 
                 />
                 <CuadrosSelect
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Tipo Documento:"
                     nombreinput="tipoDocumento"
                     idinput="tipoDocumento"
@@ -292,9 +335,6 @@ export function Formulario({ setVista }) {
                         { valor: "PPT", texto: "PERMISO DE PERMANENCIA (PPT)" },
                     ]}
                 />
-            </div>
-
-            <div className='row align-items-center g-2'>
                 <CuadrosTexto
                     tamanoinput="col-md-3"
                     titulolabel="Número Documento:"
@@ -304,6 +344,20 @@ export function Formulario({ setVista }) {
                     placeholderinput="Ingrese el número de documento"
                     value={empleado.numeroDocumento}
                     onChange={(e) => setEmpleado({ ...empleado, numeroDocumento: e.target.value })}
+                    required={true}
+                />
+            </div>
+
+            <div className='row align-items-center g-2'>
+                <CuadrosTexto
+                    tamanoinput="col-md-3"
+                    titulolabel="Ciudad de expedición:"
+                    tipoinput="text"
+                    nombreinput="ciudadExpedicion"
+                    idinput="ciudadExpedicion"
+                    placeholderinput="Ingrese la ciudad de expedición del documento"
+                    value={empleado.ciudadExpedicion}
+                    onChange={(e) => setEmpleado({ ...empleado, ciudadExpedicion: e.target.value })}
                     required={true}
                 />
                 <CuadrosTexto
@@ -326,17 +380,6 @@ export function Formulario({ setVista }) {
                     placeholderinput="Ingrese el lugar de nacimiento"
                     value={empleado.lugarNacimiento}
                     onChange={(e) => setEmpleado({ ...empleado, lugarNacimiento: e.target.value })}
-                    required={true}
-                />
-                <CuadrosTexto
-                    tamanoinput="col-md-3"
-                    titulolabel="Ciudad de expedición:"
-                    tipoinput="text"
-                    nombreinput="ciudadExpedicion"
-                    idinput="ciudadExpedicion"
-                    placeholderinput="Ingrese la ciudad de expedición del documento"
-                    value={empleado.ciudadExpedicion}
-                    onChange={(e) => setEmpleado({ ...empleado, ciudadExpedicion: e.target.value })}
                     required={true}
                 />
             </div>
@@ -385,14 +428,13 @@ export function Formulario({ setVista }) {
                         { valor: "FEMENINO", texto: "FEMENINO" },
                     ]}
                 />
-
             </div>
 
             <h5 className='alinearTexto'>Datos de Contacto</h5>
 
             <div className='row align-items-center g-2'>
                 <CuadrosTexto
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Dirección:"
                     tipoinput="text"
                     nombreinput="direccion"
@@ -403,7 +445,7 @@ export function Formulario({ setVista }) {
                     required={true}
                 />
                 <CuadrosTexto
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Teléfono:"
                     tipoinput="number"
                     nombreinput="telefono"
@@ -414,7 +456,7 @@ export function Formulario({ setVista }) {
                     required={true}
                 />
                 <CuadrosTexto
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Correo Electrónico:"
                     tipoinput="email"
                     nombreinput="correo"
@@ -485,34 +527,50 @@ export function Formulario({ setVista }) {
             </div>
 
             {familiares.length > 0 && (
-                <div>
-                    <h5>Familiares Registrados:</h5>
-                    <table className="table table-bordered border-black">
-                        <thead className="table-primary border-black">
-                            <tr>
-                                <th>Tipo</th>
-                                <th>Nombre</th>
-                                <th>Edad</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {familiares.map((f, idx) => (
-                                <tr key={idx}>
-                                    <td>{f.tipoFamiliar}</td>
-                                    <td>{f.nombreFamiliar}</td>
-                                    <td>{f.edadFamiliar}</td>
-                                    <td><button
-                                        className="btn btn-outline-danger btn-sm"
-                                        onClick={() => eliminarFamiliarTabla(idx)}
-                                        title="Eliminar"
-                                    >
-                                        <i className="bi bi-trash"></i>
-                                    </button></td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                <div className="card shadow-sm border-0 mt-1">
+                    <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 className="mb-0">👨‍👩‍👧‍👦 Familiares Registrados</h5>
+                    </div>
+                    <div className="card-body p-0">
+                        <div className="table-responsive">
+                            <table className="table table-hover table-striped mb-0 align-middle w-100">
+                                <thead className="table-primary text-center">
+                                    <tr>
+                                        <th>Tipo</th>
+                                        <th>Nombre</th>
+                                        <th>Edad</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="text-center">
+                                    {familiares.length > 0 ? (
+                                        familiares.map((f, idx) => (
+                                            <tr key={idx}>
+                                                <td>{f.tipoFamiliar}</td>
+                                                <td>{f.nombreFamiliar}</td>
+                                                <td>{f.edadFamiliar}</td>
+                                                <td>
+                                                    <button
+                                                        className="btn btn-outline-danger btn-sm"
+                                                        onClick={() => eliminarFamiliarTabla(idx)}
+                                                        title="Eliminar"
+                                                    >
+                                                        <i className="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="4" className="text-muted py-3">
+                                                No hay familiares registrados
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             )}
 
@@ -579,34 +637,50 @@ export function Formulario({ setVista }) {
             </div>
 
             {cursos.length > 0 && (
-                <div>
-                    <h5>Cursos Registrados:</h5>
-                    <table className="table table-bordered border-black">
-                        <thead className="table-primary border-black">
-                            <tr>
-                                <th>Tipo de Curso</th>
-                                <th>Categoria</th>
-                                <th>Fecha del Curso</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {cursos.map((c, idx) => (
-                                <tr key={idx}>
-                                    <td>{c.tipoCurso}</td>
-                                    <td>{c.categoria}</td>
-                                    <td>{c.fechaCurso}</td>
-                                    <td><button
-                                        className="btn btn-outline-danger btn-sm"
-                                        onClick={() => eliminarCursoTabla(idx)}
-                                        title="Eliminar"
-                                    >
-                                        <i className="bi bi-trash"></i>
-                                    </button></td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                <div className="card shadow-sm border-0 mt-1">
+                    <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 className="mb-0">📘 Cursos Registrados</h5>
+                    </div>
+                    <div className="card-body p-0">
+                        <div className="table-responsive">
+                            <table className="table table-hover table-striped mb-0 align-middle w-100">
+                                <thead className="table-primary text-center">
+                                    <tr>
+                                        <th>Tipo de Curso</th>
+                                        <th>Categoría</th>
+                                        <th>Fecha del Curso</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="text-center">
+                                    {cursos.length > 0 ? (
+                                        cursos.map((c, idx) => (
+                                            <tr key={idx}>
+                                                <td>{c.tipoCurso}</td>
+                                                <td>{c.categoria}</td>
+                                                <td>{c.fechaCurso}</td>
+                                                <td>
+                                                    <button
+                                                        className="btn btn-outline-danger btn-sm"
+                                                        onClick={() => eliminarCursoTabla(idx)}
+                                                        title="Eliminar"
+                                                    >
+                                                        <i className="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="4" className="text-muted py-3">
+                                                No hay cursos registrados
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             )}
 
@@ -667,34 +741,50 @@ export function Formulario({ setVista }) {
             </div>
 
             {estudios.length > 0 && (
-                <div>
-                    <h5>Estudios Registrados:</h5>
-                    <table className="table table-bordered border-black">
-                        <thead className="table-primary border-black">
-                            <tr>
-                                <th>Tipo de Estudio</th>
-                                <th>Descripción (Título)</th>
-                                <th>Fecha de Realización</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {estudios.map((e, idx) => (
-                                <tr key={idx}>
-                                    <td>{e.tipoEstudio}</td>
-                                    <td>{e.nombreEstudio}</td>
-                                    <td>{e.fechaEstudio}</td>
-                                    <td><button
-                                        className="btn btn-outline-danger btn-sm"
-                                        onClick={() => eliminarEstudioTabla(idx)}
-                                        title="Eliminar"
-                                    >
-                                        <i className="bi bi-trash"></i>
-                                    </button></td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                <div className="card shadow-sm border-0 mt-1">
+                    <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 className="mb-0">🎓 Estudios Registrados</h5>
+                    </div>
+                    <div className="card-body p-0">
+                        <div className="table-responsive">
+                            <table className="table table-hover table-striped mb-0 align-middle w-100">
+                                <thead className="table-primary text-center">
+                                    <tr>
+                                        <th>Tipo de Estudio</th>
+                                        <th>Descripción (Título)</th>
+                                        <th>Fecha de Realización</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="text-center">
+                                    {estudios.length > 0 ? (
+                                        estudios.map((e, idx) => (
+                                            <tr key={idx}>
+                                                <td>{e.tipoEstudio}</td>
+                                                <td>{e.nombreEstudio}</td>
+                                                <td>{e.fechaEstudio}</td>
+                                                <td>
+                                                    <button
+                                                        className="btn btn-outline-danger btn-sm"
+                                                        onClick={() => eliminarEstudioTabla(idx)}
+                                                        title="Eliminar"
+                                                    >
+                                                        <i className="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="4" className="text-muted py-3">
+                                                No hay estudios registrados
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             )}
 
@@ -729,30 +819,46 @@ export function Formulario({ setVista }) {
             </div>
 
             {experienciasLaborales.length > 0 && (
-                <div>
-                    <h5>Experiencia Laboral Registradas:</h5>
-                    <table className="table table-bordered border-black">
-                        <thead className="table-primary border-black">
-                            <tr>
-                                <th>Descripción Experiencia Laboral</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {experienciasLaborales.map((ex, idx) => (
-                                <tr key={idx}>
-                                    <td>{ex.descripcionExperiencia}</td>
-                                    <td><button
-                                        className="btn btn-outline-danger btn-sm"
-                                        onClick={() => eliminarExperienciaLaboralTabla(idx)}
-                                        title="Eliminar"
-                                    >
-                                        <i className="bi bi-trash"></i>
-                                    </button></td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                <div className="card shadow-sm border-0 mt-1">
+                    <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 className="mb-0">💼 Experiencia Laboral Registradas</h5>
+                    </div>
+                    <div className="card-body p-0">
+                        <div className="table-responsive">
+                            <table className="table table-hover table-striped mb-0 align-middle w-100">
+                                <thead className="table-primary text-center">
+                                    <tr>
+                                        <th>Descripción Experiencia Laboral</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="text-center">
+                                    {experienciasLaborales.length > 0 ? (
+                                        experienciasLaborales.map((ex, idx) => (
+                                            <tr key={idx}>
+                                                <td>{ex.descripcionExperiencia}</td>
+                                                <td>
+                                                    <button
+                                                        className="btn btn-outline-danger btn-sm"
+                                                        onClick={() => eliminarExperienciaLaboralTabla(idx)}
+                                                        title="Eliminar"
+                                                    >
+                                                        <i className="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="2" className="text-muted py-3">
+                                                No hay experiencias laborales registradas
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             )}
 
@@ -814,35 +920,52 @@ export function Formulario({ setVista }) {
             </div>
 
             {afiliaciones.length > 0 && (
-                <div>
-                    <h4>Afiliaciones Registradas:</h4>
-                    <table className="table table-bordered border-black">
-                        <thead className="table-primary border-black">
-                            <tr>
-                                <th>Tipo de Afiliación</th>
-                                <th>Nombre de la Entidad</th>
-                                <th>Fecha de Afiliación</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {afiliaciones.map((af, idx) => (
-                                <tr key={idx}>
-                                    <td>{af.tipoAfiliacion}</td>
-                                    <td>{af.nombreEntidad}</td>
-                                    <td>{af.fechaAfiliacion}</td>
-                                    <td><button
-                                        className="btn btn-outline-danger btn-sm"
-                                        onClick={() => eliminarAfiliacionTabla(idx)}
-                                        title="Eliminar"
-                                    >
-                                        <i className="bi bi-trash"></i>
-                                    </button></td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                <div className="card shadow-sm border-0 mt-1">
+                    <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 className="mb-0">🏥 Afiliaciones Registradas</h5>
+                    </div>
+                    <div className="card-body p-0">
+                        <div className="table-responsive">
+                            <table className="table table-hover table-striped mb-0 align-middle w-100">
+                                <thead className="table-primary text-center">
+                                    <tr>
+                                        <th>Tipo de Afiliación</th>
+                                        <th>Nombre de la Entidad</th>
+                                        <th>Fecha de Afiliación</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="text-center">
+                                    {afiliaciones.length > 0 ? (
+                                        afiliaciones.map((af, idx) => (
+                                            <tr key={idx}>
+                                                <td>{af.tipoAfiliacion}</td>
+                                                <td>{af.nombreEntidad}</td>
+                                                <td>{af.fechaAfiliacion}</td>
+                                                <td>
+                                                    <button
+                                                        className="btn btn-outline-danger btn-sm"
+                                                        onClick={() => eliminarAfiliacionTabla(idx)}
+                                                        title="Eliminar"
+                                                    >
+                                                        <i className="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="4" className="text-muted py-3">
+                                                No hay afiliaciones registradas
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
+
             )}
 
             <h5 className='alinearTexto'>Documentos</h5>
@@ -902,34 +1025,181 @@ export function Formulario({ setVista }) {
             </div>
 
             {documentos.length > 0 && (
-                <div>
-                    <h4>Documentos Registrados:</h4>
-                    <table className="table table-bordered border-black">
-                        <thead className="table-primary border-black">
-                            <tr>
-                                <th>Tipo de Documento</th>
-                                <th>Descripción</th>
-                                <th>Fecha de Registro</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {documentos.map((d, idx) => (
-                                <tr key={idx}>
-                                    <td>{d.tipoDocumento}</td>
-                                    <td>{d.descripcionDocumento}</td>
-                                    <td>{d.fechaRegistro}</td>
-                                    <td><button
-                                        className="btn btn-outline-danger btn-sm"
-                                        onClick={() => eliminarDocumentoTabla(idx)}
-                                        title="Eliminar"
-                                    >
-                                        <i className="bi bi-trash"></i>
-                                    </button></td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                <div className="card shadow-sm border-0 mt-1">
+                    <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 className="mb-0">📂 Documentos Registrados</h5>
+                    </div>
+                    <div className="card-body p-0">
+                        <div className="table-responsive">
+                            <table className="table table-hover table-striped mb-0 align-middle">
+                                <thead className="table-primary text-center">
+                                    <tr>
+                                        <th>Tipo de Documento</th>
+                                        <th>Descripción</th>
+                                        <th>Fecha de Registro</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="text-center">
+                                    {documentos.length > 0 ? (
+                                        documentos.map((d, idx) => (
+                                            <tr key={idx}>
+                                                <td>{d.tipoDocumento}</td>
+                                                <td>{d.descripcionDocumento}</td>
+                                                <td>{d.fechaRegistro}</td>
+                                                <td>
+                                                    <button
+                                                        className="btn btn-outline-danger btn-sm"
+                                                        onClick={() => eliminarDocumentoTabla(idx)}
+                                                        title="Eliminar"
+                                                    >
+                                                        <i className="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="4" className="text-muted py-3">
+                                                No hay documentos registrados
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <h5 className='alinearTexto'>Vehículos</h5>
+
+            <div className='row align-items-center g-2'>
+                <CuadrosSelect
+                    tamanoinput="col-md-3"
+                    titulolabel="Tipo de Vehículo:"
+                    nombreinput="tipoVehiculo"
+                    idinput="tipoVehiculo"
+                    value={vehiculoActual.tipoVehiculo}
+                    onChange={(e) =>
+                        setVehiculoActual({ ...vehiculoActual, tipoVehiculo: e.target.value })
+                    }
+                    opciones={[
+                        { valor: "MOTO", texto: "MOTO" },
+                        { valor: "CARRO", texto: "CARRO" },
+                    ]}
+                />
+                <CuadrosTexto
+                    tamanoinput="col-md-3"
+                    titulolabel="Tecnomecánico:"
+                    tipoinput="date"
+                    nombreinput="tecnomecanico"
+                    idinput="tecnomecanico"
+                    value={vehiculoActual.tecnomecanico}
+                    onChange={(e) =>
+                        setVehiculoActual({ ...vehiculoActual, tecnomecanico: e.target.value })
+                    }
+                />
+
+            </div>
+
+            <div className='row align-items-center g-2'>
+                <CuadrosTexto
+                    tamanoinput="col-md-3"
+                    titulolabel="Soat:"
+                    tipoinput="date"
+                    nombreinput="soat"
+                    idinput="soat"
+                    value={vehiculoActual.soat}
+                    onChange={(e) =>
+                        setVehiculoActual({ ...vehiculoActual, soat: e.target.value })
+                    }
+                />
+                <CuadrosTexto
+                    tamanoinput="col-md-3"
+                    titulolabel="Licencia:"
+                    tipoinput="date"
+                    nombreinput="licencia"
+                    idinput="licencia"
+                    value={vehiculoActual.licencia}
+                    onChange={(e) =>
+                        setVehiculoActual({ ...vehiculoActual, licencia: e.target.value })
+                    }
+                />
+                <CuadrosTexto
+                    tamanoinput="col-md-3"
+                    titulolabel="Placa:"
+                    tipoinput="text"
+                    nombreinput="placa"
+                    idinput="placa"
+                    value={vehiculoActual.placa}
+                    onChange={(e) =>
+                        setVehiculoActual({ ...vehiculoActual, placa: e.target.value })
+                    }
+                />
+
+                <div className="col-md-2 d-flex align-items-end">
+                    <button
+                        type="button"
+                        className="btn btn-primary w-100"
+                        onClick={agregarVehiculo}
+                        style={{ marginBottom: "-22px" }}
+                    >
+                        Agregar Vehículo
+                    </button>
+                </div>
+            </div>
+
+            {vehiculos.length > 0 && (
+                <div className="card shadow-sm border-0 mt-1">
+                    <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 className="mb-0">📂 Vehículo Registrado</h5>
+                    </div>
+                    <div className="card-body p-0">
+                        <div className="table-responsive">
+                            <table className="table table-hover table-striped mb-0 align-middle">
+                                <thead className="table-primary text-center">
+                                    <tr>
+                                        <th>Tipo de Vehículo</th>
+                                        <th>Fecha Tecnomecánico</th>
+                                        <th>Fecha Soat</th>
+                                        <th>Fecha Licencia</th>
+                                        <th>Placa</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="text-center">
+                                    {vehiculos.length > 0 ? (
+                                        vehiculos.map((v, idx) => (
+                                            <tr key={idx}>
+                                                <td>{v.tipoVehiculo}</td>
+                                                <td>{v.tecnomecanico}</td>
+                                                <td>{v.soat}</td>
+                                                <td>{v.licencia}</td>
+                                                <td>{v.placa}</td>
+                                                <td>
+                                                    <button
+                                                        className="btn btn-outline-danger btn-sm"
+                                                        onClick={() => eliminarVehiculoTabla(idx)}
+                                                        title="Eliminar"
+                                                    >
+                                                        <i className="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="4" className="text-muted py-3">
+                                                No hay Vehículos registrados
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             )}
 
@@ -937,7 +1207,7 @@ export function Formulario({ setVista }) {
 
             <div className='row align-items-center g-2'>
                 <CuadrosSelect
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Tipo de Empleado:"
                     nombreinput="tipoEmpleado"
                     idinput="tipoEmpleado"
@@ -950,7 +1220,7 @@ export function Formulario({ setVista }) {
                     ]}
                 />
                 <CuadrosTexto
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Cargo a Desempeñar:"
                     tipoinput="text"
                     nombreinput="cargo"
@@ -961,7 +1231,7 @@ export function Formulario({ setVista }) {
                     required={true}
                 />
                 <CuadrosTexto
-                    tamanoinput="col-md-4"
+                    tamanoinput="col-md-3"
                     titulolabel="Fecha de Ingreso:"
                     tipoinput="date"
                     nombreinput="fechaIngreso"
@@ -982,6 +1252,7 @@ export function Formulario({ setVista }) {
                         experienciasLaborales,
                         afiliaciones,
                         documentos,
+                        vehiculos,
                         empleado,
                         limpiarFormulario)}
                     className=" btn btn-success me-2"

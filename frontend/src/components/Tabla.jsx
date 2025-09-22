@@ -896,7 +896,7 @@ ${tipoBusqueda === "sinContrato"
                                                                 setEmpleadoSeleccionado(emp);
                                                                 setMostrarModal(true);
                                                             }}
-                                                            className="btn btn-sm btn-outline-primary me-2"
+                                                            className="btn btn-sm btn-outline-primary me-0"
                                                             title="Editar"
                                                         >
                                                             <i className="bi bi-pencil-fill"></i>
@@ -912,6 +912,13 @@ ${tipoBusqueda === "sinContrato"
                                                         title="Ver contratos"
                                                     >
                                                         <i className="bi bi-eye-fill"></i>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => exportarEmpleadoIndividual(emp)}
+                                                        className="btn btn-sm btn-outline-success me-0"
+                                                        title="Exportar empleado"
+                                                    >
+                                                        <i className="bi bi-file-earmark-excel"></i>
                                                     </button>
                                                     {!mostrarInactivos && (
                                                         <button
@@ -942,14 +949,6 @@ ${tipoBusqueda === "sinContrato"
                                                             <i className="bi bi-trash-fill"></i>
                                                         </button>
                                                     )}
-
-                                                    <button
-                                                        onClick={() => exportarEmpleadoIndividual(emp)}
-                                                        className="btn btn-sm btn-outline-success ms-2"
-                                                        title="Exportar empleado"
-                                                    >
-                                                        <i className="bi bi-file-earmark-excel"></i>
-                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -972,7 +971,7 @@ ${tipoBusqueda === "sinContrato"
                                                             setEmpleadoSeleccionado(emp);
                                                             setMostrarModal(true);
                                                         }}
-                                                        className="btn btn-sm btn-outline-primary me-1"
+                                                        className="btn btn-sm btn-outline-primary me-0"
                                                         title="Editar"
                                                     >
                                                         <i className="bi bi-pencil-fill"></i>
@@ -992,7 +991,7 @@ ${tipoBusqueda === "sinContrato"
 
                                                     <button
                                                         onClick={() => exportarEmpleadoIndividual(emp)}
-                                                        className="btn btn-sm btn-outline-success ms-2"
+                                                        className="btn btn-sm btn-outline-success me-0"
                                                         title="Exportar empleado"
                                                     >
                                                         <i className="bi bi-file-earmark-excel"></i>
@@ -1034,7 +1033,6 @@ ${tipoBusqueda === "sinContrato"
                                 )}
                             </tbody>
                         </table>
-
                     </>
                 )}
             {tipoBusqueda !== "conContrato" &&

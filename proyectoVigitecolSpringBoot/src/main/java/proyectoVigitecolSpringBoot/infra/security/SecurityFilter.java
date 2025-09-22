@@ -1,4 +1,4 @@
-package proyectoVigitecolSpringBoot.infra.errores.security;
+package proyectoVigitecolSpringBoot.infra.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

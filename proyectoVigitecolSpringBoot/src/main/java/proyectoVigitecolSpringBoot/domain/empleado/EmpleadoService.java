@@ -646,4 +646,9 @@ public class EmpleadoService {
         );
     }
 
+    public Page<DatosEmpleadoConVehiculo> findConVehiculos(Pageable pageable) {
+        return empleadoRepository.findEmpleadosConVehiculos(pageable)
+                .map(DatosEmpleadoConVehiculo::new);
+    }
+
 }
