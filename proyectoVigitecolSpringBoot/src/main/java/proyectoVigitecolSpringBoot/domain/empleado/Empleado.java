@@ -37,6 +37,10 @@ public class Empleado {
     private String numeroDocumento;
     private LocalDate fechaNacimiento;
     private String lugarNacimiento;
+
+    @Enumerated(EnumType.STRING)
+    private TipoPoblacion tipoPoblacion;
+
     private String ciudadExpedicion;
     private int edad;
 
@@ -90,6 +94,7 @@ public class Empleado {
         this.numeroDocumento = datos.numeroDocumento();
         this.fechaNacimiento = datos.fechaNacimiento();
         this.lugarNacimiento = datos.lugarNacimiento();
+        this.tipoPoblacion = datos.tipoPoblacion();
         this.ciudadExpedicion = datos.ciudadExpedicion();
         this.edad = Period.between(this.fechaNacimiento, LocalDate.now()).getYears();
         this.libretaMilitar = datos.libretaMilitar();
@@ -161,6 +166,14 @@ public class Empleado {
 
     public void setLugarNacimiento(String lugarNacimiento) {
         this.lugarNacimiento = lugarNacimiento;
+    }
+
+    public TipoPoblacion getTipoPoblacion() {
+        return tipoPoblacion;
+    }
+
+    public void setTipoPoblacion(TipoPoblacion tipoPoblacion) {
+        this.tipoPoblacion = tipoPoblacion;
     }
 
     public String getCiudadExpedicion() {

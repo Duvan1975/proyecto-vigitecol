@@ -52,6 +52,7 @@ public class TratadorDeErrores {
                     "EstadoCivil",
                     "Genero",
                     "TipoDocumento",
+                    "TipoPoblacion",
                     "TipoEmpleado"
             );
 

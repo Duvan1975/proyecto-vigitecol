@@ -83,6 +83,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         numeroDocumento: "",
         fechaNacimiento: "",
         lugarNacimiento: "",
+        tipoPoblacion: "",
         ciudadExpedicion: "",
         libretaMilitar: "",
         estadoCivil: "",
@@ -517,7 +518,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
     const actualizarVehiculo = (vehiculo) => {
 
-        authFetch("http://localhost:8080/vehiculo", {
+        authFetch("http://localhost:8080/vehiculos", {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -1284,7 +1285,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             </select>
                         </div>
                         <div className="col-md-4">
-                            <label htmlFor="tipoDocumento"><strong>Libreta Militar:</strong></label>
+                            <label htmlFor=""><strong>Libreta Militar:</strong></label>
                             <select
                                 name="libretaMilitar"
                                 value={formulario.libretaMilitar}
@@ -1300,7 +1301,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
                     <div className="row">
                         <div className="col-md-4">
-                            <label htmlFor="tipoDocumento"><strong>Estado Civil:</strong></label>
+                            <label htmlFor=""><strong>Estado Civil:</strong></label>
                             <select
                                 name="estadoCivil"
                                 value={formulario.estadoCivil}
@@ -1368,6 +1369,24 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                 placeholder="Cargo"
                                 className="form-control mb-2"
                             />
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-md-4">
+                            <label htmlFor=""> <strong>Tipo de Población:</strong></label>
+                            <select
+                                name="tipoPoblacion"
+                                value={formulario.tipoPoblacion}
+                                onChange={handleChange}
+                                className="form-control mb-2"
+                            >
+                                <option value="AFRODESCENDIENTE">AFRODESCENDIENTE</option>
+                                <option value="RAIZAL">RAIZAL</option>
+                                <option value="INDIGENA">INDÍGENA</option>
+                                <option value="GITANO">GITANO</option>
+                                <option value="PALENQUERO">PALENQUERO</option>
+                                <option value="NO_APLICA">NO APLICA</option>
+                            </select>
                         </div>
                     </div>
                     <div>
@@ -1948,9 +1967,12 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     }
                                                 >
                                                     <option value="">Seleccione</option>
-                                                    <option value="PASADO_JUDICIAL">PASADO JUDICIAL</option>
-                                                    <option value="ANTECEDENTES_PENALES">ANTECENDENTES PENALES</option>
-                                                    <option value="OTRO">OTRO</option>
+                                                    <option value="JUDICIALES">JUDICIALES</option>
+                                                    <option value="PROCURADURIA">PROCURADURIA</option>
+                                                    <option value="CONTRALORIA">CONTRALORIA</option>
+                                                    <option value="MEDIDAS_CORRECTIVAS">MEDIDAS CORRECTIVAS</option>
+                                                    <option value="INHABILIDADES">INHABILIDADES</option>
+                                                    <option value="LISTA_CLINTON">LISTA CLINTON</option>
                                                 </select>
                                             </td>
                                             <td>
@@ -1993,9 +2015,12 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     onChange={(e) => handleDocumentoChange(idx, "tipoDocumento", e.target.value)}
                                                 >
                                                     <option value="">Seleccione</option>
-                                                    <option value="PASADO_JUDICIAL">PASADO JUDICIAL</option>
-                                                    <option value="ANTECEDENTES_PENALES">ANTECEDENTES PENALES</option>
-                                                    <option value="OTRO">OTRO</option>
+                                                    <option value="JUDICIALES">JUDICIALES</option>
+                                                    <option value="PROCURADURIA">PROCURADURIA</option>
+                                                    <option value="CONTRALORIA">CONTRALORIA</option>
+                                                    <option value="MEDIDAS_CORRECTIVAS">MEDIDAS CORRECTIVAS</option>
+                                                    <option value="INHABILIDADES">INHABILIDADES</option>
+                                                    <option value="LISTA_CLINTON">LISTA CLINTON</option>
                                                 </select>
                                             </td>
                                             <td>

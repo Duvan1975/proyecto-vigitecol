@@ -28,11 +28,6 @@ public class OtroDocumentoController {
         return ResponseEntity.ok(listaDatos);
     }
 
-    /*@GetMapping
-    public List<OtroDocumento> listadoDocumentos() {
-        return otroDocumentoService.listarDocumentos();
-    }*/
-
     @GetMapping
     public ResponseEntity<Page<DatosListadoOtroDocumento>> listadoDocumentos(
             @PageableDefault(size = 10) Pageable paginacion) {

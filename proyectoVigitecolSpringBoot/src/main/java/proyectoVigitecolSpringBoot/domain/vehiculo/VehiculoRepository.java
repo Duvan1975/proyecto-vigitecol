@@ -20,4 +20,6 @@ public interface VehiculoRepository extends JpaRepository<Vehiculo, Long> {
             AND c.continua = true
             """)
     List<Vehiculo> findVehiculoByEmpleadoActivo(Long empleadoId);
+
+    List<Vehiculo> findByEmpleadoId(Long id);
 }

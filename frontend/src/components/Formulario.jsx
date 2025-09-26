@@ -12,6 +12,7 @@ export function Formulario({ setVista }) {
         numeroDocumento: "",
         fechaNacimiento: "",
         lugarNacimiento: "",
+        tipoPoblacion: "",
         ciudadExpedicion: "",
         libretaMilitar: "",
         estadoCivil: "",
@@ -195,6 +196,7 @@ export function Formulario({ setVista }) {
             numeroDocumento: "",
             fechaNacimiento: "",
             lugarNacimiento: "",
+            tipoPoblacion: "",
             ciudadExpedicion: "",
             libretaMilitar: "",
             estadoCivil: "",
@@ -381,6 +383,23 @@ export function Formulario({ setVista }) {
                     value={empleado.lugarNacimiento}
                     onChange={(e) => setEmpleado({ ...empleado, lugarNacimiento: e.target.value })}
                     required={true}
+                />
+                <CuadrosSelect
+                    tamanoinput="col-md-3"
+                    titulolabel="Tipo de Población:"
+                    nombreinput="tipoPoblacion"
+                    idinput="tipoPoblacion"
+                    value={empleado.tipoPoblacion}
+                    onChange={(e) => setEmpleado({ ...empleado, tipoPoblacion: e.target.value })}
+                    required={true}
+                    opciones={[
+                        { valor: "AFRODESCENDIENTE", texto: "AFRODESCENDIENTE" },
+                        { valor: "RAIZAL", texto: "RAIZAL" },
+                        { valor: "INDIGENA", texto: "INDÍGENA" },
+                        { valor: "GITANO", texto: "GITANO" },
+                        { valor: "PALENQUERO", texto: "PALENQUERO" },
+                        { valor: "NO_APLICA", texto: "NO APLICA" },
+                    ]}
                 />
             </div>
 
@@ -981,9 +1000,12 @@ export function Formulario({ setVista }) {
                         setDocumentoActual({ ...documentoActual, tipoDocumento: e.target.value })
                     }
                     opciones={[
-                        { valor: "PASADO_JUDICIAL", texto: "PASADO JUDICIAL" },
-                        { valor: "ANTECEDENTES_PENALES", texto: "ANTECEDENTES PENALES" },
-                        { valor: "OTRO", texto: "OTRO" },
+                        { valor: "JUDICIALES", texto: "JUDICIALES" },
+                        { valor: "PROCURADURIA", texto: "PROCURADURIA" },
+                        { valor: "CONTRALORIA", texto: "CONTRALORIA" },
+                        { valor: "MEDIDAS_CORRECTIVAS", texto: "MEDIDAS CORRECTIVAS" },
+                        { valor: "INHABILIDADES", texto: "INHABILIDADES" },
+                        { valor: "LISTA_CLINTON", texto: "LISTA CLINTON" },
                     ]}
                 />
                 <CuadrosTexto

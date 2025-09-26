@@ -14,7 +14,8 @@ const ExportModal = ({
         tipoDocumento: true,
         numeroDocumento: true,
         fechaNacimiento: true,
-        lugarNacimiento: true,
+        lugarNacimiento: true, 
+        tipoPoblacion: true, 
         ciudadExpedicion: true,
         edad: true,
         libretaMilitar: true,
@@ -46,6 +47,7 @@ const ExportModal = ({
                 if (columnasSeleccionadas.numeroDocumento) filtrado["Documento"] = emp.numeroDocumento || "";
                 if (columnasSeleccionadas.fechaNacimiento) filtrado["Fecha de Nacimiento"] = emp.fechaNacimiento || "";
                 if (columnasSeleccionadas.lugarNacimiento) filtrado["Lugar de Nacimiento"] = emp.lugarNacimiento || "";
+                if (columnasSeleccionadas.tipoPoblacion) filtrado["Tipo de Población"] = emp.tipoPoblacion || "";
                 if (columnasSeleccionadas.ciudadExpedicion) filtrado["Ciudad de Expedición"] = emp.ciudadExpedicion || "";
                 if (columnasSeleccionadas.edad) filtrado["Edad"] = emp.edad || "";
                 if (columnasSeleccionadas.libretaMilitar) filtrado["Libreta Militar"] = emp.libretaMilitar || "";

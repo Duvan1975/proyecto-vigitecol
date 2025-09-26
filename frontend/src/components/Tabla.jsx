@@ -560,6 +560,18 @@ export function Tabla({
                 autoWidth(hojaDocumentos, documentosLimpios);
                 XLSX.utils.book_append_sheet(wb, hojaDocumentos, "Documentos");
             }
+            if (datos.vehiculo?.length > 0) {
+                const vehiculosLimpios = datos.vehiculo.map(v => ({
+                    "Tipo de Vehículo": v.tipoVehiculo,
+                    "Tecnomecánico": v.tecnomecanico,
+                    "Soat": v.soat,
+                    "Licencia": v.licencia,
+                    "Placa": v.placa
+                }));
+                const hojaVehiculos = XLSX.utils.json_to_sheet(vehiculosLimpios);
+                autoWidth(hojaVehiculos, vehiculosLimpios);
+                XLSX.utils.book_append_sheet(wb, hojaVehiculos, "Vehiculos");
+            }
 
             XLSX.writeFile(wb, `Empleado_${emp.nombres}_${emp.apellidos}.xlsx`);
         } catch (error) {

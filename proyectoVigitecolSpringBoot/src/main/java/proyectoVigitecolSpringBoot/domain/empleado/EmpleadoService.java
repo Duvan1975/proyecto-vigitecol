@@ -25,6 +25,8 @@ import proyectoVigitecolSpringBoot.domain.familia.DatosListadoFamiliar;
 import proyectoVigitecolSpringBoot.domain.familia.FamiliarRepository;
 import proyectoVigitecolSpringBoot.domain.otroDocumento.DatosListadoOtroDocumento;
 import proyectoVigitecolSpringBoot.domain.otroDocumento.OtroDocumentoRepository;
+import proyectoVigitecolSpringBoot.domain.vehiculo.DatosListadoVehiculo;
+import proyectoVigitecolSpringBoot.domain.vehiculo.VehiculoRepository;
 
 import java.text.Normalizer;
 import java.time.LocalDate;
@@ -40,13 +42,13 @@ public class EmpleadoService {
     ContratoRepository contratoRepository;
 
     private final EmpleadoRepository empleadoRepository;
-    //private final ContratoRepository contratoRepository;
     private final FamiliarRepository familiarRepository;
     private final CursoRepository cursoRepository;
     private final EstudioRepository estudioRepository;
     private final ExperienciaLaboralRepository experienciaLaboralRepository;
     private final AfiliacionRepository afiliacionRepository;
     private final OtroDocumentoRepository otroDocumentoRepository;
+    private final VehiculoRepository vehiculoRepository;
 
     public EmpleadoService(EmpleadoRepository empleadoRepository,
                            FamiliarRepository familiarRepository,
@@ -54,7 +56,7 @@ public class EmpleadoService {
                            EstudioRepository estudioRepository,
                            ExperienciaLaboralRepository experienciaLaboralRepository,
                            AfiliacionRepository afiliacionRepository,
-                           OtroDocumentoRepository otroDocumentoRepository)
+                           OtroDocumentoRepository otroDocumentoRepository, VehiculoRepository vehiculoRepository)
     {
         this.empleadoRepository = empleadoRepository;
         this.familiarRepository = familiarRepository;
@@ -63,9 +65,8 @@ public class EmpleadoService {
         this.experienciaLaboralRepository = experienciaLaboralRepository;
         this.afiliacionRepository = afiliacionRepository;
         this.otroDocumentoRepository = otroDocumentoRepository;
+        this.vehiculoRepository = vehiculoRepository;
     }
-
-
 
     public ResponseEntity<DatosRespuestaEmpleado> registrarEmpleado(
             DatosRegistroEmpleado datos, UriComponentsBuilder uriComponentsBuilder) {
@@ -138,6 +139,9 @@ public class EmpleadoService {
         }
         if (datos.lugarNacimiento() != null && !datos.lugarNacimiento().isBlank()) {
             empleado.setLugarNacimiento(datos.lugarNacimiento());
+        }
+        if (datos.tipoPoblacion() != null && !datos.tipoPoblacion().toString().isBlank()) {
+            empleado.setTipoPoblacion(datos.tipoPoblacion());
         }
         if (datos.ciudadExpedicion() != null && !datos.ciudadExpedicion().isBlank()) {
             empleado.setCiudadExpedicion(datos.ciudadExpedicion());
@@ -214,6 +218,7 @@ public class EmpleadoService {
                 empleado.getNumeroDocumento(),
                 empleado.getFechaNacimiento(),
                 empleado.getLugarNacimiento(),
+                empleado.getTipoPoblacion(),
                 empleado.getCiudadExpedicion(),
                 empleado.getEdad(),
                 empleado.getLibretaMilitar(),
@@ -240,6 +245,7 @@ public class EmpleadoService {
                 empleado.getNumeroDocumento(),
                 empleado.getFechaNacimiento(),
                 empleado.getLugarNacimiento(),
+                empleado.getTipoPoblacion(),
                 empleado.getCiudadExpedicion(),
                 empleado.getEdad(),
                 empleado.getLibretaMilitar(),
@@ -286,6 +292,7 @@ public class EmpleadoService {
                         empleado.getNumeroDocumento(),
                         empleado.getFechaNacimiento(),
                         empleado.getLugarNacimiento(),
+                        empleado.getTipoPoblacion(),
                         empleado.getCiudadExpedicion(),
                         empleado.getEdad(),
                         empleado.getLibretaMilitar(),
@@ -318,6 +325,7 @@ public class EmpleadoService {
                         empleado.getNumeroDocumento(),
                         empleado.getFechaNacimiento(),
                         empleado.getLugarNacimiento(),
+                        empleado.getTipoPoblacion(),
                         empleado.getCiudadExpedicion(),
                         empleado.getEdad(),
                         empleado.getLibretaMilitar(),
@@ -357,6 +365,7 @@ public class EmpleadoService {
                         empleado.getNumeroDocumento(),
                         empleado.getFechaNacimiento(),
                         empleado.getLugarNacimiento(),
+                        empleado.getTipoPoblacion(),
                         empleado.getCiudadExpedicion(),
                         empleado.getEdad(),
                         empleado.getLibretaMilitar(),
@@ -389,6 +398,7 @@ public class EmpleadoService {
                         empleado.getNumeroDocumento(),
                         empleado.getFechaNacimiento(),
                         empleado.getLugarNacimiento(),
+                        empleado.getTipoPoblacion(),
                         empleado.getCiudadExpedicion(),
                         empleado.getEdad(),
                         empleado.getLibretaMilitar(),
@@ -598,6 +608,11 @@ public class EmpleadoService {
                 .map(DatosEmpleadoConDocumentos::new);
     }
 
+    public Page<DatosEmpleadoConVehiculo> findConVehiculos(Pageable pageable) {
+        return empleadoRepository.findEmpleadosConVehiculos(pageable)
+                .map(DatosEmpleadoConVehiculo::new);
+    }
+
     public ResponseEntity<List<DatosListadoEmpleado>> obtenerTodosActivos() {
         // Obtener todos sin paginación
         List<Empleado> empleados = contratoRepository.findEmpleadosConContratoActivoList();
@@ -634,6 +649,9 @@ public class EmpleadoService {
         List<DatosListadoOtroDocumento> documentos = otroDocumentoRepository.findByEmpleadoId(id)
                 .stream().map(DatosListadoOtroDocumento::new).toList();
 
+        List<DatosListadoVehiculo> vehiculos = vehiculoRepository.findByEmpleadoId(id)
+                .stream().map(DatosListadoVehiculo::new).toList();
+
         return new DatosEmpleadoCompletoDTO(
                 empleadoDTO,
                 contratos,
@@ -642,13 +660,8 @@ public class EmpleadoService {
                 estudios,
                 experiencias,
                 afiliaciones,
-                documentos
+                documentos,
+                vehiculos
         );
     }
-
-    public Page<DatosEmpleadoConVehiculo> findConVehiculos(Pageable pageable) {
-        return empleadoRepository.findEmpleadosConVehiculos(pageable)
-                .map(DatosEmpleadoConVehiculo::new);
-    }
-
 }

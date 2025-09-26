@@ -27,6 +27,7 @@ public record DatosActualizarEmpleado(
         String numeroDocumento,
         LocalDate fechaNacimiento,
         String lugarNacimiento,
+        TipoPoblacion tipoPoblacion,
         String ciudadExpedicion,
         int edad,
         LibretaMilitar libretaMilitar,

@@ -30,6 +30,8 @@ public record DatosRegistroEmpleado(
         LocalDate fechaNacimiento,
         @NotBlank(message = "Debe ingresar el lugar de nacimiento")
         String lugarNacimiento,
+        @NotNull(message = "Debe seleccionar el tipo de población")
+        TipoPoblacion tipoPoblacion,
         @NotBlank(message = "Debe ingresar la ciudad de expedición")
         String ciudadExpedicion,
         int edad,
