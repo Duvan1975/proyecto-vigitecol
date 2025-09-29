@@ -1,7 +1,6 @@
 package proyectoVigitecolSpringBoot.domain.empleado;
 
 import proyectoVigitecolSpringBoot.domain.afiliacion.Afiliacion;
-import proyectoVigitecolSpringBoot.domain.afiliacion.TipoAfiliacion;
 
 import java.time.LocalDate;
 

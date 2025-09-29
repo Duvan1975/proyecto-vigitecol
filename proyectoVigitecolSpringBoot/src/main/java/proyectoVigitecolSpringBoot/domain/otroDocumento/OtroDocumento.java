@@ -13,7 +13,7 @@ public class OtroDocumento {
     private Long documentoId;
 
     @Enumerated(EnumType.STRING)
-    private tipoOtroDocumento tipoOtroDocumento;
+    private TipoOtroDocumento tipoOtroDocumento;
 
     private String descripcionDocumento;
 
@@ -40,11 +40,11 @@ public class OtroDocumento {
         this.documentoId = documentoId;
     }
 
-    public tipoOtroDocumento getTipoOtroDocumento() {
+    public TipoOtroDocumento getTipoOtroDocumento() {
         return tipoOtroDocumento;
     }
 
-    public void setTipoOtroDocumento(tipoOtroDocumento tipoOtroDocumento) {
+    public void setTipoOtroDocumento(TipoOtroDocumento tipoOtroDocumento) {
         this.tipoOtroDocumento = tipoOtroDocumento;
     }
 

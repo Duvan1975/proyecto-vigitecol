@@ -1884,6 +1884,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     <option value="SALUD">SALUD</option>
                                                     <option value="PENSION">PENSIÓN</option>
                                                     <option value="ARL">ARL</option>
+                                                    <option value="CONFA">CONFA</option>
                                                 </select>
                                             </td>
                                             <td>
@@ -1929,6 +1930,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     <option value="SALUD">SALUD</option>
                                                     <option value="PENSION">PENSIÓN</option>
                                                     <option value="ARL">ARL</option>
+                                                    <option value="CONFA">CONFA</option>
                                                 </select>
                                             </td>
                                             <td>
@@ -1992,9 +1994,9 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                             <td>
                                                 <select
                                                     className="form-select"
-                                                    value={nuevoDocumento.tipoDocumento}
+                                                    value={nuevoDocumento.tipoOtroDocumento}
                                                     onChange={(e) =>
-                                                        setNuevoDocumento({ ...nuevoDocumento, tipoDocumento: e.target.value })
+                                                        setNuevoDocumento({ ...nuevoDocumento, tipoOtroDocumento: e.target.value })
                                                     }
                                                 >
                                                     <option value="">Seleccione</option>

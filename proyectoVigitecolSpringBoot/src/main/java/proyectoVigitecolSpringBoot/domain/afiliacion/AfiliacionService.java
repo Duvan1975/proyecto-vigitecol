@@ -20,13 +20,6 @@ public class AfiliacionService {
     @Autowired
     private AfiliacionRepository afiliacionRepository;
 
-    /*public void registrarAfiliacion(Long empleadoId, DatosRegistroAfiliacion datos) {
-        var empleado = empleadoRepository.findById(empleadoId)
-                .orElseThrow(()-> new RuntimeException("Empleado NO encontrado"));
-        var afiliacion = new Afiliacion(datos, empleado);
-        afiliacionRepository.save(afiliacion);
-    }*/
-
     public void registrarAfiliacion(Long empleadoId, List<DatosRegistroAfiliacion> listaDatos) {
         var empleado = empleadoRepository.findById(empleadoId)
                 .orElseThrow(() -> new RuntimeException("Empleado NO encontrado"));

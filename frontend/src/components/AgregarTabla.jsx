@@ -45,7 +45,7 @@ export async function AgregarTabla(
         const empleadoData = await responseEmpleado.json();
         const empleadoId = empleadoData.id || empleadoData.Id;
 
-        // 2. Enviar todos los familiares juntos
+        //Enviar todos los familiares juntos
         const familiaresLimpios = familiares.filter(f =>
             f.tipoFamiliar && f.nombreFamiliar && f.edadFamiliar)
             .map((f) => ({
@@ -71,12 +71,12 @@ export async function AgregarTabla(
 
         //Enviamos todos los datos de los cursos juntos
         const cursosLimpios = cursos.filter(c =>
-            c.tipoCurso && c.categoria && c.fechaCurso && c.funcionEspecifica
+            c.tipoCurso && c.categoria && c.fechaCurso
         ).map((c) => ({
             tipoCurso: c.tipoCurso,
             categoria: c.categoria,
             fechaCurso: c.fechaCurso,
-            funcionEspecifica: c.funcionEspecifica
+            funcionEspecifica: c.funcionEspecifica || null
         }));
 
         if (cursosLimpios.length > 0) {
@@ -96,10 +96,10 @@ export async function AgregarTabla(
 
         //Enviamos todos los estudios juntos
         const estudiosLimpios = estudios.filter(e =>
-            e.tipoEstudio && e.nombreEstudio && e.fechaEstudio
+            e.tipoEstudio && e.fechaEstudio
         ).map((e) => ({
             tipoEstudio: e.tipoEstudio,
-            nombreEstudio: e.nombreEstudio,
+            nombreEstudio: e.nombreEstudio || null,
             fechaEstudio: e.fechaEstudio
         }));
 
@@ -166,11 +166,11 @@ export async function AgregarTabla(
 
         //Enviamos todos los documentos juntos
         const documentosLimpios = documentos.filter(d =>
-            d.tipoOtroDocumento && d.descripcionDocumento && d.fechaRegistro
+            d.tipoOtroDocumento && d.fechaRegistro
         ).map((d) => ({
             tipoOtroDocumento: d.tipoOtroDocumento,
             fechaRegistro: d.fechaRegistro, 
-            descripcionDocumento: d.descripcionDocumento
+            descripcionDocumento: d.descripcionDocumento || null
         }));
 
         if (documentosLimpios.length > 0) {

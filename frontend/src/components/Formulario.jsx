@@ -914,7 +914,8 @@ export function Formulario({ setVista }) {
                     opciones={[
                         { valor: "SALUD", texto: "SALUD" },
                         { valor: "PENSION", texto: "PENSIÓN" },
-                        { valor: "ARL", texto: "ARL" },
+                        { valor: "ARL", texto: "ARL" }, 
+                        { valor: "CONFA", texto: "CONFA" }, 
                     ]}
                 />
                 <CuadrosTexto
@@ -1002,7 +1003,6 @@ export function Formulario({ setVista }) {
                         </div>
                     </div>
                 </div>
-
             )}
 
             <h5 className='alinearTexto'>Documentos</h5>
