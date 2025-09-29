@@ -1,6 +1,6 @@
 package proyectoVigitecolSpringBoot.domain.otroDocumento;
 
-public enum TipoDocumento {
+public enum tipoOtroDocumento {
     JUDICIALES,
     PROCURADURIA,
     CONTRALORIA,

@@ -13,7 +13,7 @@ public class OtroDocumento {
     private Long documentoId;
 
     @Enumerated(EnumType.STRING)
-    private TipoDocumento tipoDocumento;
+    private tipoOtroDocumento tipoOtroDocumento;
 
     private String descripcionDocumento;
 
@@ -24,7 +24,7 @@ public class OtroDocumento {
     private Empleado empleado;
 
     public OtroDocumento(DatosRegistroOtroDocumento datos, Empleado empleado) {
-        this.tipoDocumento = datos.tipoDocumento();
+        this.tipoOtroDocumento = datos.tipoOtroDocumento();
         this.descripcionDocumento = datos.descripcionDocumento();
         this.fechaRegistro = datos.fechaRegistro();
         this.empleado = empleado;
@@ -40,12 +40,12 @@ public class OtroDocumento {
         this.documentoId = documentoId;
     }
 
-    public TipoDocumento getTipoDocumento() {
-        return tipoDocumento;
+    public tipoOtroDocumento getTipoOtroDocumento() {
+        return tipoOtroDocumento;
     }
 
-    public void setTipoDocumento(TipoDocumento tipoDocumento) {
-        this.tipoDocumento = tipoDocumento;
+    public void setTipoOtroDocumento(tipoOtroDocumento tipoOtroDocumento) {
+        this.tipoOtroDocumento = tipoOtroDocumento;
     }
 
     public String getDescripcionDocumento() {
@@ -73,8 +73,8 @@ public class OtroDocumento {
     }
 
     public void actualizarDatos(DatosActualizarDocumento datos) {
-        if (datos.tipoDocumento() != null) {
-            this.tipoDocumento = datos.tipoDocumento();
+        if (datos.tipoOtroDocumento() != null) {
+            this.tipoOtroDocumento = datos.tipoOtroDocumento();
         }
         if (datos.descripcionDocumento() != null) {
             this.descripcionDocumento = datos.descripcionDocumento();

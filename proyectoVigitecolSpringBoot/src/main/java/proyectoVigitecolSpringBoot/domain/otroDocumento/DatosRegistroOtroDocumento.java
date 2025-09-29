@@ -3,7 +3,7 @@ package proyectoVigitecolSpringBoot.domain.otroDocumento;
 import java.time.LocalDate;
 
 public record DatosRegistroOtroDocumento(
-        TipoDocumento tipoDocumento,
+        tipoOtroDocumento tipoOtroDocumento,
         String descripcionDocumento,
         LocalDate fechaRegistro
 ) {

@@ -56,7 +56,7 @@ public class OtroDocumentoService {
 
         return new DatosRespuestaDocumento(
                 documento.getDocumentoId(),
-                documento.getTipoDocumento(),
+                documento.getTipoOtroDocumento(),
                 documento.getDescripcionDocumento(),
                 documento.getFechaRegistro()
         );

@@ -19,6 +19,7 @@ public class Curso {
     private Categoria categoria;
 
     private LocalDate fechaCurso;
+    private String funcionEspecifica;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "empleado_id")
@@ -28,6 +29,7 @@ public class Curso {
         this.tipoCurso = datos.tipoCurso();
         this.categoria = datos.categoria();
         this.fechaCurso = datos.fechaCurso();
+        this.funcionEspecifica = datos.funcionEspecifica();
         this.empleado = empleado;
     }
 
@@ -63,6 +65,14 @@ public class Curso {
         this.fechaCurso = fechaCurso;
     }
 
+    public String getFuncionEspecifica() {
+        return funcionEspecifica;
+    }
+
+    public void setFuncionEspecifica(String funcionEspecifica) {
+        this.funcionEspecifica = funcionEspecifica;
+    }
+
     public Empleado getEmpleado() {
         return empleado;
     }
@@ -82,6 +92,9 @@ public class Curso {
         }
         if (datos.fechaCurso() != null) {
             this.fechaCurso = datos.fechaCurso();
+        }
+        if (datos.funcionEspecifica() != null) {
+            this.funcionEspecifica = datos.funcionEspecifica();
         }
     }
 }

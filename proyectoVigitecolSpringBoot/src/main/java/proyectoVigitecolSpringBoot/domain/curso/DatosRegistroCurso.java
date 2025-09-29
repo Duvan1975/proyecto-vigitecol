@@ -7,7 +7,10 @@ import java.time.LocalDate;
 public record DatosRegistroCurso(
         TipoCurso tipoCurso,
         Categoria categoria,
+
         @NotNull
-        LocalDate fechaCurso
+        LocalDate fechaCurso,
+
+        String funcionEspecifica
 ) {
 }

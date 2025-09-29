@@ -37,7 +37,8 @@ export function Formulario({ setVista }) {
     const [cursoActual, setCursoActual] = useState({
         tipoCurso: "",
         categoria: "",
-        fechaCurso: ""
+        fechaCurso: "",
+        funcionEspecifica: ""
     });
 
     //Estados para registrar Estudios
@@ -65,7 +66,7 @@ export function Formulario({ setVista }) {
     //Estados para registrar Documentos
     const [documentos, setDocumentos] = useState([]);
     const [documentoActual, setDocumentoActual] = useState({
-        tipoDocumento: "",
+        tipoOtroDocumento: "",
         descripcionDocumento: "",
         fechaRegistro: ""
     });
@@ -111,7 +112,8 @@ export function Formulario({ setVista }) {
             setCursoActual({
                 tipoCurso: "",
                 categoria: "",
-                fechaCurso: ""
+                fechaCurso: "",
+                funcionEspecifica: ""
             });
         }
     };
@@ -157,14 +159,14 @@ export function Formulario({ setVista }) {
 
     const agregarDocumento = () => {
         if (
-            documentoActual.tipoDocumento &&
+            documentoActual.tipoOtroDocumento &&
             documentoActual.fechaRegistro
         ) {
             setDocumentos([...documentos, { ...documentoActual }]);
             setDocumentoActual({
-                tipoDocumento: "",
-                descripcionDocumento: "",
-                fechaRegistro: ""
+                tipoOtroDocumento: "",
+                fechaRegistro: "",
+                descripcionDocumento: ""
             });
         }
     };
@@ -220,7 +222,8 @@ export function Formulario({ setVista }) {
         setCursoActual({
             tipoCurso: "",
             categoria: "",
-            fechaCurso: ""
+            fechaCurso: "",
+            funcionEspecifica: ""
         });
         setCursos([]);
 
@@ -244,7 +247,7 @@ export function Formulario({ setVista }) {
         setAfiliaciones([]);
 
         setDocumentoActual({
-            tipoDocumento: "",
+            tipoOtroDocumento: "",
             descripcionDocumento: "",
             fechaRegistro: ""
         });
@@ -654,6 +657,19 @@ export function Formulario({ setVista }) {
                     </button>
                 </div>
             </div>
+            <div className='row align-items-center g-2'>
+                <CuadrosTexto
+                    tamanoinput="col-md-3"
+                    titulolabel="Función Específica (Opcional):"
+                    tipoinput="text"
+                    nombreinput="funcionEspecifica"
+                    idinput="funcionEspecifica"
+                    value={cursoActual.funcionEspecifica}
+                    onChange={(e) =>
+                        setCursoActual({ ...cursoActual, funcionEspecifica: e.target.value })
+                    }
+                />
+            </div>
 
             {cursos.length > 0 && (
                 <div className="card shadow-sm border-0 mt-1">
@@ -668,6 +684,7 @@ export function Formulario({ setVista }) {
                                         <th>Tipo de Curso</th>
                                         <th>Categoría</th>
                                         <th>Fecha del Curso</th>
+                                        <th>Función Específica</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -678,6 +695,7 @@ export function Formulario({ setVista }) {
                                                 <td>{c.tipoCurso}</td>
                                                 <td>{c.categoria}</td>
                                                 <td>{c.fechaCurso}</td>
+                                                <td>{c.funcionEspecifica}</td>
                                                 <td>
                                                     <button
                                                         className="btn btn-outline-danger btn-sm"
@@ -993,11 +1011,11 @@ export function Formulario({ setVista }) {
                 <CuadrosSelect
                     tamanoinput="col-md-3"
                     titulolabel="Tipo de Documento:"
-                    nombreinput="tipoDocumento"
-                    idinput="tipoDocumento"
-                    value={documentoActual.tipoDocumento}
+                    nombreinput="tipoOtroDocumento"
+                    idinput="tipoOtroDocumento"
+                    value={documentoActual.tipoOtroDocumento}
                     onChange={(e) =>
-                        setDocumentoActual({ ...documentoActual, tipoDocumento: e.target.value })
+                        setDocumentoActual({ ...documentoActual, tipoOtroDocumento: e.target.value })
                     }
                     opciones={[
                         { valor: "JUDICIALES", texto: "JUDICIALES" },
@@ -1036,7 +1054,7 @@ export function Formulario({ setVista }) {
                         className="btn btn-primary w-100"
                         onClick={agregarDocumento}
                         disabled={
-                            !documentoActual.tipoDocumento ||
+                            !documentoActual.tipoOtroDocumento ||
                             !documentoActual.fechaRegistro
                         }
                         style={{ marginBottom: "-22px" }}
@@ -1066,7 +1084,7 @@ export function Formulario({ setVista }) {
                                     {documentos.length > 0 ? (
                                         documentos.map((d, idx) => (
                                             <tr key={idx}>
-                                                <td>{d.tipoDocumento}</td>
+                                                <td>{d.tipoOtroDocumento}</td>
                                                 <td>{d.descripcionDocumento}</td>
                                                 <td>{d.fechaRegistro}</td>
                                                 <td>

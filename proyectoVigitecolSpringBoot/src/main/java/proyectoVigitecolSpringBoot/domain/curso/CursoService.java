@@ -57,7 +57,8 @@ public class CursoService {
                 curso.getCursoId(),
                 curso.getTipoCurso(),
                 curso.getCategoria(),
-                curso.getFechaCurso()
+                curso.getFechaCurso(),
+                curso.getFuncionEspecifica()
         );
     }
     public void eliminarCurso(Long id) {

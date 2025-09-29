@@ -7,7 +7,7 @@ import java.time.LocalDate;
 public record DatosActualizarDocumento(
         @NotNull
         Long id,
-        TipoDocumento tipoDocumento,
+        tipoOtroDocumento tipoOtroDocumento,
         String descripcionDocumento,
         LocalDate fechaRegistro
 ) {

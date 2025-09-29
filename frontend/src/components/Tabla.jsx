@@ -516,7 +516,8 @@ export function Tabla({
                 const cursosLimpios = datos.curso.map(cu => ({
                     "Tipo de Curso": cu.tipoCurso,
                     "Especialidad": cu.categoria,
-                    "Fecha del Curso": cu.fechaCurso
+                    "Fecha del Curso": cu.fechaCurso, 
+                    "Función Específica": cu.funcionEspecifica
                 }));
                 const hojaCursos = XLSX.utils.json_to_sheet(cursosLimpios);
                 autoWidth(hojaCursos, cursosLimpios);

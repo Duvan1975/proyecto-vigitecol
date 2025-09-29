@@ -7,6 +7,7 @@ public record DatosListadoCurso(
         TipoCurso tipoCurso,
         Categoria categoria,
         LocalDate fechaCurso,
+        String funcionEspecifica,
         String nombreEmpleado,
         String apellidoEmpleado,
         String documentoEmpleado
@@ -17,6 +18,7 @@ public record DatosListadoCurso(
                 curso.getTipoCurso(),
                 curso.getCategoria(),
                 curso.getFechaCurso(),
+                curso.getFuncionEspecifica(),
                 curso.getEmpleado().getNombres(),
                 curso.getEmpleado().getApellidos(),
                 curso.getEmpleado().getNumeroDocumento()

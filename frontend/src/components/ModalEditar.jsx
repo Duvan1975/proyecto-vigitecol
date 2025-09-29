@@ -34,7 +34,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     const [nuevoCurso, setNuevoCurso] = useState({
         tipoCurso: "",
         categoria: "",
-        fechaCurso: ""
+        fechaCurso: "",
+        funcionEspecifica: ""
     });
 
     //Estado para agregar estudios
@@ -58,7 +59,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
     //Estado para agregar documentos
     const [nuevoDocumento, setNuevoDocumento] = useState({
-        tipoDocumento: "",
+        tipoOtroDocumento: "",
         descripcionDocumento: "",
         fechaRegistro: ""
     });
@@ -161,7 +162,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                         id: cu.id ?? cu.cursoId ?? null,
                         tipoCurso: cu.tipoCurso ?? "",
                         categoria: cu.categoria ?? "",
-                        fechaCurso: cu.fechaCurso ?? ""
+                        fechaCurso: cu.fechaCurso ?? "",
+                        funcionEspecifica: cu.funcionEspecifica ?? ""
                     }));
                     setCursos(cursosPreparados);
                 });
@@ -241,7 +243,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                 .then(data => {
                     const documentosPreparados = (Array.isArray(data) ? data : []).map(d => ({
                         id: d.id ?? d.documentoId ?? null,
-                        tipoDocumento: d.tipoDocumento ?? "",
+                        tipoOtroDocumento: d.tipoOtroDocumento ?? "",
                         descripcionDocumento: d.descripcionDocumento ?? "",
                         fechaRegistro: d.fechaRegistro ?? ""
                     }));
@@ -634,10 +636,11 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                     id: cursoCreado.id ?? cursoCreado.cursoId,
                     tipoCurso: nuevoCurso.tipoCurso,
                     categoria: nuevoCurso.categoria,
-                    fechaCurso: nuevoCurso.fechaCurso
+                    fechaCurso: nuevoCurso.fechaCurso,
+                    funcionEspecifica: nuevoCurso.funcionEspecifica
                 }]);
 
-                setNuevoCurso({ tipoCurso: "", categoria: "", fechaCurso: "" });
+                setNuevoCurso({ tipoCurso: "", categoria: "", fechaCurso: "", funcionEspecifica: "" });
 
                 Swal.fire("Curso agregado", "El curso ha sido registrado correctamente", "success");
             })
@@ -764,8 +767,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
     //Function para registrar un nuevo documento en el Modal
     const registrarNuevoDocumento = () => {
-        // Validar tipoDocumento
-        if (!nuevoDocumento.tipoDocumento) {
+        // Validar tipoOtroDocumento
+        if (!nuevoDocumento.tipoOtroDocumento) {
             Swal.fire("Campo incompleto", "Por favor selecciona el tipo de documento.", "warning");
             return;
         }
@@ -791,12 +794,12 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             .then((documentoCreado) => {
                 setDocumentos(prev => [...prev, {
                     id: documentoCreado.id ?? documentoCreado.documentoId,
-                    tipoDocumento: nuevoDocumento.tipoDocumento,
+                    tipoOtroDocumento: nuevoDocumento.tipoOtroDocumento,
                     descripcionDocumento: nuevoDocumento.descripcionDocumento,
                     fechaRegistro: nuevoDocumento.fechaRegistro
                 }]);
 
-                setNuevoDocumento({ tipoDocumento: "", descripcionDocumento: "", fechaRegistro: "" });
+                setNuevoDocumento({ tipoOtroDocumento: "", descripcionDocumento: "", fechaRegistro: "" });
 
                 Swal.fire("Documento agregado", "El documento ha sido registrado correctamente", "success");
             })
@@ -1513,122 +1516,150 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                         </div>
 
                         <div className="collapse" id="tablaCursos">
-                            <table className="table table-bordered">
-                                <thead className="table-primary">
-                                    <tr>
-                                        <th>Tipo Curso</th>
-                                        <th>Especialidad</th>
-                                        <th>Fecha de Realización</th>
-                                        <th>Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {nuevoCurso && (
-                                        <tr>
-                                            <td>
-                                                <select
-                                                    className="form-select"
-                                                    value={nuevoCurso.tipoCurso}
-                                                    onChange={(e) =>
-                                                        setNuevoCurso({ ...nuevoCurso, tipoCurso: e.target.value })
-                                                    }
-                                                >
-                                                    <option value="">Seleccione</option>
-                                                    <option value="FUNDAMENTACION">FUNDAMENTACIÓN</option>
-                                                    <option value="REENTRENAMIENTO">REENTRENAMIENTO</option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <select
-                                                    className="form-select"
-                                                    value={nuevoCurso.categoria}
-                                                    onChange={(e) =>
-                                                        setNuevoCurso({ ...nuevoCurso, categoria: e.target.value })
-                                                    }
-                                                >
-                                                    <option value="">Seleccione</option>
-                                                    <option value="GUARDA_DE_SEGURIDAD">GUARDA DE SEGURIDAD</option>
-                                                    <option value="MANEJADOR_CANINO">MANEJADOR CANINO</option>
-                                                    <option value="SUPERVISOR">SUPERVISOR</option>
-                                                    <option value="OPERADOR_DE_MEDIOS">OPERADOR DE MEDIOS</option>
-                                                    <option value="ESCOLTA">ESCOLTA</option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <input
-                                                    type="date"
-                                                    className="form-control"
-                                                    placeholder="Fecha de Realización"
-                                                    value={nuevoCurso.fechaCurso}
-                                                    onChange={(e) =>
-                                                        setNuevoCurso({ ...nuevoCurso, fechaCurso: e.target.value })
-                                                    }
-                                                />
-                                            </td>
-                                            <td>
-                                                <button className="btn btn-primary btn-sm"
-                                                    onClick={registrarNuevoCurso}
-                                                >
-                                                    Agregar
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    )}
-                                    {cursos.map((c, idx) => (
-                                        <tr key={c.id || idx}>
-                                            <td>
-                                                <select
-                                                    className="form-select"
-                                                    value={c.tipoCurso !== undefined && c.tipoCurso !== null ? c.tipoCurso : ""}
-                                                    onChange={(e) => handleCursoChange(idx, "tipoCurso", e.target.value)}
-                                                >
-                                                    <option value="">Seleccione</option>
-                                                    <option value="FUNDAMENTACION">FUNDAMENTACION</option>
-                                                    <option value="REENTRENAMIENTO">REENTRENAMIENTO</option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <select
-                                                    className="form-select"
-                                                    value={c.categoria !== undefined && c.categoria !== null ? c.categoria : ""}
-                                                    onChange={(e) => handleCursoChange(idx, "categoria", e.target.value)}
-                                                >
-                                                    <option value="">Seleccione</option>
-                                                    <option value="GUARDA_DE_SEGURIDAD">GUARDA DE SEGURIDAD</option>
-                                                    <option value="MANEJADOR_CANINO">MANEJADOR CANINO</option>
-                                                    <option value="SUPERVISOR">SUPERVISOR</option>
-                                                    <option value="OPERADOR_DE_MEDIOS">OPERADOR DE MEDIOS</option>
-                                                    <option value="ESCOLTA">ESCOLTA</option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <input
-                                                    type="date"
-                                                    className="form-control"
-                                                    value={c.fechaCurso !== undefined && c.fechaCurso !== null ? c.fechaCurso : ""}
-                                                    onChange={(e) => handleCursoChange(idx, "fechaCurso", e.target.value)}
-                                                />
-                                            </td>
-                                            <td className="d-flex justify-content-between">
-                                                <button
-                                                    className="btn btn-success btn-sm me-2"
-                                                    onClick={() => actualizarCurso(c)}
-                                                >
-                                                    Actualizar
-                                                </button>
-                                                <button
-                                                    className="btn btn-outline-danger btn-sm"
-                                                    onClick={() => eliminarCurso(c.id)}
-                                                    title="Eliminar"
-                                                >
-                                                    <i className="bi bi-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
 
-                                </tbody>
-                            </table>
+                            <div className="table-responsive">
+                                <table className="table table-hover table-striped mb-0 align-middle text-center">
+                                    <thead className="table-primary">
+                                        <tr>
+                                            <th>Tipo Curso</th>
+                                            <th>Especialidad</th>
+                                            <th>Fecha de Realización</th>
+                                            <th>Función Específica</th>
+                                            <th>Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {nuevoCurso && (
+                                            <tr>
+                                                <td style={{ minWidth: "200px" }}>
+                                                    <select
+                                                        className="form-select"
+                                                        value={nuevoCurso.tipoCurso}
+                                                        onChange={(e) =>
+                                                            setNuevoCurso({
+                                                                ...nuevoCurso,
+                                                                tipoCurso: e.target.value
+                                                            })
+                                                        }
+                                                    >
+                                                        <option value="">Seleccione</option>
+                                                        <option value="FUNDAMENTACION">FUNDAMENTACIÓN</option>
+                                                        <option value="REENTRENAMIENTO">REENTRENAMIENTO</option>
+                                                    </select>
+                                                </td>
+                                                <td style={{ minWidth: "200px" }}>
+                                                    <select
+                                                        className="form-select"
+                                                        value={nuevoCurso.categoria}
+                                                        onChange={(e) =>
+                                                            setNuevoCurso({ ...nuevoCurso, categoria: e.target.value })
+                                                        }
+                                                    >
+                                                        <option value="">Seleccione</option>
+                                                        <option value="GUARDA_DE_SEGURIDAD">GUARDA DE SEGURIDAD</option>
+                                                        <option value="MANEJADOR_CANINO">MANEJADOR CANINO</option>
+                                                        <option value="SUPERVISOR">SUPERVISOR</option>
+                                                        <option value="OPERADOR_DE_MEDIOS">OPERADOR DE MEDIOS</option>
+                                                        <option value="ESCOLTA">ESCOLTA</option>
+                                                    </select>
+                                                </td>
+                                                <td style={{ minWidth: "180px" }}>
+                                                    <input
+                                                        type="date"
+                                                        className="form-control"
+                                                        placeholder="Fecha de Realización"
+                                                        value={nuevoCurso.fechaCurso}
+                                                        onChange={(e) =>
+                                                            setNuevoCurso({ ...nuevoCurso, fechaCurso: e.target.value })
+                                                        }
+                                                    />
+                                                </td>
+                                                <td style={{ minWidth: "200px" }}>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        placeholder="Función Específica"
+                                                        value={nuevoCurso.funcionEspecifica}
+                                                        onChange={(e) =>
+                                                            setNuevoCurso({ ...nuevoCurso, funcionEspecifica: e.target.value })
+                                                        }
+                                                    />
+                                                </td>
+                                                <td style={{ minWidth: "100px" }}>
+                                                    <button className="btn btn-primary btn-sm"
+                                                        onClick={registrarNuevoCurso}
+                                                    >
+                                                        Agregar
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        )}
+                                        {cursos.map((c, idx) => (
+                                            <tr key={c.id || idx}>
+                                                <td>
+                                                    <select
+                                                        className="form-select"
+                                                        value={c.tipoCurso !== undefined && c.tipoCurso !== null ? c.tipoCurso : ""}
+                                                        onChange={(e) => handleCursoChange(idx, "tipoCurso", e.target.value)}
+                                                    >
+                                                        <option value="">Seleccione</option>
+                                                        <option value="FUNDAMENTACION">FUNDAMENTACION</option>
+                                                        <option value="REENTRENAMIENTO">REENTRENAMIENTO</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select
+                                                        className="form-select"
+                                                        value={c.categoria !== undefined && c.categoria !== null ? c.categoria : ""}
+                                                        onChange={(e) => handleCursoChange(idx, "categoria", e.target.value)}
+                                                    >
+                                                        <option value="">Seleccione</option>
+                                                        <option value="GUARDA_DE_SEGURIDAD">GUARDA DE SEGURIDAD</option>
+                                                        <option value="MANEJADOR_CANINO">MANEJADOR CANINO</option>
+                                                        <option value="SUPERVISOR">SUPERVISOR</option>
+                                                        <option value="OPERADOR_DE_MEDIOS">OPERADOR DE MEDIOS</option>
+                                                        <option value="ESCOLTA">ESCOLTA</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input
+                                                        type="date"
+                                                        className="form-control"
+                                                        value={c.fechaCurso !== undefined && c.fechaCurso !== null ? c.fechaCurso : ""}
+                                                        onChange={(e) => handleCursoChange(idx, "fechaCurso", e.target.value)}
+                                                    />
+                                                </td>
+                                                <td>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        value={c.funcionEspecifica !== undefined && c.funcionEspecifica !== null ? c.funcionEspecifica : ""}
+                                                        onChange={(e) => handleCursoChange(idx, "funcionEspecifica", e.target.value)}
+                                                    />
+                                                </td>
+                                                <td className="d-flex justify-content-between">
+                                                    <button
+                                                        className="btn btn-success btn-sm me-2"
+                                                        onClick={() => actualizarCurso(c)}
+                                                    >
+                                                        Actualizar
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-outline-danger btn-sm"
+                                                        onClick={() => eliminarCurso(c.id)}
+                                                        title="Eliminar"
+                                                    >
+                                                        <i className="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+
                         </div>
 
                         <div>
@@ -2011,8 +2042,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                             <td>
                                                 <select
                                                     className="form-select"
-                                                    value={d.tipoDocumento !== undefined && d.tipoDocumento !== null ? d.tipoDocumento : ""}
-                                                    onChange={(e) => handleDocumentoChange(idx, "tipoDocumento", e.target.value)}
+                                                    value={d.tipoOtroDocumento !== undefined && d.tipoOtroDocumento !== null ? d.tipoOtroDocumento : ""}
+                                                    onChange={(e) => handleDocumentoChange(idx, "tipoOtroDocumento", e.target.value)}
                                                 >
                                                     <option value="">Seleccione</option>
                                                     <option value="JUDICIALES">JUDICIALES</option>

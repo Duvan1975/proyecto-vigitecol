@@ -9,6 +9,7 @@ public record DatosActualizarCurso(
         Long id,
         TipoCurso tipoCurso,
         Categoria categoria,
-        LocalDate fechaCurso
+        LocalDate fechaCurso,
+        String funcionEspecifica
 ) {
 }

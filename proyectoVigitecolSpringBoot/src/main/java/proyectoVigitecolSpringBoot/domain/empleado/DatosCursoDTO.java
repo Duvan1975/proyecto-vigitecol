@@ -8,6 +8,7 @@ public record DatosCursoDTO(
         String tipoCurso,
         String categoria,
         LocalDate fechaCurso,
+        String funcionEspecifica,
         boolean vencido
 ) {
     public DatosCursoDTO(Curso curso) {
@@ -15,6 +16,7 @@ public record DatosCursoDTO(
                 curso.getTipoCurso().toString(),
                 curso.getCategoria().toString(),
                 curso.getFechaCurso(),
+                curso.getFuncionEspecifica(),
                 curso.getFechaCurso().plusYears(1).isBefore(LocalDate.now())
         );
     }

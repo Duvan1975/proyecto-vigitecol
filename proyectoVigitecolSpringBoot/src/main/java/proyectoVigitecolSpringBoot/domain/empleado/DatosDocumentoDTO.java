@@ -5,13 +5,13 @@ import proyectoVigitecolSpringBoot.domain.otroDocumento.OtroDocumento;
 import java.time.LocalDate;
 
 public record DatosDocumentoDTO(
-        String tipoDocumento,
+        String tipoOtroDocumento,
         String descripcionDocumento,
         LocalDate fechaRegistro
 ) {
     public DatosDocumentoDTO(OtroDocumento otroDocumento) {
         this(
-                otroDocumento.getTipoDocumento().toString(),
+                otroDocumento.getTipoOtroDocumento().toString(),
                 otroDocumento.getDescripcionDocumento(),
                 otroDocumento.getFechaRegistro()
         );

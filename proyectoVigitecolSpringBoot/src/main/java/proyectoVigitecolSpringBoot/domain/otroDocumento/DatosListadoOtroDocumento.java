@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public record DatosListadoOtroDocumento(
         Long documentoId,
-        TipoDocumento tipoDocumento,
+        tipoOtroDocumento tipoOtroDocumento,
         String descripcionDocumento,
         LocalDate fechaRegistro,
         String nombreEmpleado,
@@ -14,7 +14,7 @@ public record DatosListadoOtroDocumento(
     public DatosListadoOtroDocumento(OtroDocumento otroDocumento) {
         this(
                 otroDocumento.getDocumentoId(),
-                otroDocumento.getTipoDocumento(),
+                otroDocumento.getTipoOtroDocumento(),
                 otroDocumento.getDescripcionDocumento(),
                 otroDocumento.getFechaRegistro(),
                 otroDocumento.getEmpleado().getNombres(),

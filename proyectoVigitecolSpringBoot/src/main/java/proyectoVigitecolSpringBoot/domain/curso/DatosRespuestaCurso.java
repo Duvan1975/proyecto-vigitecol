@@ -6,6 +6,7 @@ public record DatosRespuestaCurso(
         Long cursoId,
         TipoCurso tipoCurso,
         Categoria categoria,
-        LocalDate fechaCurso
+        LocalDate fechaCurso,
+        String funcionEspecifica
 ) {
 }

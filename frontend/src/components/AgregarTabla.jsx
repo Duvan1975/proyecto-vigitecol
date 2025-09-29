@@ -69,13 +69,14 @@ export async function AgregarTabla(
             }
         }
 
-        //Enviamos todos los cursos juntos
+        //Enviamos todos los datos de los cursos juntos
         const cursosLimpios = cursos.filter(c =>
-            c.tipoCurso && c.categoria && c.fechaCurso
+            c.tipoCurso && c.categoria && c.fechaCurso && c.funcionEspecifica
         ).map((c) => ({
             tipoCurso: c.tipoCurso,
             categoria: c.categoria,
-            fechaCurso: c.fechaCurso
+            fechaCurso: c.fechaCurso,
+            funcionEspecifica: c.funcionEspecifica
         }));
 
         if (cursosLimpios.length > 0) {
@@ -165,11 +166,11 @@ export async function AgregarTabla(
 
         //Enviamos todos los documentos juntos
         const documentosLimpios = documentos.filter(d =>
-            d.tipoDocumento && d.descripcionDocumento && d.fechaRegistro
+            d.tipoOtroDocumento && d.descripcionDocumento && d.fechaRegistro
         ).map((d) => ({
-            tipoDocumento: d.tipoDocumento,
-            descripcionDocumento: d.descripcionDocumento,
-            fechaRegistro: d.fechaRegistro
+            tipoOtroDocumento: d.tipoOtroDocumento,
+            fechaRegistro: d.fechaRegistro, 
+            descripcionDocumento: d.descripcionDocumento
         }));
 
         if (documentosLimpios.length > 0) {
@@ -191,10 +192,10 @@ export async function AgregarTabla(
         const vehiculosLimpios = vehiculos.filter(v =>
             v.tipoVehiculo && v.tecnomecanico && v.soat && v.licencia && v.placa
         ).map((v) => ({
-            tipoVehiculo: v.tipoVehiculo, 
-            tecnomecanico: v.tecnomecanico, 
-            soat: v.soat, 
-            licencia: v.licencia, 
+            tipoVehiculo: v.tipoVehiculo,
+            tecnomecanico: v.tecnomecanico,
+            soat: v.soat,
+            licencia: v.licencia,
             placa: v.placa
         }));
 
