@@ -156,12 +156,13 @@ public class EmpleadoController {
         return ResponseEntity.ok(resultado);
     }
     @GetMapping("/con-familiares-menores")
-    public ResponseEntity<Page<DatosEmpleadoConFamiliaresMenoresDe12>> listadoFamiliaresMenoresDe12(
-            @RequestParam(required = false) TipoEmpleado tipoEmpleado, // Nuevo parámetro
+    public ResponseEntity<Page<DatosEmpleadoConFamiliaresMenoresDe12>> listadoFamiliaresMenoresDeEdad(
+            @RequestParam(required = false) TipoEmpleado tipoEmpleado,
+            @RequestParam(defaultValue = "12") int edadMax, // Nuevo parámetro dinámico
             @PageableDefault(size = 10, sort = "apellidos") Pageable pageable) {
 
         Page<DatosEmpleadoConFamiliaresMenoresDe12> resultado = empleadoService
-                .listarFamiliaresMenoresDe12(tipoEmpleado, pageable);
+                .listarFamiliaresMenoresDeEdad(tipoEmpleado, edadMax, pageable);
 
         return ResponseEntity.ok(resultado);
     }

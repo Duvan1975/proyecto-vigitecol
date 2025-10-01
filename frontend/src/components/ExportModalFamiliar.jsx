@@ -115,7 +115,7 @@ const ExportModalFamiliar = ({
                         </button>
                         <button
                             className="btn btn-primary"
-                            onClick={handleExport}
+                            onClick={handleExport} 
                             disabled={exportando}
                         >
                             {exportando ? "⏳ Exportando..." : "📥 Exportar TODO"}

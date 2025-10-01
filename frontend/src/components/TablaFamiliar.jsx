@@ -3,7 +3,7 @@ import { authFetch } from "../utils/authFetch";
 import Paginacion from "./Paginacion";
 import ExportModalFamiliar from "./ExportModalFamiliar";
 
-export function TablaFamiliar({ tipoEmpleado, titulo, genero, tipoBusqueda }) {
+export function TablaFamiliar({ tipoEmpleado, titulo, genero, tipoBusqueda, edadMax }) {
     const [empleadosConFamiliares, setEmpleadosConFamiliares] = useState([]);
     const [paginaActual, setPaginaActual] = useState(0);
     const [totalPaginas, setTotalPaginas] = useState(0);
@@ -13,10 +13,11 @@ export function TablaFamiliar({ tipoEmpleado, titulo, genero, tipoBusqueda }) {
     const [cargando, setCargando] = useState(true);
     const [isExportOpen, setIsExportOpen] = useState(false);
 
+
     useEffect(() => {
         cargarEmpleadosConFamiliares(paginaActual);
         // eslint-disable-next-line
-    }, [paginaActual, tipoEmpleado, genero, tipoBusqueda]);
+    }, [paginaActual, tipoEmpleado, genero, tipoBusqueda, edadMax]);
 
     // Función para cargar todas las páginas
     const cargarTodasLasPaginas = async () => {
@@ -27,7 +28,7 @@ export function TablaFamiliar({ tipoEmpleado, titulo, genero, tipoBusqueda }) {
             for (let pagina = 0; pagina < totalPaginas; pagina++) {
                 let url;
                 if (tipoBusqueda === "conFamiliares") {
-                    url = `http://localhost:8080/empleados/con-familiares-menores?page=${pagina}`;
+                    url = `http://localhost:8080/empleados/con-familiares-menores?edadMax=${edadMax}&page=${pagina}`;
                     if (tipoEmpleado) url += `&tipoEmpleado=${tipoEmpleado}`;
                 } else if (tipoBusqueda === "familiaresPorGenero") {
                     url = `http://localhost:8080/empleados/conFamiliares/genero?page=${pagina}`;
@@ -55,6 +56,7 @@ export function TablaFamiliar({ tipoEmpleado, titulo, genero, tipoBusqueda }) {
         let url;
         if (tipoBusqueda === "conFamiliares") {
             url = `http://localhost:8080/empleados/con-familiares-menores?page=${pagina}`;
+                        if (edadMax) url += `&edadMax=${edadMax}`;
             if (tipoEmpleado) url += `&tipoEmpleado=${tipoEmpleado}`;
         } else if (tipoBusqueda === "familiaresPorGenero") {
             url = `http://localhost:8080/empleados/conFamiliares/genero?page=${pagina}`;

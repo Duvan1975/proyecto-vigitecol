@@ -500,11 +500,12 @@ public class EmpleadoService {
                 .map(DatosEmpleadoConFamiliaresMenoresDe12::new);
     }
 
-    public Page<DatosEmpleadoConFamiliaresMenoresDe12> listarFamiliaresMenoresDe12(
+    public Page<DatosEmpleadoConFamiliaresMenoresDe12> listarFamiliaresMenoresDeEdad(
             TipoEmpleado tipoEmpleado,
+            int edadMax,
             Pageable pageable) {
-        return empleadoRepository.findEmpleadosConFamiliaresMenoresDe12(tipoEmpleado, pageable)
-                .map(DatosEmpleadoConFamiliaresMenoresDe12::new);
+        return empleadoRepository.findEmpleadosConFamiliaresMenoresDeEdad(tipoEmpleado, edadMax, pageable)
+                .map(empleado -> new DatosEmpleadoConFamiliaresMenoresDe12(empleado, edadMax));
     }
 
     public Page<DatosEmpleadoConFamiliares> obtenerEmpleadosConTodosFamiliares(

@@ -52,6 +52,7 @@ export function Tabla({
     const [generoBuscarFamiliares, setGeneroBuscarFamiliares] = useState("");
     const [libretaMilitarBuscar, setLibretaMilitarBuscar] = useState("");
     const [cargoBuscar, setCargoBuscar] = useState("");
+    const [edadMax, setEdadMax] = useState(12);
 
     //Estados para mostrar Modal y exportar a Excel
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -66,6 +67,7 @@ export function Tabla({
         mostrarSupervisores,
         estadoCivilBuscar,
         generoBuscar,
+        edadMax, 
         generoBuscarFamiliares,
         libretaMilitarBuscar,
         cargoBuscar,
@@ -104,8 +106,8 @@ export function Tabla({
                 url += `&tipoEmpleado=OPERATIVO`;
             }
 
-        } else if (tipoBusqueda === "conFamiliares") {
-            url = `${baseUrl}/con-familiares-menores?page=${pagina}`;
+        } else if (tipoBusqueda === "conFamiliares" && edadMax) {
+            url = `${baseUrl}/con-familiares-menores?edadMax=${edadMax}&page=${pagina}`;
 
             if (mostrarAdministrativos) {
                 url += `&tipoEmpleado=ADMINISTRATIVO`;
@@ -295,6 +297,7 @@ export function Tabla({
                 : `http://localhost:8080/empleados/buscar/activos/documento?numeroDocumento=${documentoBuscar}`;
 
             realizarBusqueda(url);
+            
         }
         if (tipoBusqueda === "sinContrato") {
             authFetch("http://localhost:8080/empleados/sin-contrato")
@@ -311,6 +314,8 @@ export function Tabla({
             realizarBusquedaFiltrada("estado-civil", estadoCivilBuscar, "Estado civil");
         } else if (tipoBusqueda === "genero") {
             realizarBusquedaFiltrada("genero", generoBuscar, "Género");
+        } else if (tipoBusqueda === "conFamiliares") {
+            realizarBusquedaFiltrada("conFamiliares", edadMax, "Familiares por Edad");
         } else if (tipoBusqueda === "familiaresPorGenero") {
             realizarBusquedaFiltrada("familiaresPorGenero", generoBuscarFamiliares, "Familiares por Género");
         } else if (tipoBusqueda === "libretaMilitar") {
@@ -374,9 +379,9 @@ export function Tabla({
             return `PERSONAL ACTIVO MAYOR DE 50 AÑOS (total = ${totalElementos})`;
         }
         if (tipoBusqueda === "conFamiliares") {
-            if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO CON HIJOS MENORES DE 12 AÑOS (total = ${totalElementos} PADRES)`;
-            if (mostrarOperativos) return `PERSONAL OPERATIVO CON HIJOS MENORES DE 12 AÑOS (total = ${totalElementos} PADRES)`;
-            return `PERSONAL ACTIVO CON HIJOS MENORES DE 12 AÑOS (total = ${totalElementos} PADRES)`;
+            if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO CON HIJOS ≤ ${edadMax} AÑOS (total = ${totalElementos} PADRES)`;
+            if (mostrarOperativos) return `PERSONAL OPERATIVO CON HIJOS ≤ ${edadMax} AÑOS (total = ${totalElementos} PADRES)`;
+            return `PERSONAL ACTIVO CON HIJOS ≤ ${edadMax} AÑOS (total = ${totalElementos} PADRES)`;
         }
         if (tipoBusqueda === "estadoCivil") {
             if (mostrarAdministrativos) return `PERSONAL ADMINISTRATIVO CON ESTADO CIVIL: ${estadoCivilBuscar}(total = ${totalElementos})`;
@@ -516,7 +521,7 @@ export function Tabla({
                 const cursosLimpios = datos.curso.map(cu => ({
                     "Tipo de Curso": cu.tipoCurso,
                     "Especialidad": cu.categoria,
-                    "Fecha del Curso": cu.fechaCurso, 
+                    "Fecha del Curso": cu.fechaCurso,
                     "Función Específica": cu.funcionEspecifica
                 }));
                 const hojaCursos = XLSX.utils.json_to_sheet(cursosLimpios);
@@ -612,6 +617,7 @@ export function Tabla({
 
                     {tipoBusqueda !== "estadoCivil" &&
                         tipoBusqueda !== "genero" &&
+                        tipoBusqueda !== "conFamiliares" &&
                         tipoBusqueda !== "familiaresPorGenero" &&
                         tipoBusqueda !== "libretaMilitar" && (
                             <div className="col-md-5">
@@ -638,7 +644,6 @@ export function Tabla({
                                     }
                                     className="form-control"
                                     disabled={["personalMayorDe50",
-                                        "conFamiliares",
                                         "cursosPorVencer",
                                         "periodoDePrueba",
                                         "conContrato",
@@ -646,6 +651,20 @@ export function Tabla({
                                 />
                             </div>
                         )}
+
+                    {tipoBusqueda === "conFamiliares" && (
+                        <div className="col-md-5">
+                            <label className="form-label">Edad máxima</label>
+                            <input
+                                type="number"
+                                value={edadMax}
+                                onChange={(e) => setEdadMax(e.target.value)}
+                                placeholder="Ingrese edad máxima"
+                                className="form-control"
+                                min="1"
+                            />
+                        </div>
+                    )}
 
                     {tipoBusqueda === "estadoCivil" && (
                         <div className="col-md-5">
@@ -725,7 +744,6 @@ export function Tabla({
                                 "familiaresPorGenero",
                                 "libretaMilitar",
                                 "cargo",
-                                "conFamiliares",
                                 "cursosPorVencer",
                                 "periodoDePrueba",
                                 "conContrato",
@@ -745,6 +763,7 @@ export function Tabla({
                                 setCargoBuscar("");
                                 setEstadoCivilBuscar("");
                                 setGeneroBuscar("");
+                                setEdadMax("");
                                 setGeneroBuscarFamiliares("");
                                 setLibretaMilitarBuscar("");
                                 setMostrarTablaContratos(false);
@@ -818,6 +837,7 @@ export function Tabla({
                                 mostrarOperativos ? "OPERATIVO" : null
                         }
                         titulo={obtenerTitulo()}
+                        edadMax={edadMax}
                     />
                 </div>
             )}
@@ -832,6 +852,7 @@ export function Tabla({
                                 mostrarOperativos ? "OPERATIVO" : null
                         }
                         titulo={obtenerTitulo()}
+                        edadMax={edadMax}
                     />
                 </div>
             )}

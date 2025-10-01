@@ -16,7 +16,7 @@ public record DatosEmpleadoConFamiliaresMenoresDe12(
         int numeroDeFamiliares,
         List<DatosFamiliarDTO> familiares
 ) {
-    public DatosEmpleadoConFamiliaresMenoresDe12(Empleado empleado) {
+    public DatosEmpleadoConFamiliaresMenoresDe12(Empleado empleado, int edadMax) {
         this(
                 empleado.getId(),
                 empleado.getNombres(),
@@ -29,12 +29,15 @@ public record DatosEmpleadoConFamiliaresMenoresDe12(
                 empleado.getCorreo(),
                 empleado.getCargo(),
                 (int) empleado.getFamiliares().stream()
-                        .filter(f -> f.getEdadFamiliar() <= 12)
+                        .filter(f -> f.getEdadFamiliar() <= edadMax)
                         .count(),
                 empleado.getFamiliares().stream()
-                        .filter(f -> f.getEdadFamiliar() <= 12)
+                        .filter(f -> f.getEdadFamiliar() <= edadMax)
                         .map(DatosFamiliarDTO::new)
                         .toList()
         );
+    }
+    public DatosEmpleadoConFamiliaresMenoresDe12(Empleado empleado) {
+        this(empleado, 12);
     }
 }

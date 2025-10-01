@@ -52,10 +52,11 @@ public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
                     WHERE c2.empleado = e
                 ) AND c.continua = true
                   AND (:tipoEmpleado IS NULL OR c.empleado.tipoEmpleado = :tipoEmpleado)
-                WHERE f.edadFamiliar <= 12
+                WHERE f.edadFamiliar <= :edadMax
             """)
-    Page<Empleado> findEmpleadosConFamiliaresMenoresDe12(
+    Page<Empleado> findEmpleadosConFamiliaresMenoresDeEdad(
             @Param("tipoEmpleado") TipoEmpleado tipoEmpleado,
+            @Param("edadMax") int edadMax,
             Pageable pageable);
 
     @Query("""
