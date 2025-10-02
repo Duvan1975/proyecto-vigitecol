@@ -33,6 +33,7 @@ public class SecurityConfigurations {
                             "http://localhost:3000",
                             "http://localhost:8081",
                             "https://proyecto-vigitecol-dsa7.vercel.app",
+                            "https://proyecto-vigitecol-dsa7-ocljwnv39-duvans-projects-4d9c2e8d.vercel.app",
                             "https://jodie-biobibliographic-tidally.ngrok-free.dev"
                     ));
                     corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
