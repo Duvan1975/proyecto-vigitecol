@@ -32,7 +32,8 @@ public class SecurityConfigurations {
                     corsConfiguration.setAllowedOrigins(List.of(
                             "http://localhost:3000",
                             "http://localhost:8081",
-                            "https://proyecto-vigitecol-dsa7.vercel.app"
+                            "https://proyecto-vigitecol-dsa7.vercel.app",
+                            "https://jodie-biobibliographic-tidally.ngrok-free.dev"
                     ));
                     corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
                     corsConfiguration.setAllowedHeaders(List.of("*"));
