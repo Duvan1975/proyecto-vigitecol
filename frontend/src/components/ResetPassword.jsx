@@ -31,7 +31,7 @@ export default function ResetPassword() {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/password-reset/confirm", {
+      const response = await fetch("https://jodie-biobibliographic-tidally.ngrok-free.dev/password-reset/request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
