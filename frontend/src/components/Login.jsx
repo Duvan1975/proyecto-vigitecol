@@ -8,7 +8,7 @@ export function Login({ onLoginSuccess }) {
 
 const handleLogin = async () => {
     try {
-        const response = await fetch("https://jodie-biobibliographic-tidally.ngrok-free.dev/password-reset/request", {
+        const response = await fetch("http://localhost:8080/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -73,7 +73,7 @@ const handleLogin = async () => {
 
         if (email) {
             try {
-                const response = await fetch("https://jodie-biobibliographic-tidally.ngrok-free.dev/password-reset/request", {
+                const response = await fetch("http://localhost:8081/password-reset/request", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ admin: email })
