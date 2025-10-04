@@ -2,6 +2,7 @@ import { CuadrosTexto } from "./CuadrosTexto";
 import { CuadrosSelect } from "./CuadrosSelect";
 import { AgregarTabla } from "./AgregarTabla";
 import { useState } from "react";
+import Swal from "sweetalert2";
 
 export function Formulario({ setVista }) {
 
@@ -914,8 +915,8 @@ export function Formulario({ setVista }) {
                     opciones={[
                         { valor: "SALUD", texto: "SALUD" },
                         { valor: "PENSION", texto: "PENSIÓN" },
-                        { valor: "ARL", texto: "ARL" }, 
-                        { valor: "CONFA", texto: "CONFA" }, 
+                        { valor: "ARL", texto: "ARL" },
+                        { valor: "CONFA", texto: "CONFA" },
                     ]}
                 />
                 <CuadrosTexto
@@ -1302,7 +1303,29 @@ export function Formulario({ setVista }) {
                 <button
                     type="button"
                     className="btn btn-secondary"
-                    onClick={() => setVista("tabla")}
+                    onClick={() => {
+                        Swal.fire({
+                            title: "¿Cancelar registro?",
+                            text: "Se perderán los datos ingresados en el formulario.",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#3085d6",
+                            cancelButtonColor: "#d33",
+                            confirmButtonText: "Sí, cancelar",
+                            cancelButtonText: "Volver",
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                setVista("tabla"); // 👉 regresa a la vista de tabla
+                                Swal.fire({
+                                    icon: "info",
+                                    title: "Registro cancelado",
+                                    text: "Los datos no fueron guardados.",
+                                    timer: 1500,
+                                    showConfirmButton: false,
+                                });
+                            }
+                        });
+                    }}
                 >
                     Cancelar
                 </button>

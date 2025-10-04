@@ -1,6 +1,5 @@
 package proyectoVigitecolSpringBoot.infra.security;
 
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import proyectoVigitecolSpringBoot.domain.usuarios.Usuario;
@@ -73,5 +72,4 @@ public class PasswordResetService {
                 .filter(t -> t.getExpiryDate().isAfter(LocalDateTime.now()))
                 .isPresent();
     }
-
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Formulario } from "./Formulario";
 import { Tabla } from "./Tabla";
 import { Login } from "./Login";
+import Swal from "sweetalert2";
 import logoVigitecol from '../img/vigitecol.png'; // Ajusta la ruta según tu estructura
 import ProtectedElement from "../utils/ProtectedElement";
 import UserManagement from "./UserManagement";
@@ -118,11 +119,32 @@ export function Menu() {
                             </div>
                             <button
                                 className="btn btn-outline-warning btn-sm"
-                                onClick={handleLogout}
                                 title="Cerrar sesión"
+                                onClick={() => {
+                                    Swal.fire({
+                                        title: "¿Deseas cerrar sesión?",
+                                        text: "Se cerrará tu sesión actual y deberás volver a iniciar sesión.",
+                                        icon: "warning",
+                                        showCancelButton: true,
+                                        confirmButtonColor: "#3085d6",
+                                        cancelButtonColor: "#d33",
+                                        confirmButtonText: "Sí, cerrar sesión",
+                                        cancelButtonText: "Cancelar",
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            handleLogout(); // 👉 solo ejecuta el cierre si el usuario confirma
+                                            Swal.fire({
+                                                icon: "success",
+                                                title: "Sesión cerrada",
+                                                text: "Has cerrado sesión correctamente.",
+                                                timer: 1500,
+                                                showConfirmButton: false,
+                                            });
+                                        }
+                                    });
+                                }}
                             >
-                                <i className="bi bi-box-arrow-right"></i>
-                                <span className="d-none d-md-inline ms-1">Cerrar</span>
+                                Cerrar sesión
                             </button>
                         </div>
                     </div>

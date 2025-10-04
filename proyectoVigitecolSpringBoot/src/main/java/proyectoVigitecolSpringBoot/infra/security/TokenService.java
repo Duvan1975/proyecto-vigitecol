@@ -77,7 +77,7 @@ public class TokenService {
     }
 
     private Instant generarFechaExpiracion(){
-        return LocalDateTime.now().plusHours(2)
+        return LocalDateTime.now().plusHours(1)
                 .toInstant(ZoneOffset.of("-05:00"));
     }
 }

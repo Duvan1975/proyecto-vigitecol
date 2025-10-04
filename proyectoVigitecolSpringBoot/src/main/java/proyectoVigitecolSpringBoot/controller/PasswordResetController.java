@@ -51,5 +51,4 @@ public class PasswordResetController {
             return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
         }
     }
-
 }
