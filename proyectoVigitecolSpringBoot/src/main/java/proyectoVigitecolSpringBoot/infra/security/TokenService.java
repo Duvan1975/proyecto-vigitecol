@@ -26,8 +26,8 @@ public class TokenService {
                     .withIssuer("database")
                     .withSubject(usuario.getAdmin())
                     .withClaim("id", usuario.getId())
-                    .withClaim("rol", usuario.getRol().name()) // ← AGREGAR ESTO
-                    .withClaim("estado", usuario.isEnabled())  // ← AGREGAR ESTO
+                    .withClaim("rol", usuario.getRol().name())
+                    .withClaim("estado", usuario.isEnabled())
                     .withExpiresAt(generarFechaExpiracion())
                     .sign(algorithm);
         } catch (JWTCreationException exception){
@@ -77,7 +77,7 @@ public class TokenService {
     }
 
     private Instant generarFechaExpiracion(){
-        return LocalDateTime.now().plusHours(1)
+        return LocalDateTime.now().plusMinutes(1)
                 .toInstant(ZoneOffset.of("-05:00"));
     }
 }

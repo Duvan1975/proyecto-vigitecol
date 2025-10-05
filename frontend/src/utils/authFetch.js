@@ -26,9 +26,10 @@ export const authFetch = async (url, options = {}) => {
     });
 
     // Redirigimos al login
-    window.location.href = "/login";
+    localStorage.clear();
+    window.location.href = "http://localhost:3000/";
 
-    throw new Error("Sesión expirada o no autorizada");
+    return Promise.reject(new Error("Sesión expirada"));
   }
 
   return res;
@@ -76,3 +77,78 @@ export const authPatch = (url, data) => {
     body: JSON.stringify(data),
   });
 };
+
+
+/*export const authFetch = async (url, options = {}) => {
+  const token = localStorage.getItem("token");
+  const headers = {
+    ...(options.headers || {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+
+  const res = await fetch(url, { ...options, headers });
+
+  if (res.status === 401 || res.status === 403) {
+    // Evitamos continuar el flujo normal
+    await Swal.fire({
+      icon: "warning",
+      title: "Sesión expirada",
+      text: "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.",
+      confirmButtonText: "Aceptar",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
+
+    // Limpiamos y redirigimos
+    localStorage.clear();
+    window.location.href = "http://localhost:3000/"; // o navigate("/") si usas react-router
+
+    // Devolvemos una promesa rechazada para cortar el flujo
+    return Promise.reject(new Error("Sesión expirada"));
+  }
+
+  return res;
+};
+
+// Función GET (devuelve JSON)
+export const authGet = (url) => {
+  return authFetch(url).then((response) => {
+    if (response.ok) {
+      return response.json();
+    }
+    throw new Error(`Error HTTP: ${response.status}`);
+  });
+};
+
+// POST
+export const authPost = (url, data) => {
+  return authFetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+};
+
+// PUT
+export const authPut = (url, data) => {
+  return authFetch(url, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+};
+
+// PATCH
+export const authPatch = (url, data) => {
+  return authFetch(url, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+};*/
