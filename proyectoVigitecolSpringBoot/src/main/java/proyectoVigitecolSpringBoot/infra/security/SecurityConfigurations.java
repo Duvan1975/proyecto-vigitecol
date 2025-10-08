@@ -35,7 +35,9 @@ public class SecurityConfigurations {
                             "https://proyecto-vigitecol-dsa7.vercel.app",
                             "https://proyecto-vigitecol-dsa7-ocljwnv39-duvans-projects-4d9c2e8d.vercel.app",
                             "https://jodie-biobibliographic-tidally.ngrok-free.dev",
-                            "http://192.168.20.142:8081"
+                            "http://192.168.20.142:8081",
+                            "http://192.168.1.50:8081",
+                            "http://192.168.1.50:3000"
                     ));
                     corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
                     corsConfiguration.setAllowedHeaders(List.of("*"));
