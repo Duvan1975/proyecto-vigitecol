@@ -19,45 +19,47 @@ export default function ResetPassword() {
   }, [token]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (nuevaClave !== confirmarClave) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Las contraseñas no coinciden",
-      });
-      return;
+  if (nuevaClave !== confirmarClave) {
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "Las contraseñas no coinciden",
+    });
+    return;
+  }
+
+  try {
+    // CAMBIA ESTA LÍNEA - Usa la variable de entorno
+    const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8081";
+    const response = await fetch(`${backendUrl}/password-reset/confirm`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ token, nuevaClave }),
+    });
+
+    if (!response.ok) {
+      throw new Error("No se pudo restablecer la contraseña");
     }
 
-    try {
-      const response = await fetch("http://localhost:8080/password-reset/confirm", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token, nuevaClave }),
-      });
-
-      if (!response.ok) {
-        throw new Error("No se pudo restablecer la contraseña");
-      }
-
-      Swal.fire({
-        icon: "success",
-        title: "Éxito",
-        text: "Tu contraseña ha sido restablecida correctamente",
-      }).then(() => {
-        window.location.href = "/"; // Redirige al login
-      });
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.message || "Error al restablecer la contraseña",
-      });
-    }
-  };
+    Swal.fire({
+      icon: "success",
+      title: "Éxito",
+      text: "Tu contraseña ha sido restablecida correctamente",
+    }).then(() => {
+      window.location.href = "/";
+    });
+  } catch (error) {
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: error.message || "Error al restablecer la contraseña",
+    });
+  }
+};
 
   return (
     <div className="container d-flex justify-content-center align-items-center min-vh-100 bg-light">
