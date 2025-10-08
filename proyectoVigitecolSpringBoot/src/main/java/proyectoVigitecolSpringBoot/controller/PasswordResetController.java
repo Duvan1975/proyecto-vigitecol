@@ -1,8 +1,11 @@
 package proyectoVigitecolSpringBoot.controller;
 
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import proyectoVigitecolSpringBoot.domain.dto.PasswordResetConfirmDTO;
@@ -51,4 +54,21 @@ public class PasswordResetController {
             return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
         }
     }
+
+    /*@Component
+    public class EnvCheck {
+
+        @Value("${spring.mail.password:NOT_FOUND}")
+        private String sendGridKey;
+
+        @PostConstruct
+        public void verifyKey() {
+            if ("NOT_FOUND".equals(sendGridKey)) {
+                System.out.println("⚠️ Variable SENDGRID_API_KEY NO detectada por Spring Boot");
+            } else {
+                System.out.println("✅ Variable SENDGRID_API_KEY detectada correctamente");
+                System.out.println("Inicio de clave: " + sendGridKey.substring(0, 10) + "*********");
+            }
+        }
+    }*/
 }
