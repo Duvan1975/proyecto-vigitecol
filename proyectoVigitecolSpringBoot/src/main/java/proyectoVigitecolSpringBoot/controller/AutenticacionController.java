@@ -64,7 +64,6 @@ public class AutenticacionController {
         }
     }
 
-
     @GetMapping("/verificar")
     public ResponseEntity<?> verificarToken(@RequestHeader("Authorization") String authHeader) {
         try {
