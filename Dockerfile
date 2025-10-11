@@ -1,19 +1,17 @@
-# Usar imagen más ligera
 FROM eclipse-temurin:17-jdk-alpine
 
 WORKDIR /app
 
-# Copiar solo los archivos necesarios para cache de Maven
-COPY pom.xml .
-COPY src ./src
+# Copiar desde la ubicación actual (todo está aquí)
+COPY . .
 
-# Instalar Maven en Alpine
+# Instalar Maven
 RUN apk add --no-cache maven
 
-# Compilar con más memoria
-RUN mvn clean package -DskipTests -Xmx512m
+# Compilar
+RUN mvn clean package -DskipTests
 
-# Crear imagen final mínima
+# Imagen final
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 COPY --from=0 /app/target/proyectoVigitecolSpringBoot-0.0.1-SNAPSHOT.jar app.jar
