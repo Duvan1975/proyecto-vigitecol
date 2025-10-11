@@ -1,8 +1,9 @@
 [build]
 builder = "NIXPACKS"
+buildCommand = "cd proyectoVigitecolSpringBoot && ./mvnw clean package -DskipTests"
 
 [deploy]
-startCommand = "java -jar target/proyectoVigitecolSpringBoot-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod"
+startCommand = "cd proyectoVigitecolSpringBoot && java -jar target/proyectoVigitecolSpringBoot-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod"
 
 [[services]]
 http_port = 8080
