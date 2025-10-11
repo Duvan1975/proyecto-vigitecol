@@ -7,6 +7,9 @@ WORKDIR /app
 # Copiamos los archivos del proyecto
 COPY . .
 
+# Damos permisos de ejecución a mvnw
+RUN chmod +x ./mvnw
+
 # Compilamos la aplicación
 RUN ./mvnw clean package -DskipTests
 
