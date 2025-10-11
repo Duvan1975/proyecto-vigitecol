@@ -1,29 +1,22 @@
-# Imagen base con JDK 17
-FROM eclipse-temurin:17-jdk as build
+# Usar imagen más ligera
+FROM eclipse-temurin:17-jdk-alpine
 
-# Establecemos el directorio de trabajo
 WORKDIR /app
 
-# Copiamos los archivos del proyecto
-COPY . .
+# Copiar solo los archivos necesarios para cache de Maven
+COPY pom.xml .
+COPY src ./src
 
-# Damos permisos de ejecución a mvnw
-RUN chmod +x ./mvnw
+# Instalar Maven en Alpine
+RUN apk add --no-cache maven
 
-# Compilamos la aplicación
-RUN ./mvnw clean package -DskipTests
+# Compilar con más memoria
+RUN mvn clean package -DskipTests -Xmx512m
 
-# Segunda etapa: Imagen final más ligera
-FROM eclipse-temurin:17-jdk
-
-# Directorio de trabajo
+# Crear imagen final mínima
+FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
+COPY --from=0 /app/target/proyectoVigitecolSpringBoot-0.0.1-SNAPSHOT.jar app.jar
 
-# Copiamos el jar generado desde la etapa anterior
-COPY --from=build /app/target/*.jar app.jar
-
-# Exponemos el puerto
 EXPOSE 8080
-
-# Comando para arrancar la app CON perfil prod
 ENTRYPOINT ["java", "-jar", "app.jar", "--spring.profiles.active=prod"]
