@@ -3,12 +3,12 @@ import { useState } from "react";
 import logoVigitecol from '../img/vigitecol.png';
 
 export function Login({ onLoginSuccess }) {
-    const [admin, setAdmin] = useState("");
+    const [admin, setAdmin] = useState(""); 
     const [clave, setClave] = useState("");
 
     const handleLogin = async () => {
         try {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8081";
         const response = await fetch(`${backendUrl}/login`, {
                 method: "POST",
                 headers: {
