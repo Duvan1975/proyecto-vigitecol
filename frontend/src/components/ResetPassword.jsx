@@ -6,7 +6,7 @@ export default function ResetPassword() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token"); // Captura el token de la URL
   const [nuevaClave, setNuevaClave] = useState("");
-  const [confirmarClave, setConfirmarClave] = useState("");
+  const [confirmarClave, setConfirmarClave] = useState(""); 
 
   useEffect(() => {
     if (!token) {
