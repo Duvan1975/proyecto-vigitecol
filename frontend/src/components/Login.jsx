@@ -8,7 +8,8 @@ export function Login({ onLoginSuccess }) {
 
     const handleLogin = async () => {
         try {
-            const response = await fetch("http://localhost:8080/login", {
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        const response = await fetch(`${backendUrl}/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
