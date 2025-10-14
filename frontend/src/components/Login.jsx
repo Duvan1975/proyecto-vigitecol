@@ -2,6 +2,9 @@ import Swal from "sweetalert2";
 import { useState } from "react";
 import logoVigitecol from '../img/vigitecol.png';
 
+import { debugEnv } from '../debug-env';
+console.log("DEBUG ENV:", debugEnv);
+
 export function Login({ onLoginSuccess }) {
     const [admin, setAdmin] = useState(""); 
     const [clave, setClave] = useState("");
