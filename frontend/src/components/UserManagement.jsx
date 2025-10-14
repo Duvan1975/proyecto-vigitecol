@@ -15,7 +15,8 @@ const UserManagement = () => {
 
     const loadUsers = async () => {
         try {
-            const data = await authGet('http://localhost:8080/usuarios');
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+            const data = await authGet(`${backendUrl}/usuarios`);
             setUsers(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Error loading users:', error);

@@ -14,14 +14,14 @@ export async function AgregarTabla(
     limpiarFormulario) {
 
     try {
-        const responseEmpleado = await authFetch("http://localhost:8080/empleados", {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json",
-            },
-            body: JSON.stringify(
-                empleado),
-        });
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+const responseEmpleado = await authFetch(`${backendUrl}/empleados`, {
+    method: "POST",
+    headers: {
+        "Content-type": "application/json",
+    },
+    body: JSON.stringify(empleado),
+});
 
         if (!responseEmpleado.ok) {
             const errores = await responseEmpleado.json();
@@ -55,7 +55,8 @@ export async function AgregarTabla(
             }));
 
         if (familiaresLimpios.length > 0) {
-            const responseFamiliares = await authFetch(`http://localhost:8080/familiares/${empleadoId}`, {
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+            const responseFamiliares = await authFetch(`${backendUrl}/familiares/${empleadoId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -80,7 +81,8 @@ export async function AgregarTabla(
         }));
 
         if (cursosLimpios.length > 0) {
-            const responseCursos = await authFetch(`http://localhost:8080/cursos/${empleadoId}`, {
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+            const responseCursos = await authFetch(`${backendUrl}/cursos/${empleadoId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -104,7 +106,8 @@ export async function AgregarTabla(
         }));
 
         if (estudiosLimpios.length > 0) {
-            const responseEstudios = await authFetch(`http://localhost:8080/estudios/${empleadoId}`, {
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+            const responseEstudios = await authFetch(`${backendUrl}/estudios/${empleadoId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -126,7 +129,8 @@ export async function AgregarTabla(
         }));
 
         if (experienciasLaboralesLimpias.length > 0) {
-            const responseExperienciasLaborales = await authFetch(`http://localhost:8080/experienciasLaborales/${empleadoId}`, {
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+            const responseExperienciasLaborales = await authFetch(`${backendUrl}/experienciasLaborales/${empleadoId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -150,7 +154,8 @@ export async function AgregarTabla(
         }));
 
         if (afiliacionesLimpias.length > 0) {
-            const responseAfiliaciones = await authFetch(`http://localhost:8080/afiliaciones/${empleadoId}`, {
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+            const responseAfiliaciones = await authFetch(`${backendUrl}/afiliaciones/${empleadoId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -174,7 +179,8 @@ export async function AgregarTabla(
         }));
 
         if (documentosLimpios.length > 0) {
-            const responseDocumentos = await authFetch(`http://localhost:8080/documentos/${empleadoId}`, {
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+            const responseDocumentos = await authFetch(`${backendUrl}/documentos/${empleadoId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -200,7 +206,8 @@ export async function AgregarTabla(
         }));
 
         if (vehiculosLimpios.length > 0) {
-            const responseVehiculos = await authFetch(`http://localhost:8080/vehiculos/${empleadoId}`, {
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+            const responseVehiculos = await authFetch(`${backendUrl}/vehiculos/${empleadoId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -214,7 +221,7 @@ export async function AgregarTabla(
             }
         }
 
-        const responseContratos = await authFetch(`http://localhost:8080/contratos/${empleadoId}`, {
+        const responseContratos = await authFetch(`${backendUrl}/contratos/${empleadoId}`, {
 
             method: "POST",
             headers: {

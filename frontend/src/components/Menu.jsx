@@ -34,7 +34,8 @@ export function Menu() {
 
     const verificarToken = async (token) => {
         try {
-            const response = await fetch("http://localhost:8080/auth/verificar", {
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+            const response = await fetch(`${backendUrl}/auth/verificar`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`

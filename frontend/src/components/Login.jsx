@@ -74,7 +74,7 @@ export function Login({ onLoginSuccess }) {
   if (email) {
     try {
       // CAMBIA ESTA LÍNEA - Usa la variable de entorno
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8081";
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
       const response = await fetch(`${backendUrl}/password-reset/request`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

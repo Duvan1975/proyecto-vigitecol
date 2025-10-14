@@ -14,7 +14,8 @@ export function TablaContratosPorEmpleado({ empleadoId, actualizar, onClose }) {
 
     const cargarContratosPorEmpleado = () => {
         setCargando(true);
-        authFetch(`http://localhost:8080/contratos/por-empleado/${empleadoId}`)
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/contratos/por-empleado/${empleadoId}`)
             .then((res) => res.json())
             .then((data) => {
                 setContratos(data);

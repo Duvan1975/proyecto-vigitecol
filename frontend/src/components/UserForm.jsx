@@ -20,7 +20,8 @@ const UserForm = ({ onUserCreated, onCancel }) => {
         }
 
         try {
-            await authPost('http://localhost:8080/usuarios', {
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+            await authPost(`${backendUrl}/usuarios`, {
                 admin: formData.admin,
                 clave: formData.clave,
                 rol: formData.rol,

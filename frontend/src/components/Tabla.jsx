@@ -91,7 +91,8 @@ export function Tabla({
 
     // 👉 Función que construye la URL según filtros
     const construirUrlEmpleados = (pagina = 0, exportar = false) => {
-        let baseUrl = "http://localhost:8080/empleados";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        let baseUrl = `${backendUrl}/empleados`;
         let url;
 
         if (sinContrato || tipoBusqueda === "sinContrato") {
@@ -200,9 +201,10 @@ export function Tabla({
     };
 
     const eliminarEmpleado = async (id) => {
-        console.log("Id a eliminar:", id); //Prueba en consola
+
         try {
-            const response = await authFetch(`http://localhost:8080/empleados/${id}`, {
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+            const response = await authFetch(`${backendUrl}/empleados/${id}`, {
                 method: 'DELETE'
             });
             if (response.ok) {
@@ -227,8 +229,8 @@ export function Tabla({
             });
             return false;
         }
-
-        let url = `http://localhost:8080/empleados/${tipo}?${valor}=${valor}`;
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        let url = `${backendUrl}/empleados/${tipo}?${valor}=${valor}`;
 
         authFetch(url)
             .then((response) => response.json())
@@ -276,9 +278,10 @@ export function Tabla({
                 });
                 return;
             }
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
             const url = mostrarInactivos
-                ? `http://localhost:8080/empleados/buscar/inactivos?filtro=${nombreBuscar}`
-                : `http://localhost:8080/empleados/buscar/activos?filtro=${nombreBuscar}`;
+                ? `${backendUrl}/empleados/buscar/inactivos?filtro=${nombreBuscar}`
+                : `${backendUrl}/empleados/buscar/activos?filtro=${nombreBuscar}`;
 
             realizarBusqueda(url);
         } else {
@@ -291,16 +294,17 @@ export function Tabla({
                 });
                 return;
             }
-
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
             const url = mostrarInactivos
-                ? `http://localhost:8080/empleados/buscar/inactivos/documento?numeroDocumento=${documentoBuscar}`
-                : `http://localhost:8080/empleados/buscar/activos/documento?numeroDocumento=${documentoBuscar}`;
+                ? `${backendUrl}/empleados/buscar/inactivos/documento?numeroDocumento=${documentoBuscar}`
+                : `${backendUrl}/empleados/buscar/activos/documento?numeroDocumento=${documentoBuscar}`;
 
             realizarBusqueda(url);
             
         }
         if (tipoBusqueda === "sinContrato") {
-            authFetch("http://localhost:8080/empleados/sin-contrato")
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+            authFetch(`${backendUrl}/empleados/sin-contrato`)
                 .then(res => res.json())
                 .then(data => {
                     setResultadoBusqueda(data.content || []);
@@ -476,7 +480,8 @@ export function Tabla({
 
     const exportarEmpleadoIndividual = async (emp) => {
         try {
-            const response = await authFetch(`http://localhost:8080/empleados/${emp.id}/completo`);
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+            const response = await authFetch(`${backendUrl}/empleados/${emp.id}/completo`);
             if (!response.ok) {
                 throw new Error("Error al obtener datos completos del empleado");
             }

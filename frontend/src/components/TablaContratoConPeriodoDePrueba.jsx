@@ -19,7 +19,8 @@ export function TablaContratoConPeriodoDePrueba() {
     const cargarEmpleadosConPeriodoDePrueba = (pagina = 0) => {
         setCargando(true);
 
-        authFetch(`http://localhost:8080/empleados/periodo-prueba/vencido?page=${pagina}`, {
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/empleados/periodo-prueba/vencido?page=${pagina}`, {
             headers: {},
         })
             .then((res) => res.json())
@@ -42,7 +43,8 @@ export function TablaContratoConPeriodoDePrueba() {
         setCargando(true);
 
         // Traemos TODOS los registros
-        authFetch(`http://localhost:8080/empleados/periodo-prueba/vencido?page=0&size=10000`, {
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/empleados/periodo-prueba/vencido?page=0&size=10000`, {
             headers: {},
         })
             .then((res) => res.json())

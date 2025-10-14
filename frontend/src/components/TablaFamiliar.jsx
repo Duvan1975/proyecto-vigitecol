@@ -26,12 +26,13 @@ export function TablaFamiliar({ tipoEmpleado, titulo, genero, tipoBusqueda, edad
 
             // Recorremos todas las páginas
             for (let pagina = 0; pagina < totalPaginas; pagina++) {
+                const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
                 let url;
                 if (tipoBusqueda === "conFamiliares") {
-                    url = `http://localhost:8080/empleados/con-familiares-menores?edadMax=${edadMax}&page=${pagina}`;
+                    url = `${backendUrl}/empleados/con-familiares-menores?edadMax=${edadMax}&page=${pagina}`;
                     if (tipoEmpleado) url += `&tipoEmpleado=${tipoEmpleado}`;
                 } else if (tipoBusqueda === "familiaresPorGenero") {
-                    url = `http://localhost:8080/empleados/conFamiliares/genero?page=${pagina}`;
+                    url = `${backendUrl}/empleados/conFamiliares/genero?page=${pagina}`;
                     if (genero) url += `&genero=${genero}`;
                     if (tipoEmpleado) url += `&tipoEmpleado=${tipoEmpleado}`;
                 } else {
@@ -52,14 +53,14 @@ export function TablaFamiliar({ tipoEmpleado, titulo, genero, tipoBusqueda, edad
 
     const cargarEmpleadosConFamiliares = (pagina = 0) => {
         setCargando(true);
-
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         let url;
         if (tipoBusqueda === "conFamiliares") {
-            url = `http://localhost:8080/empleados/con-familiares-menores?page=${pagina}`;
-                        if (edadMax) url += `&edadMax=${edadMax}`;
+            url = `${backendUrl}/empleados/con-familiares-menores?page=${pagina}`;
+            if (edadMax) url += `&edadMax=${edadMax}`;
             if (tipoEmpleado) url += `&tipoEmpleado=${tipoEmpleado}`;
         } else if (tipoBusqueda === "familiaresPorGenero") {
-            url = `http://localhost:8080/empleados/conFamiliares/genero?page=${pagina}`;
+            url = `${backendUrl}/empleados/conFamiliares/genero?page=${pagina}`;
             if (genero) url += `&genero=${genero}`;
             if (tipoEmpleado) url += `&tipoEmpleado=${tipoEmpleado}`;
         } else {

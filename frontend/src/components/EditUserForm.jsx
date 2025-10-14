@@ -20,6 +20,7 @@ export const EditUserForm = ({ user, onUserUpdated, onCancel }) => {
 
         try {
             // Preparar datos para enviar (sin confirmarClave)
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
             const userData = {
                 admin: formData.admin,
                 rol: formData.rol,
@@ -31,7 +32,7 @@ export const EditUserForm = ({ user, onUserUpdated, onCancel }) => {
                 userData.clave = formData.clave;
             }
 
-            await authPut(`http://localhost:8080/usuarios/${user.id}`, userData);
+            await authPut(`${backendUrl}/usuarios/${user.id}`, userData);
             
             alert('Usuario actualizado exitosamente');
             onUserUpdated();
@@ -42,7 +43,8 @@ export const EditUserForm = ({ user, onUserUpdated, onCancel }) => {
 
     const handleChangeEstado = async (nuevoEstado) => {
         try {
-            await authPatch(`http://localhost:8080/usuarios/${user.id}/estado?estado=${nuevoEstado}`);
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+            await authPatch(`${backendUrl}/usuarios/${user.id}/estado?estado=${nuevoEstado}`);
             alert(`Usuario ${nuevoEstado ? 'activado' : 'desactivado'} exitosamente`);
             onUserUpdated();
         } catch (error) {

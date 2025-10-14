@@ -98,9 +98,10 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     useEffect(() => {
         if (empleado) {
             setFormulario(empleado);
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
             // Obtener el último contrato del empleado
-            authFetch(`http://localhost:8080/contratos/ultimo-contrato/${empleado.id}`)
+            authFetch(`${backendUrl}/contratos/ultimo-contrato/${empleado.id}`)
                 .then(res => {
                     if (!res.ok) throw new Error("Error al obtener el contrato");
                     return res.json();
@@ -130,9 +131,10 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     useEffect(() => {
         if (empleado) {
             setFormulario(empleado);
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
             //Obtener familiares del empleado por ID
-            authFetch(`http://localhost:8080/familiares/por-empleado/${empleado.id}`, {
+            authFetch(`${backendUrl}/familiares/por-empleado/${empleado.id}`, {
 
             })
                 .then(res => res.json())
@@ -151,9 +153,10 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     useEffect(() => {
         if (empleado) {
             setFormulario(empleado);
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
             //Obtener cursos del empleado por ID
-            authFetch(`http://localhost:8080/cursos/por-empleado/${empleado.id}`, {
+            authFetch(`${backendUrl}/cursos/por-empleado/${empleado.id}`, {
 
             })
                 .then(res => res.json())
@@ -173,9 +176,10 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     useEffect(() => {
         if (empleado) {
             setFormulario(empleado);
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
             //Obtener estudios del empleado por ID
-            authFetch(`http://localhost:8080/estudios/por-empleado/${empleado.id}`, {
+            authFetch(`${backendUrl}/estudios/por-empleado/${empleado.id}`, {
 
             })
                 .then(res => res.json())
@@ -194,9 +198,10 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     useEffect(() => {
         if (empleado) {
             setFormulario(empleado);
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
             //Obtener experiencias laborales del empleado por ID
-            authFetch(`http://localhost:8080/experienciasLaborales/por-empleado/${empleado.id}`, {
+            authFetch(`${backendUrl}/experienciasLaborales/por-empleado/${empleado.id}`, {
 
             })
                 .then(res => res.json())
@@ -213,9 +218,10 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     useEffect(() => {
         if (empleado) {
             setFormulario(empleado);
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
             //Obtener afiliaciones del empleado por ID
-            authFetch(`http://localhost:8080/afiliaciones/por-empleado/${empleado.id}`, {
+            authFetch(`${backendUrl}/afiliaciones/por-empleado/${empleado.id}`, {
 
             })
                 .then(res => res.json())
@@ -234,9 +240,10 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     useEffect(() => {
         if (empleado) {
             setFormulario(empleado);
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
             //Obtener documentos del empleado por ID
-            authFetch(`http://localhost:8080/documentos/por-empleado/${empleado.id}`, {
+            authFetch(`${backendUrl}/documentos/por-empleado/${empleado.id}`, {
 
             })
                 .then(res => res.json())
@@ -255,9 +262,10 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     useEffect(() => {
         if (empleado) {
             setFormulario(empleado);
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
             //Obtener vehiculos del empleado por ID
-            authFetch(`http://localhost:8080/vehiculos/por-empleado/${empleado.id}`, {
+            authFetch(`${backendUrl}/vehiculos/por-empleado/${empleado.id}`, {
 
             })
                 .then(res => res.json())
@@ -354,8 +362,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const actualizarEmpleado = () => {
-
-        authFetch("http://localhost:8080/empleados", {
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/empleados`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -411,8 +419,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const actualizarFamiliar = (familiar) => {
-
-        authFetch("http://localhost:8080/familiares", {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/familiares`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -429,8 +437,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const actualizarCurso = (curso) => {
-
-        authFetch("http://localhost:8080/cursos", {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/cursos`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -447,8 +455,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const actualizarEstudio = (estudio) => {
-
-        authFetch("http://localhost:8080/estudios", {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/estudios`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -465,8 +473,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const actualizarExperienciaLaboral = (experienciaLaboral) => {
-
-        authFetch("http://localhost:8080/experienciasLaborales", {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/experienciasLaborales`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -483,8 +491,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const actualizarAfiliacion = (afiliacion) => {
-
-        authFetch("http://localhost:8080/afiliaciones", {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/afiliaciones`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -501,8 +509,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const actualizarDocumento = (documento) => {
-
-        authFetch("http://localhost:8080/documentos", {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/documentos`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -519,8 +527,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const actualizarVehiculo = (vehiculo) => {
-
-        authFetch("http://localhost:8080/vehiculos", {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/vehiculos`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -549,8 +557,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             Swal.fire("Campos incompletos", "Por favor llena todos los campos.", "warning");
             return;
         }
-
-        authFetch(`http://localhost:8080/familiares/${empleado.id}`, {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/familiares/${empleado.id}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -619,8 +627,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             Swal.fire("Fecha inválida", "Verifica que la fecha tenga el formato correcto (yyyy-MM-dd).", "error");
             return;
         }
-
-        authFetch(`http://localhost:8080/cursos/${empleado.id}`, {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/cursos/${empleado.id}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -664,7 +672,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         }
 
         // Si todo está correcto, proceder con el fetch
-        authFetch(`http://localhost:8080/estudios/${empleado.id}`, {
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/estudios/${empleado.id}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -696,7 +705,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     const registrarNuevaExperienciaLaboral = () => {
 
         // Si todo está correcto, proceder con el fetch
-        authFetch(`http://localhost:8080/experienciasLaborales/${empleado.id}`, {
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/experienciasLaborales/${empleado.id}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -737,7 +747,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         }
 
         // Si todo está correcto, proceder con el fetch
-        authFetch(`http://localhost:8080/afiliaciones/${empleado.id}`, {
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/afiliaciones/${empleado.id}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -780,7 +791,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         }
 
         // Si todo está correcto, proceder con el fetch
-        authFetch(`http://localhost:8080/documentos/${empleado.id}`, {
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/documentos/${empleado.id}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -837,7 +849,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         }
 
         // Si todo está correcto, proceder con el fetch
-        authFetch(`http://localhost:8080/vehiculos/${empleado.id}`, {
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/vehiculos/${empleado.id}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -869,8 +882,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const actualizarContrato = (contrato) => {
-
-        authFetch("http://localhost:8080/contratos", {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/contratos`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -901,8 +914,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             vacacionesDesde: "",
             vacacionesHasta: ""
         };
-
-        authFetch(`http://localhost:8080/contratos/${empleado.id}`, {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/contratos/${empleado.id}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -914,8 +927,9 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                 //return res.text(); // ya que solo devuelve un mensaje de texto
             })
             .then(() => {
+                const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
                 // Volver a cargar todos los contratos desde el backend
-                authFetch(`http://localhost:8080/contratos/por-empleado/${empleado.id}`)
+                authFetch(`${backendUrl}/contratos/por-empleado/${empleado.id}`)
                     .then(res => res.json())
                     .then(data => {
                         const contratosPreparados = (Array.isArray(data) ? data : []).map(c => ({
@@ -950,7 +964,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             cancelButtonText: "Cancelar",
         }).then((result) => {
             if (result.isConfirmed) {
-                authFetch(`http://localhost:8080/contratos/${id}`, {
+                const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+                authFetch(`${backendUrl}/contratos/${id}`, {
                     method: "DELETE",
                 })
                     .then((res) => {
@@ -967,7 +982,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const cargarTodosContratos = () => {
-        authFetch(`http://localhost:8080/contratos/por-empleado/${empleado.id}`)
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/contratos/por-empleado/${empleado.id}`)
             .then(res => res.json())
             .then(data => {
                 const contratosPreparados = data.map(c => ({
@@ -1000,8 +1016,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         }).then((result) => {
             if (result.isConfirmed) {
                 const token = localStorage.getItem("token");
-
-                authFetch(`http://localhost:8080/familiares/${id}`, {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+                authFetch(`${backendUrl}/familiares/${id}`, {
                     method: "DELETE",
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -1029,8 +1045,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-
-                authFetch(`http://localhost:8080/cursos/${id}`, {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+                authFetch(`${backendUrl}/cursos/${id}`, {
                     method: "DELETE",
 
                 })
@@ -1056,8 +1072,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-
-                authFetch(`http://localhost:8080/estudios/${id}`, {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+                authFetch(`${backendUrl}/estudios/${id}`, {
                     method: "DELETE",
 
                 })
@@ -1083,8 +1099,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-
-                authFetch(`http://localhost:8080/experienciasLaborales/${id}`, {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+                authFetch(`${backendUrl}/experienciasLaborales/${id}`, {
                     method: "DELETE",
 
                 })
@@ -1110,8 +1126,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-
-                authFetch(`http://localhost:8080/afiliaciones/${id}`, {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+                authFetch(`${backendUrl}/afiliaciones/${id}`, {
                     method: "DELETE",
 
                 })
@@ -1137,8 +1153,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-
-                authFetch(`http://localhost:8080/documentos/${id}`, {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+                authFetch(`${backendUrl}/documentos/${id}`, {
                     method: "DELETE",
 
                 })
@@ -1164,8 +1180,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-
-                authFetch(`http://localhost:8080/vehiculos/${id}`, {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+                authFetch(`${backendUrl}/vehiculos/${id}`, {
                     method: "DELETE",
 
                 })
@@ -2406,7 +2422,8 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                 cargarTodosContratos(); // ← muestra todos
                                             } else {
                                                 // ← dejamos solo el contrato más reciente
-                                                authFetch(`http://localhost:8080/contratos/ultimo-contrato/${empleado.id}`)
+                                                const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+                                                authFetch(`${backendUrl}/contratos/ultimo-contrato/${empleado.id}`)
                                                     .then(res => res.json())
                                                     .then(data => {
                                                         const contratoUnico = {

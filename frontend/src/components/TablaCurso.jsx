@@ -18,8 +18,8 @@ export function TablaCurso() {
 
     const cargarEmpleadosConCursosPorVencer = (pagina = 0) => {
         setCargando(true);
-
-        authFetch(`http://localhost:8080/empleados/con-cursos/por-vencer?page=${pagina}`, {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/empleados/con-cursos/por-vencer?page=${pagina}`, {
             headers: {},
         })
             .then((res) => res.json())
@@ -40,8 +40,8 @@ export function TablaCurso() {
     // Exportar TODOS los registros a Excel con filtros
     const exportarExcel = () => {
         setCargando(true);
-
-        authFetch(`http://localhost:8080/empleados/con-cursos/por-vencer?page=0&size=10000`, {
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        authFetch(`${backendUrl}/empleados/con-cursos/por-vencer?page=0&size=10000`, {
             headers: {},
         })
             .then((res) => res.json())
