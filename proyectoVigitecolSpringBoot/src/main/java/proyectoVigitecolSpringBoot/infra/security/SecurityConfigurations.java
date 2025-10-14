@@ -38,7 +38,10 @@ public class SecurityConfigurations {
                             "http://192.168.20.142:8081",
                             "http://192.168.1.6:8081",
                             "http://192.168.1.6:3000",
-                            "https://proyecto-vigitecol-1.onrender.com"
+                            "https://proyecto-vigitecol-1.onrender.com",
+                            "https://proyecto-vigitecol-dsa7-git-",
+                            "http://192.168.1.6:3000",
+                            "http://192.168.20.142:3000"
 
                     ));
                     corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
