@@ -12,7 +12,7 @@ export function Login({ onLoginSuccess }) {
     const handleLogin = async () => {
         try {
             //const backendUrl = "https://proyecto-vigitecol-1.onrender.com";
-        const backendUrl = process.env.REACT_APP_BACKEND_URL;
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080" || "http://localhost:8081";
         const response = await fetch(`${backendUrl}/login`, {
                 method: "POST",
                 headers: {
