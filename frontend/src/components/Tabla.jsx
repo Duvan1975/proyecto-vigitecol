@@ -928,18 +928,19 @@ ${tipoBusqueda === "sinContrato"
                                                 <div className="d-flex justify-content-center gap-2">
                                                     {console.log('Emp actual:', emp, 'Rol:', localStorage.getItem("rol"))}
 
-                                                    <button
-                                                        onClick={() => {
-                                                            console.log('Click en botón, emp:', emp);
-                                                            setEmpleadoSeleccionado(emp);
-                                                            setMostrarModal(true);
-                                                        }}
-                                                        className="btn btn-sm btn-outline-primary me-0"
-                                                        title="Editar"
-                                                    >
-                                                        <i className="bi bi-pencil-fill"></i>
-                                                    </button>
-
+                                                    <ProtectedElement allowedRoles={["RRHH"]}>
+                                                        <button
+                                                            onClick={() => {
+                                                                console.log('Click en botón, emp:', emp);
+                                                                setEmpleadoSeleccionado(emp);
+                                                                setMostrarModal(true);
+                                                            }}
+                                                            className="btn btn-sm btn-outline-primary me-0"
+                                                            title="Editar"
+                                                        >
+                                                            <i className="bi bi-pencil-fill"></i>
+                                                        </button>
+                                                    </ProtectedElement>
                                                     <button
                                                         onClick={() => {
                                                             setEmpleadoParaHistorial(emp.id);
@@ -958,33 +959,36 @@ ${tipoBusqueda === "sinContrato"
                                                         <i className="bi bi-file-earmark-excel"></i>
                                                     </button>
                                                     {!mostrarInactivos && (
-                                                        <button
-                                                            onClick={() => {
-                                                                Swal.fire({
-                                                                    title: '¿Estás seguro?',
-                                                                    text: "Esta acción desactivará al empleado.",
-                                                                    icon: 'warning',
-                                                                    showCancelButton: true,
-                                                                    confirmButtonColor: '#3085d6',
-                                                                    cancelButtonColor: '#d33',
-                                                                    confirmButtonText: 'Sí, desactivar',
-                                                                    cancelButtonText: 'Cancelar'
-                                                                }).then((result) => {
-                                                                    if (result.isConfirmed) {
-                                                                        eliminarEmpleado(emp.id);
-                                                                        Swal.fire(
-                                                                            'Eliminado',
-                                                                            'El empleado ha sido retirado.',
-                                                                            'success'
-                                                                        );
-                                                                    }
-                                                                });
-                                                            }}
-                                                            className="btn btn-sm btn-outline-danger"
-                                                            title="Desactivar"
-                                                        >
-                                                            <i className="bi bi-trash-fill"></i>
-                                                        </button>
+
+                                                        <ProtectedElement allowedRoles={["RRHH"]}>
+                                                            <button
+                                                                onClick={() => {
+                                                                    Swal.fire({
+                                                                        title: '¿Estás seguro?',
+                                                                        text: "Esta acción desactivará al empleado.",
+                                                                        icon: 'warning',
+                                                                        showCancelButton: true,
+                                                                        confirmButtonColor: '#3085d6',
+                                                                        cancelButtonColor: '#d33',
+                                                                        confirmButtonText: 'Sí, desactivar',
+                                                                        cancelButtonText: 'Cancelar'
+                                                                    }).then((result) => {
+                                                                        if (result.isConfirmed) {
+                                                                            eliminarEmpleado(emp.id);
+                                                                            Swal.fire(
+                                                                                'Eliminado',
+                                                                                'El empleado ha sido retirado.',
+                                                                                'success'
+                                                                            );
+                                                                        }
+                                                                    });
+                                                                }}
+                                                                className="btn btn-sm btn-outline-danger"
+                                                                title="Desactivar"
+                                                            >
+                                                                <i className="bi bi-trash-fill"></i>
+                                                            </button>
+                                                        </ProtectedElement>
                                                     )}
                                                 </div>
                                             </td>
@@ -1039,33 +1043,37 @@ ${tipoBusqueda === "sinContrato"
                                                     </button>
 
                                                     {!mostrarInactivos && tipoBusqueda !== "sinContrato" && (
-                                                        <button
-                                                            onClick={() => {
-                                                                Swal.fire({
-                                                                    title: '¿Estás seguro?',
-                                                                    text: "Esta acción desactivará al empleado.",
-                                                                    icon: 'warning',
-                                                                    showCancelButton: true,
-                                                                    confirmButtonColor: '#3085d6',
-                                                                    cancelButtonColor: '#d33',
-                                                                    confirmButtonText: 'Sí, desactivar',
-                                                                    cancelButtonText: 'Cancelar'
-                                                                }).then((result) => {
-                                                                    if (result.isConfirmed) {
-                                                                        eliminarEmpleado(emp.id);
-                                                                        Swal.fire(
-                                                                            'Desactivado',
-                                                                            'El empleado ha sido retirado.',
-                                                                            'success'
-                                                                        );
-                                                                    }
-                                                                });
-                                                            }}
-                                                            className="btn btn-sm btn-outline-danger"
-                                                            title="Desactivar"
-                                                        >
-                                                            <i className="bi bi-trash-fill"></i>
-                                                        </button>
+
+                                                        <ProtectedElement allowedRoles={["RRHH"]}>
+                                                            <button
+                                                                onClick={() => {
+                                                                    Swal.fire({
+                                                                        title: '¿Estás seguro?',
+                                                                        text: "Esta acción desactivará al empleado.",
+                                                                        icon: 'warning',
+                                                                        showCancelButton: true,
+                                                                        confirmButtonColor: '#3085d6',
+                                                                        cancelButtonColor: '#d33',
+                                                                        confirmButtonText: 'Sí, desactivar',
+                                                                        cancelButtonText: 'Cancelar'
+                                                                    }).then((result) => {
+                                                                        if (result.isConfirmed) {
+                                                                            eliminarEmpleado(emp.id);
+                                                                            Swal.fire(
+                                                                                'Desactivado',
+                                                                                'El empleado ha sido retirado.',
+                                                                                'success'
+                                                                            );
+                                                                        }
+                                                                    });
+                                                                }}
+                                                                className="btn btn-sm btn-outline-danger"
+                                                                title="Desactivar"
+                                                            >
+                                                                <i className="bi bi-trash-fill"></i>
+                                                            </button>
+                                                        </ProtectedElement>
+
                                                     )}
                                                 </div>
                                             </td>
