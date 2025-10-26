@@ -75,6 +75,38 @@ export function Menu() {
         setVista("login");
     };
 
+    const BackupButton = () => {
+        const handleBackup = async () => {
+            const token = localStorage.getItem("token"); // si usas autenticación
+            const response = await fetch("http://localhost:8080/backup/download", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                }
+            });
+
+            if (!response.ok) {
+                alert("Error al generar el backup");
+                return;
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "backup_vigitecol.sql";
+            a.click();
+            window.URL.revokeObjectURL(url);
+        };
+
+        return (
+            <button className="btn btn-outline-success" onClick={handleBackup}>
+                💾 Descargar Backup
+            </button>
+        );
+    };
+
+
     // Mostrar loading mientras verifica el token
     if (cargando) {
         return (
@@ -155,7 +187,7 @@ export function Menu() {
             {/* Contenido principal (crece para empujar el footer abajo) */}
             <main className="flex-grow-1">
                 <div className="container mt-3">
-                    {/* ... (tu código existente de botones y vistas) ... */}
+                    {/* ... (código existente de botones y vistas) ... */}
                     {isLoggedIn && vista !== "login" && (
                         <div className="mb-4">
                             <div className="d-flex flex-wrap justify-content-center gap-2">
@@ -262,6 +294,10 @@ export function Menu() {
                                         Selecciona una opción del menú superior para comenzar
                                     </p>
                                 </div>
+                                <ProtectedElement allowedRoles={["ADMIN"]}>
+                                    <BackupButton />
+                                </ProtectedElement>
+
                             </div>
                         </div>
                     )}
