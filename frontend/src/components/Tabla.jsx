@@ -8,7 +8,6 @@ import { TablaFamiliar } from "./TablaFamiliar";
 import { TablaCurso } from "./TablaCurso";
 import { TablaContratoConPeriodoDePrueba } from "./TablaContratoConPeriodoDePrueba";
 import { authFetch } from "../utils/authFetch";
-import ProtectedElement from "../utils/ProtectedElement";
 import ExportModal from "./ExportModal";
 import * as XLSX from "xlsx";
 
@@ -928,7 +927,6 @@ ${tipoBusqueda === "sinContrato"
                                                 <div className="d-flex justify-content-center gap-2">
                                                     {console.log('Emp actual:', emp, 'Rol:', localStorage.getItem("rol"))}
 
-                                                    <ProtectedElement allowedRoles={["RRHH"]}>
                                                         <button
                                                             onClick={() => {
                                                                 console.log('Click en botón, emp:', emp);
@@ -940,7 +938,6 @@ ${tipoBusqueda === "sinContrato"
                                                         >
                                                             <i className="bi bi-pencil-fill"></i>
                                                         </button>
-                                                    </ProtectedElement>
 
                                                     <button
                                                         onClick={() => {

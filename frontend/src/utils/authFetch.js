@@ -13,8 +13,8 @@ export const authFetch = async (url, options = {}) => {
   if (res.status === 401 || res.status === 403) {
     // Eliminamos los datos de sesión
     localStorage.removeItem("token");
-    //localStorage.removeItem("rol");
-    //localStorage.removeItem("admin");
+    localStorage.removeItem("rol");
+    localStorage.removeItem("admin");
     localStorage.removeItem("estado");
 
     // Mostramos alerta

@@ -69,6 +69,7 @@ public class SecurityConfigurations {
                         // ESCRITURA - Solo RRHH
                         .requestMatchers(HttpMethod.POST, "/empleados").hasAuthority("ROLE_RRHH")
                         .requestMatchers(HttpMethod.PUT, "/empleados/**").hasAuthority("ROLE_RRHH")
+                        .requestMatchers(HttpMethod.PUT, "/empleados/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/empleados/**").hasAuthority("ROLE_RRHH")
 
                         // ==================== CONTRATOS ====================
