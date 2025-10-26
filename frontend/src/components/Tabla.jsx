@@ -8,6 +8,7 @@ import { TablaFamiliar } from "./TablaFamiliar";
 import { TablaCurso } from "./TablaCurso";
 import { TablaContratoConPeriodoDePrueba } from "./TablaContratoConPeriodoDePrueba";
 import { authFetch } from "../utils/authFetch";
+import ProtectedElement from "../utils/ProtectedElement";
 import ExportModal from "./ExportModal";
 import * as XLSX from "xlsx";
 
@@ -66,7 +67,7 @@ export function Tabla({
         mostrarSupervisores,
         estadoCivilBuscar,
         generoBuscar,
-        edadMax, 
+        edadMax,
         generoBuscarFamiliares,
         libretaMilitarBuscar,
         cargoBuscar,
@@ -228,7 +229,7 @@ export function Tabla({
             });
             return false;
         }
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         let url = `${backendUrl}/empleados/${tipo}?${valor}=${valor}`;
 
         authFetch(url)
@@ -293,13 +294,13 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
                 });
                 return;
             }
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
             const url = mostrarInactivos
                 ? `${backendUrl}/empleados/buscar/inactivos/documento?numeroDocumento=${documentoBuscar}`
                 : `${backendUrl}/empleados/buscar/activos/documento?numeroDocumento=${documentoBuscar}`;
 
             realizarBusqueda(url);
-            
+
         }
         if (tipoBusqueda === "sinContrato") {
             const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
@@ -927,17 +928,17 @@ ${tipoBusqueda === "sinContrato"
                                                 <div className="d-flex justify-content-center gap-2">
                                                     {console.log('Emp actual:', emp, 'Rol:', localStorage.getItem("rol"))}
 
-                                                        <button
-                                                            onClick={() => {
-                                                                console.log('Click en botón, emp:', emp);
-                                                                setEmpleadoSeleccionado(emp);
-                                                                setMostrarModal(true);
-                                                            }}
-                                                            className="btn btn-sm btn-outline-primary me-0"
-                                                            title="Editar"
-                                                        >
-                                                            <i className="bi bi-pencil-fill"></i>
-                                                        </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            console.log('Click en botón, emp:', emp);
+                                                            setEmpleadoSeleccionado(emp);
+                                                            setMostrarModal(true);
+                                                        }}
+                                                        className="btn btn-sm btn-outline-primary me-0"
+                                                        title="Editar"
+                                                    >
+                                                        <i className="bi bi-pencil-fill"></i>
+                                                    </button>
 
                                                     <button
                                                         onClick={() => {
@@ -1002,16 +1003,20 @@ ${tipoBusqueda === "sinContrato"
                                             <td>{emp.cargo}</td>
                                             <td>
                                                 <div className="d-flex justify-content-center gap-2">
-                                                    <button
-                                                        onClick={() => {
-                                                            setEmpleadoSeleccionado(emp);
-                                                            setMostrarModal(true);
-                                                        }}
-                                                        className="btn btn-sm btn-outline-primary me-0"
-                                                        title="Editar"
-                                                    >
-                                                        <i className="bi bi-pencil-fill"></i>
-                                                    </button>
+
+                                                    <ProtectedElement allowedRoles={["RRHH"]}>
+                                                        <button
+                                                            onClick={() => {
+                                                                setEmpleadoSeleccionado(emp);
+                                                                setMostrarModal(true);
+                                                            }}
+                                                            className="btn btn-sm btn-outline-primary me-0"
+                                                            title="Editar"
+                                                        >
+                                                            <i className="bi bi-pencil-fill"></i>
+                                                        </button>
+                                                    </ProtectedElement>
+
 
                                                     <button
                                                         onClick={() => {
