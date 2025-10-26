@@ -10,6 +10,8 @@ import java.io.*;
 
 @RestController
 @RequestMapping("/backup")
+@CrossOrigin(origins = "http://localhost:3000")
+
 public class BackupController {
 
     @Value("${spring.datasource.username}")
