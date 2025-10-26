@@ -928,7 +928,7 @@ ${tipoBusqueda === "sinContrato"
                                                 <div className="d-flex justify-content-center gap-2">
                                                     {console.log('Emp actual:', emp, 'Rol:', localStorage.getItem("rol"))}
 
-                                                    <ProtectedElement allowedRoles={["RRHH", "ADMIN"]}>
+                                                    <ProtectedElement allowedRoles={["RRHH"]}>
                                                         <button
                                                             onClick={() => {
                                                                 console.log('Click en botón, emp:', emp);

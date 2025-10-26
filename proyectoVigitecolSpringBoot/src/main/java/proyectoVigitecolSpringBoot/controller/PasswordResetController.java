@@ -54,21 +54,4 @@ public class PasswordResetController {
             return ResponseEntity.badRequest().body(java.util.Map.of("error", e.getMessage()));
         }
     }
-
-    /*@Component
-    public class EnvCheck {
-
-        @Value("${spring.mail.password:NOT_FOUND}")
-        private String sendGridKey;
-
-        @PostConstruct
-        public void verifyKey() {
-            if ("NOT_FOUND".equals(sendGridKey)) {
-                System.out.println("⚠️ Variable SENDGRID_API_KEY NO detectada por Spring Boot");
-            } else {
-                System.out.println("✅ Variable SENDGRID_API_KEY detectada correctamente");
-                System.out.println("Inicio de clave: " + sendGridKey.substring(0, 10) + "*********");
-            }
-        }
-    }*/
 }
