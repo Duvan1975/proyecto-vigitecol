@@ -1,79 +1,59 @@
 package proyectoVigitecolSpringBoot.controller;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @RestController
 @RequestMapping("/backup")
-@CrossOrigin(origins = "http://localhost:3000")
-
 public class BackupController {
-
-    @Value("${spring.datasource.username}")
-    private String dbUser;
-
-    @Value("${AIVEN_DB_PASSWORD}")
-    private String dbPassword;
-
-    @Value("${spring.datasource.url}")
-    private String dbUrl;
 
     @GetMapping("/download")
     public ResponseEntity<InputStreamResource> downloadBackup() {
         try {
-            // Extraer nombre de la base de datos desde la URL
-            String dbName = dbUrl.substring(dbUrl.lastIndexOf("/") + 1, dbUrl.indexOf("?"));
+            // Nombre del archivo con fecha
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+            String backupFile = "backup_" + timestamp + ".sql";
 
-            // Archivo temporal donde guardaremos el backup
-            File backupFile = File.createTempFile("backup_vigitecol_", ".sql");
+            // Ruta completa del mysqldump en Windows
+            String mysqldumpPath = "C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysqldump.exe";
 
-            // Comando mysqldump
-            String command = String.format(
-                    "mysqldump -u%s -p%s -h%s --port=%s %s",
-                    dbUser,
-                    dbPassword,
-                    extractHost(dbUrl),
-                    extractPort(dbUrl),
-                    dbName
+            // Parámetros de conexión
+            String user = "root"; // o el usuario que tengas
+            String password = "TU_PASSWORD";
+            String database = "vigitecol_db";
+
+            // Comando para exportar la base de datos
+            ProcessBuilder pb = new ProcessBuilder(
+                    mysqldumpPath,
+                    "-u", user,
+                    "-p" + password,
+                    "--databases", database
             );
 
-            // Ejecutar el comando
-            ProcessBuilder pb = new ProcessBuilder("bash", "-c", command);
-            pb.redirectOutput(backupFile);
+            // Redirigir salida al archivo .sql
+            pb.redirectOutput(new File(backupFile));
             Process process = pb.start();
-            int exitCode = process.waitFor();
+            process.waitFor();
 
-            if (exitCode != 0) {
-                throw new RuntimeException("Error al ejecutar mysqldump. Código: " + exitCode);
-            }
-
-            InputStreamResource resource = new InputStreamResource(new FileInputStream(backupFile));
+            // Leer archivo y enviarlo como descarga
+            File file = new File(backupFile);
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=backup_vigitecol.sql")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName())
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .contentLength(file.length())
                     .body(resource);
 
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError()
-                    .body(null);
+            return ResponseEntity.internalServerError().build();
         }
-    }
-
-    private String extractHost(String url) {
-        // Ejemplo: jdbc:mysql://mysql-xxxxxx.aivencloud.com:20771/dbname
-        String hostPort = url.substring(url.indexOf("//") + 2, url.lastIndexOf("/"));
-        return hostPort.split(":")[0];
-    }
-
-    private String extractPort(String url) {
-        String hostPort = url.substring(url.indexOf("//") + 2, url.lastIndexOf("/"));
-        return hostPort.split(":")[1];
     }
 }
