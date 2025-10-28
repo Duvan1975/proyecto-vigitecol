@@ -78,24 +78,25 @@ export function Menu() {
     const BackupButton = () => {
         const handleBackup = async () => {
             const token = localStorage.getItem("token"); // si usas autenticación
-const response = await fetch("http://localhost:8080/backup/excel", {
-  method: "GET",
-  headers: {
-    "Authorization": `Bearer ${token}`,
-  },
-});
+            const response = await fetch("http://localhost:8080/backup/download", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                }
+            });
 
-if (!response.ok) {
-  throw new Error("Error al generar el backup");
-}
+            if (!response.ok) {
+                alert("Error al generar el backup");
+                return;
+            }
 
-const blob = await response.blob();
-const url = window.URL.createObjectURL(blob);
-const link = document.createElement("a");
-link.href = url;
-link.download = "backup_completo_vigitecol.xlsx";
-link.click();
-
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "backup_vigitecol.sql";
+            a.click();
+            window.URL.revokeObjectURL(url);
         };
 
         return (

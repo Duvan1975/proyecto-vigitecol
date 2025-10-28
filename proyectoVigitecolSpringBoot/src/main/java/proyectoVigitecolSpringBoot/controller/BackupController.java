@@ -1,119 +1,61 @@
 package proyectoVigitecolSpringBoot.controller;
 
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.sql.DataSource;
-import java.io.ByteArrayOutputStream;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @RestController
 @RequestMapping("/backup")
 public class BackupController {
 
-    @Autowired
-    private DataSource dataSource;
+    @GetMapping("/download")
+    public ResponseEntity<InputStreamResource> downloadBackup() {
+        try {
+            String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+            String backupFile = "backup_" + timestamp + ".sql";
 
-    @GetMapping("/excel")
-    public ResponseEntity<byte[]> generarBackupCompletoExcel() {
-        try (Connection connection = dataSource.getConnection()) {
+            // Ruta del mysqldump en Windows
+            String mysqldumpPath = "C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysqldump.exe";
 
-            // 🔹 Obtener todas las tablas del esquema actual
-            DatabaseMetaData metaData = connection.getMetaData();
-            ResultSet tables = metaData.getTables(connection.getCatalog(), null, "%", new String[]{"TABLE"});
+            // Parámetros de conexión AIVEN
+            String host = "mysql-14d288cf-ballexplorer1975-fb53.d.aivencloud.com";
+            String port = "20771";
+            String user = "avnadmin";
+            String password = System.getenv("AIVEN_DB_PASSWORD");
+            String database = "vigitecol_db";
 
-            Workbook workbook = new XSSFWorkbook();
-            CellStyle headerStyle = crearEstiloEncabezado(workbook);
+            // Comando completo (AIVEN requiere SSL)
+            ProcessBuilder pb = new ProcessBuilder(
+                    mysqldumpPath,
+                    "-h", host,
+                    "-P", port,
+                    "-u", user,
+                    "-p" + password,
+                    "--ssl-mode=REQUIRED",
+                    "--databases", database
+            );
 
-            List<String> tablasProcesadas = new ArrayList<>();
+            pb.redirectOutput(new File(backupFile));
+            Process process = pb.start();
+            process.waitFor();
 
-            while (tables.next()) {
-                String tableName = tables.getString("TABLE_NAME");
-
-                // Evitar tablas del sistema si existieran
-                if (tableName.startsWith("sys_") || tableName.startsWith("hibernate_")) continue;
-
-                tablasProcesadas.add(tableName);
-                Sheet sheet = workbook.createSheet(tableName);
-
-                Statement stmt = connection.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT * FROM " + tableName);
-                ResultSetMetaData rsMeta = rs.getMetaData();
-                int columnCount = rsMeta.getColumnCount();
-
-                // Crear encabezados
-                Row headerRow = sheet.createRow(0);
-                for (int i = 1; i <= columnCount; i++) {
-                    Cell cell = headerRow.createCell(i - 1);
-                    cell.setCellValue(rsMeta.getColumnName(i));
-                    cell.setCellStyle(headerStyle);
-                }
-
-                // Llenar filas
-                int rowNum = 1;
-                while (rs.next()) {
-                    Row row = sheet.createRow(rowNum++);
-                    for (int i = 1; i <= columnCount; i++) {
-                        Object value = rs.getObject(i);
-                        row.createCell(i - 1).setCellValue(value != null ? value.toString() : "");
-                    }
-                }
-
-                // Ajustar ancho de columnas
-                for (int i = 0; i < columnCount; i++) {
-                    sheet.autoSizeColumn(i);
-                }
-
-                rs.close();
-                stmt.close();
-            }
-
-            if (tablasProcesadas.isEmpty()) {
-                Sheet emptySheet = workbook.createSheet("Sin datos");
-                emptySheet.createRow(0).createCell(0).setCellValue("No se encontraron tablas en la base de datos");
-            }
-
-            // 🔸 Convertir a bytes para descarga
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            workbook.write(outputStream);
-            workbook.close();
-
-            byte[] excelBytes = outputStream.toByteArray();
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=backup_completo_vigitecol.xlsx");
+            File file = new File(backupFile);
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 
             return ResponseEntity.ok()
-                    .headers(headers)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName())
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .body(excelBytes);
+                    .contentLength(file.length())
+                    .body(resource);
 
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
-    }
-
-    private CellStyle crearEstiloEncabezado(Workbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        Font font = workbook.createFont();
-        font.setBold(true);
-        font.setFontHeightInPoints((short) 11);
-        style.setFont(font);
-        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        style.setAlignment(HorizontalAlignment.CENTER);
-        style.setBorderBottom(BorderStyle.THIN);
-        style.setBorderTop(BorderStyle.THIN);
-        style.setBorderLeft(BorderStyle.THIN);
-        style.setBorderRight(BorderStyle.THIN);
-        return style;
     }
 }

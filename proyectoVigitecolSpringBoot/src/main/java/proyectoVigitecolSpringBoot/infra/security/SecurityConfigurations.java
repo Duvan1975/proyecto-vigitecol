@@ -94,6 +94,8 @@ public class SecurityConfigurations {
                         // ==================== REPORTES ====================
                         .requestMatchers(HttpMethod.GET, "/reportes/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_RRHH")
 
+                        .requestMatchers(HttpMethod.GET, "/backup/download").hasRole("ADMIN")
+
                         // Endpoints de prueba
                         .requestMatchers("/test/admin").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/test/rrhh").hasAnyAuthority("ROLE_ADMIN", "ROLE_RRHH")
