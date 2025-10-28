@@ -78,7 +78,7 @@ export function Menu() {
     const BackupButton = () => {
         const handleBackup = async () => {
             const token = localStorage.getItem("token"); // si usas autenticación
-            const response = await fetch("http://localhost:8080/backup/download", {
+            const response = await fetch("http://localhost:8081/backup/download", {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
