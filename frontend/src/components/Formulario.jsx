@@ -913,7 +913,7 @@ export function Formulario({ setVista }) {
                         { valor: "SALUD", texto: "SALUD" },
                         { valor: "PENSION", texto: "PENSIÓN" },
                         { valor: "ARL", texto: "ARL" },
-                        { valor: "CONFA", texto: "CONFA" },
+                        { valor: "CAJA_DE_COMPENSACION", texto: "CAJA_DE_COMPENSACION" },
                     ]}
                 />
                 <CuadrosTexto

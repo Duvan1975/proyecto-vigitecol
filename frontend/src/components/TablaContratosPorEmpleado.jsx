@@ -87,10 +87,10 @@ export function TablaContratosPorEmpleado({ empleadoId, actualizar, onClose }) {
                         <th>Fecha Retiro</th>
                         <th>Fecha Renuncia</th>
                         <th>Fecha OTRO Sí</th>
-                        <th>Omiso</th>
+                        <th>Observaciones (Omiso)</th>
                         <th>¿Continúa?</th>
-                        <th>Vacaciones Desde</th>
-                        <th>Vacaciones Hasta</th>
+                        <th>Terminación de Contrato Desde</th>
+                        <th>Terminación de Contrato Hasta</th>
                     </tr>
                 </thead>
                 <tbody>

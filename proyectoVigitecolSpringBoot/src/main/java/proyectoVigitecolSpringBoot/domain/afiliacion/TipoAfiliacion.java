@@ -4,5 +4,5 @@ public enum TipoAfiliacion {
     SALUD,
     PENSION,
     ARL,
-    CONFA
+    CAJA_DE_COMPENSACION
 }

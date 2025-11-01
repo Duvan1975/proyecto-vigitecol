@@ -1900,7 +1900,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     <option value="SALUD">SALUD</option>
                                                     <option value="PENSION">PENSIÓN</option>
                                                     <option value="ARL">ARL</option>
-                                                    <option value="CONFA">CONFA</option>
+                                                    <option value="CAJA_DE_COMPENSACION">CAJA DE COMPENSACION</option>
                                                 </select>
                                             </td>
                                             <td>
@@ -1946,7 +1946,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                     <option value="SALUD">SALUD</option>
                                                     <option value="PENSION">PENSIÓN</option>
                                                     <option value="ARL">ARL</option>
-                                                    <option value="CONFA">CONFA</option>
+                                                    <option value="CAJA_DE_COMPENSACION">CAJA DE COMPENSACIÓN</option>
                                                 </select>
                                             </td>
                                             <td>
@@ -2346,7 +2346,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
                                                 <div className="row">
                                                     <div className="col-md-8">
-                                                        <label><strong>Omiso:</strong></label>
+                                                        <label><strong>Observaciones (Omiso):</strong></label>
                                                         <input
                                                             type="text"
                                                             className="form-control"
