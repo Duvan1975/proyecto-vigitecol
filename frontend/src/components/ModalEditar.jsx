@@ -419,7 +419,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const actualizarFamiliar = (familiar) => {
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/familiares`, {
             method: "PUT",
             headers: {
@@ -437,7 +437,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
     };
 
     const actualizarCurso = (curso) => {
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/cursos`, {
             method: "PUT",
             headers: {
@@ -455,7 +455,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
     };
 
     const actualizarEstudio = (estudio) => {
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/estudios`, {
             method: "PUT",
             headers: {
@@ -473,7 +473,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
     };
 
     const actualizarExperienciaLaboral = (experienciaLaboral) => {
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/experienciasLaborales`, {
             method: "PUT",
             headers: {
@@ -491,7 +491,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
     };
 
     const actualizarAfiliacion = (afiliacion) => {
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/afiliaciones`, {
             method: "PUT",
             headers: {
@@ -509,7 +509,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
     };
 
     const actualizarDocumento = (documento) => {
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/documentos`, {
             method: "PUT",
             headers: {
@@ -527,7 +527,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
     };
 
     const actualizarVehiculo = (vehiculo) => {
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/vehiculos`, {
             method: "PUT",
             headers: {
@@ -557,7 +557,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
             Swal.fire("Campos incompletos", "Por favor llena todos los campos.", "warning");
             return;
         }
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/familiares/${empleado.id}`, {
             method: "POST",
             headers: {
@@ -627,7 +627,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
             Swal.fire("Fecha inválida", "Verifica que la fecha tenga el formato correcto (yyyy-MM-dd).", "error");
             return;
         }
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/cursos/${empleado.id}`, {
             method: "POST",
             headers: {
@@ -666,10 +666,10 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         }
 
         // Validar fechaEstudio (vacía o inválida)
-        if (!nuevoEstudio.fechaEstudio) {
+        /*if (!nuevoEstudio.fechaEstudio) {
             Swal.fire("Campo incompleto", "Por favor ingresa la fecha del estudio.", "warning");
             return;
-        }
+        }*/
 
         // Si todo está correcto, proceder con el fetch
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
@@ -689,7 +689,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
                     id: estudioCreado.id ?? estudioCreado.estudioId,
                     tipoEstudio: nuevoEstudio.tipoEstudio,
                     nombreEstudio: nuevoEstudio.nombreEstudio,
-                    fechaEstudio: nuevoEstudio.fechaEstudio
+                    fechaEstudio: nuevoEstudio.fechaEstudio || null
                 }]);
 
                 setNuevoEstudio({ tipoEstudio: "", nombreEstudio: "", fechaEstudio: "" });
@@ -741,8 +741,8 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         }
 
         // Validar fechaAfiliacion (vacía o inválida)
-        if (!nuevaAfiliacion.fechaAfiliacion) {
-            Swal.fire("Campo incompleto", "Por favor ingresa la fecha de afiliación.", "warning");
+        if (!nuevaAfiliacion.nombreEntidad) {
+            Swal.fire("Campo incompleto", "Por favor ingresa el nombre de la entidad.", "warning");
             return;
         }
 
@@ -785,10 +785,10 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         }
 
         // Validar fechaRegistro (vacía o inválida)
-        if (!nuevoDocumento.fechaRegistro) {
+        /*if (!nuevoDocumento.fechaRegistro) {
             Swal.fire("Campo incompleto", "Por favor ingresa la fecha de registro.", "warning");
             return;
-        }
+        }*/
 
         // Si todo está correcto, proceder con el fetch
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
@@ -882,7 +882,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
     };
 
     const actualizarContrato = (contrato) => {
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/contratos`, {
             method: "PUT",
             headers: {
@@ -914,7 +914,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
             vacacionesDesde: "",
             vacacionesHasta: ""
         };
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/contratos/${empleado.id}`, {
             method: "POST",
             headers: {
@@ -1016,7 +1016,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         }).then((result) => {
             if (result.isConfirmed) {
                 const token = localStorage.getItem("token");
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+                const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
                 authFetch(`${backendUrl}/familiares/${id}`, {
                     method: "DELETE",
                     headers: {
@@ -1045,7 +1045,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+                const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
                 authFetch(`${backendUrl}/cursos/${id}`, {
                     method: "DELETE",
 
@@ -1072,7 +1072,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+                const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
                 authFetch(`${backendUrl}/estudios/${id}`, {
                     method: "DELETE",
 
@@ -1099,7 +1099,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+                const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
                 authFetch(`${backendUrl}/experienciasLaborales/${id}`, {
                     method: "DELETE",
 
@@ -1126,7 +1126,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+                const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
                 authFetch(`${backendUrl}/afiliaciones/${id}`, {
                     method: "DELETE",
 
@@ -1153,13 +1153,13 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+                const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
                 authFetch(`${backendUrl}/documentos/${id}`, {
                     method: "DELETE",
 
                 })
                     .then((res) => {
-                        if (!res.ok) throw new Error("Error al eliminar documento, (Debes actualizar los datos para poder eliminar este registro)");
+                        if (!res.ok) throw new Error("Error al eliminar documento, (Debes actualizar los datos generales para poder eliminar este registro)");
                         setDocumentos(documentos.filter(d => d.id !== id));
                         Swal.fire("Eliminado", "El documento fue eliminado correctamente", "success");
                     })
@@ -1180,7 +1180,7 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+                const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
                 authFetch(`${backendUrl}/vehiculos/${id}`, {
                     method: "DELETE",
 

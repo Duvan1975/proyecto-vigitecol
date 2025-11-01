@@ -563,7 +563,7 @@ export function Tabla({
             }
             if (datos.otroDocumento?.length > 0) {
                 const documentosLimpios = datos.otroDocumento.map(d => ({
-                    "Tipo de Documento": d.tipoDocumento,
+                    "Tipo de Documento": d.tipoOtroDocumento,
                     "Descripción": d.descripcionDocumento,
                     "Fecha de Registro": d.fechaRegistro
                 }));
@@ -650,7 +650,7 @@ export function Tabla({
                                     className="form-control"
                                     disabled={["personalMayorDe50",
                                         "cursosPorVencer",
-                                        "periodoDePrueba",
+                                        "periodoDePrueba", 
                                         "conContrato",
                                         "sinContrato"].includes(tipoBusqueda)}
                                 />
@@ -745,7 +745,8 @@ export function Tabla({
                             disabled={[
                                 "estadoCivil",
                                 "personalMayorDe50",
-                                "genero",
+                                "genero", 
+                                "conFamiliares", 
                                 "familiaresPorGenero",
                                 "libretaMilitar",
                                 "cargo",

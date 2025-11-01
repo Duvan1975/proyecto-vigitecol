@@ -98,11 +98,11 @@ const responseEmpleado = await authFetch(`${backendUrl}/empleados`, {
 
         //Enviamos todos los estudios juntos
         const estudiosLimpios = estudios.filter(e =>
-            e.tipoEstudio && e.fechaEstudio
+            e.tipoEstudio
         ).map((e) => ({
             tipoEstudio: e.tipoEstudio,
             nombreEstudio: e.nombreEstudio || null,
-            fechaEstudio: e.fechaEstudio
+            fechaEstudio: e.fechaEstudio || null
         }));
 
         if (estudiosLimpios.length > 0) {
@@ -146,11 +146,11 @@ const responseEmpleado = await authFetch(`${backendUrl}/empleados`, {
 
         //Enviamos todos las afiliaciones juntas
         const afiliacionesLimpias = afiliaciones.filter(af =>
-            af.tipoAfiliacion && af.nombreEntidad && af.fechaAfiliacion
+            af.tipoAfiliacion && af.nombreEntidad
         ).map((af) => ({
             tipoAfiliacion: af.tipoAfiliacion,
             nombreEntidad: af.nombreEntidad,
-            fechaAfiliacion: af.fechaAfiliacion
+            fechaAfiliacion: af.fechaAfiliacion || null
         }));
 
         if (afiliacionesLimpias.length > 0) {
@@ -171,10 +171,10 @@ const responseEmpleado = await authFetch(`${backendUrl}/empleados`, {
 
         //Enviamos todos los documentos juntos
         const documentosLimpios = documentos.filter(d =>
-            d.tipoOtroDocumento && d.fechaRegistro
+            d.tipoOtroDocumento
         ).map((d) => ({
             tipoOtroDocumento: d.tipoOtroDocumento,
-            fechaRegistro: d.fechaRegistro, 
+            fechaRegistro: d.fechaRegistro || null, 
             descripcionDocumento: d.descripcionDocumento || null
         }));
 

@@ -121,8 +121,7 @@ export function Formulario({ setVista }) {
 
     const agregarEstudio = () => {
         if (
-            estudioActual.tipoEstudio &&
-            estudioActual.fechaEstudio
+            estudioActual.tipoEstudio
         ) {
             setEstudios([...estudios, { ...estudioActual }]);
             setEstudioActual({
@@ -147,7 +146,7 @@ export function Formulario({ setVista }) {
     const agregarAfiliacion = () => {
         if (
             afiliacionActual.tipoAfiliacion &&
-            afiliacionActual.fechaAfiliacion
+            afiliacionActual.nombreEntidad
         ) {
             setAfiliaciones([...afiliaciones, { ...afiliacionActual }]);
             setAfiliacionActual({
@@ -160,8 +159,7 @@ export function Formulario({ setVista }) {
 
     const agregarDocumento = () => {
         if (
-            documentoActual.tipoOtroDocumento &&
-            documentoActual.fechaRegistro
+            documentoActual.tipoOtroDocumento
         ) {
             setDocumentos([...documentos, { ...documentoActual }]);
             setDocumentoActual({
@@ -768,8 +766,7 @@ export function Formulario({ setVista }) {
                         className="btn btn-primary w-100"
                         onClick={agregarEstudio}
                         disabled={ // Deshabilitar si falta algo
-                            !estudioActual.tipoEstudio ||
-                            !estudioActual.fechaEstudio
+                            !estudioActual.tipoEstudio
                         }
                         style={{ marginBottom: "-22px" }}
                     >
@@ -948,8 +945,7 @@ export function Formulario({ setVista }) {
                         onClick={agregarAfiliacion}
                         disabled={
                             !afiliacionActual.tipoAfiliacion ||
-                            !afiliacionActual.nombreEntidad ||
-                            !afiliacionActual.fechaAfiliacion
+                            !afiliacionActual.nombreEntidad
                         }
                         style={{ marginBottom: "-22px" }}
                     >
@@ -1055,8 +1051,7 @@ export function Formulario({ setVista }) {
                         className="btn btn-primary w-100"
                         onClick={agregarDocumento}
                         disabled={
-                            !documentoActual.tipoOtroDocumento ||
-                            !documentoActual.fechaRegistro
+                            !documentoActual.tipoOtroDocumento
                         }
                         style={{ marginBottom: "-22px" }}
                     >
@@ -1184,6 +1179,13 @@ export function Formulario({ setVista }) {
                         type="button"
                         className="btn btn-primary w-100"
                         onClick={agregarVehiculo}
+                        disabled={
+                            !vehiculoActual.tipoVehiculo ||
+                            !vehiculoActual.tecnomecanico || 
+                            !vehiculoActual.soat || 
+                            !vehiculoActual.licencia || 
+                            !vehiculoActual.placa
+                        }
                         style={{ marginBottom: "-22px" }}
                     >
                         Agregar Vehículo
