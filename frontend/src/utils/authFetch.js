@@ -46,25 +46,57 @@ export const authGet = (url) => {
 };
 
 // POST
-export const authPost = (url, data) => {
-  return authFetch(url, {
+export const authPost = async (url, data) => {
+  const res = await authFetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
   });
+
+  // Procesar respuesta
+  const contentType = res.headers.get("Content-Type");
+  const responseBody = contentType && contentType.includes("application/json")
+    ? await res.json()
+    : await res.text();
+
+  if (!res.ok) {
+    // Lanzar el error para que el catch en UserForm lo maneje
+    // eslint-disable-next-line
+    throw {
+      status: res.status,
+      message: responseBody?.error || responseBody || "Error desconocido",
+    };
+  }
+
+  return responseBody;
 };
 
 // PUT
-export const authPut = (url, data) => {
-  return authFetch(url, {
+export const authPut = async (url, data) => {
+  const res = await authFetch(url, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
   });
+
+  const contentType = res.headers.get("Content-Type");
+  const responseBody = contentType && contentType.includes("application/json")
+    ? await res.json()
+    : await res.text();
+
+  if (!res.ok) {
+    // eslint-disable-next-line
+    throw {
+      status: res.status,
+      message: responseBody?.error || responseBody || "Error desconocido",
+    };
+  }
+
+  return responseBody;
 };
 
 // PATCH

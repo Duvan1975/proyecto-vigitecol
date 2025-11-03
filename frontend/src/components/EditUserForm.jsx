@@ -51,13 +51,17 @@ export const EditUserForm = ({ user, onUserUpdated, onCancel }) => {
 
             onUserUpdated();
         } catch (error) {
-            await Swal.fire({
-                icon: "error",
-                title: "Error al actualizar",
-                text: error.message || "Ocurrió un error al guardar los cambios.",
-                confirmButtonColor: "#dc3545"
-            });
-        }
+    const mensaje = error.message || "Ocurrió un error al guardar los cambios.";
+
+    await Swal.fire({
+        icon: "error",
+        title: "❌ Error al actualizar",
+        text: mensaje.includes("correo") 
+            ? mensaje 
+            : "Verifica que el correo no esté duplicado o revisa los datos ingresados.",
+        confirmButtonColor: "#dc3545"
+    });
+}
     };
 
     const handleChangeEstado = async (nuevoEstado) => {
