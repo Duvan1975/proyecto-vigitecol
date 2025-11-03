@@ -41,12 +41,13 @@ export function Login({ onLoginSuccess }) {
             localStorage.setItem("rol", data.rol);
             localStorage.setItem("admin", data.admin);
             localStorage.setItem("estado", data.estado);
+            localStorage.setItem("nombreUsuario", data.nombreUsuario);
 
             Swal.fire({
                 icon: "success",
                 title: "Inicio de sesión exitoso",
                 html: `
-                <p>Bienvenido: <strong>${data.admin}</strong></p>
+                <p>Bienvenido: <strong>${data.nombreUsuario}</strong></p>
                 <p>Rol: <strong>${data.rol}</strong></p>
             `
             }).then(() => {

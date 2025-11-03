@@ -70,6 +70,7 @@ export function Menu() {
         localStorage.removeItem("token");
         localStorage.removeItem("rol");
         localStorage.removeItem("admin");
+        localStorage.removeItem("nombreUsuario");
         localStorage.removeItem("estado");
         setIsLoggedIn(false);
         setVista("login");
@@ -147,7 +148,7 @@ export function Menu() {
                         {/* Información del usuario a la derecha */}
                         <div className="d-flex align-items-center">
                             <div className="text-white me-3 text-end">
-                                <div className="fw-bold text-warning">{localStorage.getItem("admin")}</div>
+                                <div className="fw-bold text-warning">{localStorage.getItem("nombreUsuario")}</div>
                                 <small className="opacity-75">Rol: {localStorage.getItem("rol")}</small>
                             </div>
                             <button

@@ -50,6 +50,7 @@ public class UsuarioService {
         usuarioExistente.setAdmin(usuarioActualizado.getAdmin());
         usuarioExistente.setRol(usuarioActualizado.getRol());
         usuarioExistente.setEstado(usuarioActualizado.isEstado());
+        usuarioExistente.setNombreUsuario(usuarioActualizado.getNombreUsuario());
 
         // Solo actualizar la contraseña si se proporciona una nueva
         if (usuarioActualizado.getClave() != null && !usuarioActualizado.getClave().isEmpty()) {

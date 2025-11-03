@@ -69,6 +69,7 @@ const UserManagement = () => {
                         <thead className="table-dark">
                             <tr>
                                 <th>ID</th>
+                                <th>Nombre completo</th>
                                 <th>Usuario</th>
                                 <th>Rol</th>
                                 <th>Estado</th>
@@ -79,6 +80,7 @@ const UserManagement = () => {
                             {users.map(user => (
                                 <tr key={user.id}>
                                     <td>{user.id}</td>
+                                    <td>{user.nombreUsuario}</td>
                                     <td>{user.admin}</td>
                                     <td>
                                         <span className={`badge ${user.rol === 'ADMIN' ? 'bg-danger' :

@@ -31,6 +31,7 @@ public class AutenticacionController {
     public ResponseEntity<?> autenticarUsuario(@RequestBody @Valid DatosAutenticacionUsuario datosAutenticacionUsuario) {
         try {
             Authentication authToken = new UsernamePasswordAuthenticationToken(
+
                     datosAutenticacionUsuario.admin(),
                     datosAutenticacionUsuario.clave()
             );
@@ -52,6 +53,7 @@ public class AutenticacionController {
             response.put("rol", usuario.getRol().name());
             response.put("estado", usuario.isEnabled());
             response.put("admin", usuario.getAdmin());
+            response.put("nombreUsuario", usuario.getNombreUsuario());
 
             return ResponseEntity.ok(response);
 

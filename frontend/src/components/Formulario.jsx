@@ -1,7 +1,7 @@
 import { CuadrosTexto } from "./CuadrosTexto";
 import { CuadrosSelect } from "./CuadrosSelect";
 import { AgregarTabla } from "./AgregarTabla";
-import { useState } from "react";
+import React, { useState } from 'react';
 import Swal from "sweetalert2";
 
 export function Formulario({ setVista }) {

@@ -29,6 +29,9 @@ public class Usuario implements UserDetails {
 
     private boolean estado;
 
+    @Column(name = "nombre_usuario")
+    private String nombreUsuario;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + rol.name()));
@@ -102,6 +105,14 @@ public class Usuario implements UserDetails {
 
     public void setEstado(boolean estado) {
         this.estado = estado;
+    }
+
+    public String getNombreUsuario() {
+        return nombreUsuario;
+    }
+
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
     }
 
     public Usuario(){}

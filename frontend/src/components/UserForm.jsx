@@ -1,9 +1,10 @@
-// src/components/UserForm.jsx
 import React, { useState } from 'react';
 import { authPost } from '../utils/authFetch';
+import Swal from 'sweetalert2';
 
 const UserForm = ({ onUserCreated, onCancel }) => {
     const [formData, setFormData] = useState({
+        nombreUsuario: '',
         admin: '',
         clave: '',
         confirmarClave: '',
@@ -13,33 +14,85 @@ const UserForm = ({ onUserCreated, onCancel }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (formData.clave !== formData.confirmarClave) {
-            alert('Las contraseñas no coinciden');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Contraseñas no coinciden',
+                text: 'Por favor verifica los campos de contraseña.',
+                confirmButtonText: 'Aceptar'
+            });
             return;
         }
 
         try {
             const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
-            await authPost(`${backendUrl}/usuarios`, {
+
+            const response = await authPost(`${backendUrl}/usuarios`, {
+                nombreUsuario: formData.nombreUsuario,
                 admin: formData.admin,
                 clave: formData.clave,
                 rol: formData.rol,
                 estado: formData.estado
             });
-            
-            alert('Usuario creado exitosamente');
+
+            // Verificar si el backend devuelve un error conocido
+            if (response && response.error && response.error.includes("ya existe")) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Usuario duplicado',
+                    text: 'El email o usuario ingresado ya está registrado.',
+                    confirmButtonText: 'Entendido'
+                });
+                return;
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Usuario creado',
+                text: 'El usuario fue creado exitosamente.',
+                confirmButtonText: 'Aceptar'
+            });
+
             onUserCreated(); // Recargar la lista
+
             setFormData({
+                nombreUsuario: '',
                 admin: '',
                 clave: '',
                 confirmarClave: '',
                 rol: 'USER',
                 estado: true
             });
-        } catch (error) {
-            alert('Error creando usuario: ' + error.message);
-        }
+
+} catch (error) {
+    if (error.status === 400 && error.message.includes("ya existe")) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Usuario duplicado',
+            text: 'Ya existe un usuario con ese correo.',
+            confirmButtonText: 'Entendido'
+        });
+    } else {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error creando usuario',
+            text: error.message || 'Ocurrió un error inesperado.',
+            confirmButtonText: 'Cerrar'
+        });
+    }
+}
+
+    };
+
+    const handleCancel = () => {
+        Swal.fire({
+            icon: 'info',
+            title: 'Acción cancelada',
+            text: 'La creación de usuario fue cancelada por el administrador.',
+            confirmButtonText: 'Entendido'
+        });
+        onCancel();
     };
 
     return (
@@ -49,24 +102,35 @@ const UserForm = ({ onUserCreated, onCancel }) => {
             </div>
             <div className="card-body">
                 <form onSubmit={handleSubmit}>
+
                     <div className="row mb-3">
-                        <div className="col-md-6">
+                        <div className="col-md-4">
+                            <label className="form-label">Nombre completo *</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                value={formData.nombreUsuario}
+                                onChange={(e) => setFormData({ ...formData, nombreUsuario: e.target.value })}
+                                required
+                            />
+                        </div>
+                        <div className="col-md-4">
                             <label className="form-label">Email/Usuario *</label>
                             <input
                                 type="email"
                                 className="form-control"
                                 value={formData.admin}
-                                onChange={(e) => setFormData({...formData, admin: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, admin: e.target.value })}
                                 required
                             />
                         </div>
-                        
-                        <div className="col-md-6">
+
+                        <div className="col-md-4">
                             <label className="form-label">Rol *</label>
                             <select
                                 className="form-select"
                                 value={formData.rol}
-                                onChange={(e) => setFormData({...formData, rol: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, rol: e.target.value })}
                                 required
                             >
                                 <option value="USER">Usuario</option>
@@ -77,24 +141,24 @@ const UserForm = ({ onUserCreated, onCancel }) => {
                     </div>
 
                     <div className="row mb-3">
-                        <div className="col-md-6">
+                        <div className="col-md-4">
                             <label className="form-label">Contraseña *</label>
                             <input
                                 type="password"
                                 className="form-control"
                                 value={formData.clave}
-                                onChange={(e) => setFormData({...formData, clave: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, clave: e.target.value })}
                                 required
                             />
                         </div>
-                        
-                        <div className="col-md-6">
+
+                        <div className="col-md-4">
                             <label className="form-label">Confirmar Contraseña *</label>
                             <input
                                 type="password"
                                 className="form-control"
                                 value={formData.confirmarClave}
-                                onChange={(e) => setFormData({...formData, confirmarClave: e.target.value})}
+                                onChange={(e) => setFormData({ ...formData, confirmarClave: e.target.value })}
                                 required
                             />
                         </div>
@@ -106,7 +170,7 @@ const UserForm = ({ onUserCreated, onCancel }) => {
                                 type="checkbox"
                                 className="form-check-input"
                                 checked={formData.estado}
-                                onChange={(e) => setFormData({...formData, estado: e.target.checked})}
+                                onChange={(e) => setFormData({ ...formData, estado: e.target.checked })}
                             />
                             <label className="form-check-label">Usuario activo</label>
                         </div>
@@ -116,7 +180,7 @@ const UserForm = ({ onUserCreated, onCancel }) => {
                         <button type="submit" className="btn btn-success">
                             ✅ Crear Usuario
                         </button>
-                        <button type="button" className="btn btn-secondary" onClick={onCancel}>
+                        <button type="button" className="btn btn-secondary" onClick={handleCancel}>
                             ❌ Cancelar
                         </button>
                     </div>
