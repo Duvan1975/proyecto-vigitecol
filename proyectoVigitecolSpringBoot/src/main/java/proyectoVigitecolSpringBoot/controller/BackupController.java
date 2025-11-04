@@ -1,10 +1,15 @@
 package proyectoVigitecolSpringBoot.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import proyectoVigitecolSpringBoot.domain.historial.HistorialAccion;
+import proyectoVigitecolSpringBoot.domain.historial.HistorialRepository;
+import proyectoVigitecolSpringBoot.domain.usuarios.UsuarioService;
+
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -13,23 +18,26 @@ import java.time.format.DateTimeFormatter;
 @RequestMapping("/backup")
 public class BackupController {
 
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private HistorialRepository historialRepository;
+
     @GetMapping("/download")
     public ResponseEntity<InputStreamResource> downloadBackup() {
         try {
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
             String backupFile = "backup_" + timestamp + ".sql";
 
-            // Ruta del mysqldump en Windows
             String mysqldumpPath = "C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysqldump.exe";
 
-            // Parámetros de conexión AIVEN
             String host = "mysql-14d288cf-ballexplorer1975-fb53.d.aivencloud.com";
             String port = "20771";
             String user = "avnadmin";
             String password = System.getenv("AIVEN_DB_PASSWORD");
             String database = "vigitecol_db";
 
-            // Comando completo (AIVEN requiere SSL)
             ProcessBuilder pb = new ProcessBuilder(
                     mysqldumpPath,
                     "-h", host,
@@ -46,6 +54,14 @@ public class BackupController {
 
             File file = new File(backupFile);
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+
+            // 🔹 Registrar acción en historial
+            String actor = usuarioService.obtenerUsuarioActual();
+            historialRepository.save(new HistorialAccion(
+                    actor,
+                    "BACKUP_SISTEMA",
+                    "El usuario ADMIN realizó un respaldo completo del sistema"
+            ));
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName())

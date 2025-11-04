@@ -7,6 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import proyectoVigitecolSpringBoot.domain.empleado.EmpleadoRepository;
+import proyectoVigitecolSpringBoot.domain.historial.HistorialAccion;
+import proyectoVigitecolSpringBoot.domain.historial.HistorialRepository;
+import proyectoVigitecolSpringBoot.domain.usuarios.UsuarioService;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +23,12 @@ public class CursoService {
     @Autowired
     private CursoRepository cursoRepository;
 
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private HistorialRepository historialRepository;
+
     public void resgistrarCurso(Long empleadoId, List<DatosRegistroCurso> listaDatos) {
         var empleado = empleadoRepository.findById(empleadoId)
                 .orElseThrow(() -> new RuntimeException("Empleado NO encontrado"));
@@ -27,6 +36,14 @@ public class CursoService {
                 .map(datos -> new Curso(datos, empleado))
                 .toList();
         cursoRepository.saveAll(cursos);
+
+        String actor = usuarioService.obtenerUsuarioActual();
+
+        historialRepository.save(new HistorialAccion(
+                actor,
+                "REGISTRAR_CURSO",
+                "Registró curso(s) del empleado: " + empleado.getNombres() +" "+ empleado.getApellidos()
+        ));
     }
 
     public Page<Curso> listarCursos(Pageable paginacion) {
@@ -53,6 +70,13 @@ public class CursoService {
         Curso curso = optionalCurso.get();
         curso.actualizarDatos(datos);
 
+        String actor = usuarioService.obtenerUsuarioActual();
+        historialRepository.save(new HistorialAccion(
+                actor,
+                "ACTUALIZAR_CURSO",
+                "Actualizó el curso con ID: " + curso.getCursoId()
+        ));
+
         return new DatosRespuestaCurso(
                 curso.getCursoId(),
                 curso.getTipoCurso(),
@@ -66,5 +90,12 @@ public class CursoService {
             throw new EntityNotFoundException("Curso no encontrado con ID: " + id);
         }
         cursoRepository.deleteById(id); // Devuelve 204 No Content
+
+        String actor = usuarioService.obtenerUsuarioActual();
+        historialRepository.save(new HistorialAccion(
+                actor,
+                "ELIMINAR_CURSO",
+                "Eliminó el curso con ID: " + id
+        ));
     }
 }

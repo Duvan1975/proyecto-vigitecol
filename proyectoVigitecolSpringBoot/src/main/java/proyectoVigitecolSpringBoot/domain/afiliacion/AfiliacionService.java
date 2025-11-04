@@ -7,6 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import proyectoVigitecolSpringBoot.domain.empleado.EmpleadoRepository;
+import proyectoVigitecolSpringBoot.domain.historial.HistorialAccion;
+import proyectoVigitecolSpringBoot.domain.historial.HistorialRepository;
+import proyectoVigitecolSpringBoot.domain.usuarios.UsuarioService;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +23,12 @@ public class AfiliacionService {
     @Autowired
     private AfiliacionRepository afiliacionRepository;
 
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private HistorialRepository historialRepository;
+
     public void registrarAfiliacion(Long empleadoId, List<DatosRegistroAfiliacion> listaDatos) {
         var empleado = empleadoRepository.findById(empleadoId)
                 .orElseThrow(() -> new RuntimeException("Empleado NO encontrado"));
@@ -27,6 +36,14 @@ public class AfiliacionService {
                 .map(datos -> new Afiliacion(datos, empleado))
                 .toList();
         afiliacionRepository.saveAll(afiliaciones);
+
+        String actor = usuarioService.obtenerUsuarioActual();
+
+        historialRepository.save(new HistorialAccion(
+                actor,
+                "REGISTRAR_AFILIACION",
+                "Registró afiliaciones del empleado: " + empleado.getNombres() +" "+ empleado.getApellidos()
+        ));
     }
 
     public Page<Afiliacion> listarAfiliaciones(Pageable paginacion) {
@@ -54,6 +71,15 @@ public class AfiliacionService {
         Afiliacion afiliacion = optionalAfiliacion.get();
         afiliacion.actualizarDatos(datos);
 
+        afiliacionRepository.save(afiliacion);
+
+        String actor = usuarioService.obtenerUsuarioActual();
+        historialRepository.save(new HistorialAccion(
+                actor,
+                "ACTUALIZAR_AFILIACION",
+                "Actualizó la afiliación con ID: " + afiliacion.getAfiliacionId()
+        ));
+
         return new DatosRespuestaAfiliacion(
                 afiliacion.getAfiliacionId(),
                 afiliacion.getTipoAfiliacion(),
@@ -67,5 +93,12 @@ public class AfiliacionService {
             throw new EntityNotFoundException("Afiliación no encontrada con ID: " + id);
         }
         afiliacionRepository.deleteById(id); // Devuelve 204 No Content
+
+        String actor = usuarioService.obtenerUsuarioActual();
+        historialRepository.save(new HistorialAccion(
+                actor,
+                "ELIMINAR_AFILIACION",
+                "Eliminó la afiliación con ID: " + id
+        ));
     }
 }

@@ -18,6 +18,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import java.util.List;
 
 @Configuration
+
 @EnableWebSecurity
 public class SecurityConfigurations {
 
@@ -95,6 +96,7 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.GET, "/reportes/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_RRHH")
 
                         .requestMatchers(HttpMethod.GET, "/backup/download").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/historial").hasRole("ADMIN")
 
                         // Endpoints de prueba
                         .requestMatchers("/test/admin").hasAuthority("ROLE_ADMIN")
@@ -118,4 +120,5 @@ public class SecurityConfigurations {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }

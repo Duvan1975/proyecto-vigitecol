@@ -7,6 +7,7 @@ import logoVigitecol from '../img/vigitecol.png'; // Ajusta la ruta según tu es
 import ProtectedElement from "../utils/ProtectedElement";
 import UserManagement from "./UserManagement";
 import ResetPassword from "./ResetPassword";
+import { HistorialAcciones } from "./HistorialAcciones";
 
 export function Menu() {
     const [vista, setVista] = useState("login");
@@ -78,7 +79,7 @@ export function Menu() {
 
     const BackupButton = () => {
         const handleBackup = async () => {
-            const token = localStorage.getItem("token"); // si usas autenticación
+            const token = localStorage.getItem("token");
             const response = await fetch("http://localhost:8081/backup/download", {
                 method: "GET",
                 headers: {
@@ -295,9 +296,14 @@ export function Menu() {
                                         Selecciona una opción del menú superior para comenzar
                                     </p>
                                 </div>
+                                
                                 <ProtectedElement allowedRoles={["ADMIN"]}>
-                                    <BackupButton />
+                                    <div className="d-flex justify-content-center flex-wrap gap-2 mt-3">
+                                        <BackupButton />
+                                        <HistorialAcciones />
+                                    </div>
                                 </ProtectedElement>
+
 
                             </div>
                         </div>

@@ -14,6 +14,7 @@ import proyectoVigitecolSpringBoot.domain.usuarios.UsuarioRepository;
 import java.io.IOException;
 
 @Component
+
 public class SecurityFilter extends OncePerRequestFilter {
 
     @Autowired
@@ -47,6 +48,7 @@ public class SecurityFilter extends OncePerRequestFilter {
                     var usuario = usuarioRepository.findByAdmin(subject);
                     var authentication = new UsernamePasswordAuthenticationToken(
                             usuario, null, usuario.getAuthorities());
+                    authentication.setDetails(usuario);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } catch (RuntimeException e) {

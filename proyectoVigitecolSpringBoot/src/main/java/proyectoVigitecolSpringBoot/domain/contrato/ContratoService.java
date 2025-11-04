@@ -9,6 +9,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import proyectoVigitecolSpringBoot.domain.empleado.EmpleadoRepository;
+import proyectoVigitecolSpringBoot.domain.historial.HistorialAccion;
+import proyectoVigitecolSpringBoot.domain.historial.HistorialRepository;
+import proyectoVigitecolSpringBoot.domain.usuarios.UsuarioService;
 
 import java.util.Comparator;
 import java.util.List;
@@ -23,6 +26,12 @@ public class ContratoService {
     @Autowired
     private ContratoRepository contratoRepository;
 
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private HistorialRepository historialRepository;
+
     public void registrarContrato(Long empleadoId, DatosRegistroContrato datos) {
         var empleado = empleadoRepository.findById(empleadoId)
             .orElseThrow(() -> new RuntimeException("Persona NO encontrada"));
@@ -36,6 +45,13 @@ public class ContratoService {
         contrato.setNumeroContrato(nuevoNumeroContrato);
 
         contratoRepository.save(contrato);
+
+        String actor = usuarioService.obtenerUsuarioActual();
+        historialRepository.save(new HistorialAccion(
+                actor,
+                "REGISTRAR_CONTRATO",
+                "Registró un nuevo contrato N° " + nuevoNumeroContrato + " para el empleado: " + empleado.getNombres() +" "+ empleado.getApellidos()
+        ));
     }
     public ResponseEntity<Page<DatosListadoContrato>> listarContratos(@PageableDefault(size = 10) Pageable paginacion) {
         return ResponseEntity.ok(contratoRepository.findAll(paginacion).map(DatosListadoContrato::new));
@@ -57,7 +73,28 @@ public class ContratoService {
         }
 
         Contrato contrato = optionalContrato.get();
+        Boolean estadoAnterior = contrato.getContinua();
         contrato.actualizarDatos(datos);
+
+        String actor = usuarioService.obtenerUsuarioActual();
+        Boolean nueva = datos.continua();
+        if (nueva != null && !nueva.equals(estadoAnterior)) {
+            historialRepository.save(new HistorialAccion(
+                    actor,
+                    "CAMBIO_ESTADO_CONTRATO",
+                    "El contrato N° " + contrato.getNumeroContrato() + " del empleado "
+                            + contrato.getEmpleado().getNombres() + " "
+                            + contrato.getEmpleado().getApellidos() + " cambió su estado a "
+                            + (contrato.getContinua() ? "ACTIVO" : "FINALIZADO")
+            ));
+        } else {
+            historialRepository.save(new HistorialAccion(
+                    actor,
+                    "ACTUALIZAR_CONTRATO",
+                    "Actualizó el contrato con ID: " + contrato.getContratoId()
+                            + " (Contrato N° " + contrato.getNumeroContrato() + ")"
+            ));
+        }
 
         return new DatosRespuestaContrato(
                 contrato.getContratoId(),
@@ -72,6 +109,7 @@ public class ContratoService {
                 contrato.getVacacionesHasta()
         );
     }
+
     public DatosListadoContrato obtenerUltimoContratoPorEmpleado(Long empleadoId) {
         var empleado = empleadoRepository.findById(empleadoId)
                 .orElseThrow(() -> new RuntimeException("Empleado no encontrado o está inactivo"));
@@ -88,6 +126,12 @@ public class ContratoService {
             throw new EntityNotFoundException("Contrato no encontrado con ID: " + id);
         }
         contratoRepository.deleteById(id);
-    }
 
+        String actor = usuarioService.obtenerUsuarioActual();
+        historialRepository.save(new HistorialAccion(
+                actor,
+                "ELIMINAR_CONTRATO",
+                "Eliminó el contrato con ID: " + id
+        ));
+    }
 }

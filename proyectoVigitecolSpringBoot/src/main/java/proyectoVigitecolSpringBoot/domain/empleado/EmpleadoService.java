@@ -23,8 +23,11 @@ import proyectoVigitecolSpringBoot.domain.experienciaLaboral.DatosListadoExperie
 import proyectoVigitecolSpringBoot.domain.experienciaLaboral.ExperienciaLaboralRepository;
 import proyectoVigitecolSpringBoot.domain.familia.DatosListadoFamiliar;
 import proyectoVigitecolSpringBoot.domain.familia.FamiliarRepository;
+import proyectoVigitecolSpringBoot.domain.historial.HistorialAccion;
+import proyectoVigitecolSpringBoot.domain.historial.HistorialRepository;
 import proyectoVigitecolSpringBoot.domain.otroDocumento.DatosListadoOtroDocumento;
 import proyectoVigitecolSpringBoot.domain.otroDocumento.OtroDocumentoRepository;
+import proyectoVigitecolSpringBoot.domain.usuarios.UsuarioService;
 import proyectoVigitecolSpringBoot.domain.vehiculo.DatosListadoVehiculo;
 import proyectoVigitecolSpringBoot.domain.vehiculo.VehiculoRepository;
 
@@ -40,6 +43,12 @@ public class EmpleadoService {
 
     @Autowired
     ContratoRepository contratoRepository;
+
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private HistorialRepository historialRepository;
 
     private final EmpleadoRepository empleadoRepository;
     private final FamiliarRepository familiarRepository;
@@ -95,6 +104,14 @@ public class EmpleadoService {
                 empleado.getCorreo(),
                 empleado.getCargo()
         );
+
+        String actor = usuarioService.obtenerUsuarioActual();
+        historialRepository.save(new HistorialAccion(
+                actor,
+                "REGISTRAR_EMPLEADO",
+                "Registró al empleado: " + empleado.getNombres() + " " + empleado.getApellidos() +
+                        " (Documento: " + empleado.getNumeroDocumento() + ")"
+        ));
 
         return ResponseEntity.created(uri).body(datosRespuestaEmpleado);
     }
@@ -179,6 +196,14 @@ public class EmpleadoService {
             empleado.setCargo(datos.cargo());
         }
 
+        String actor = usuarioService.obtenerUsuarioActual();
+        historialRepository.save(new HistorialAccion(
+                actor,
+                "ACTUALIZAR_EMPLEADO",
+                "Actualizó los datos del empleado: " + empleado.getNombres() + " " + empleado.getApellidos() +
+                        " (Documento: " + empleado.getNumeroDocumento() + ")"
+        ));
+
         return ResponseEntity.ok(new DatosRespuestaEmpleado(
                 empleado.getId(),
                 empleado.getNombres(),
@@ -201,7 +226,19 @@ public class EmpleadoService {
                 .findTopByEmpleadoIdAndContinuaTrueOrderByFechaIngresoDesc(id)
                 .orElseThrow(() -> new RuntimeException("Contrato activo no encontrado para este empleado"));
 
-        contrato.setContinua(false);
+        //contrato.setContinua(false);
+
+        if (contrato.getContinua()) {
+            contrato.setContinua(false);
+
+            String actor = usuarioService.obtenerUsuarioActual();
+            historialRepository.save(new HistorialAccion(
+                    actor,
+                    "CAMBIO_ESTADO_CONTRATO",
+                    "El contrato del empleado " + empleado.getNombres()
+                            + " " + empleado.getApellidos() + " fue finalizado"
+            ));
+        }
 
         return ResponseEntity.noContent().build();
     }
