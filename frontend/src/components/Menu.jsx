@@ -102,12 +102,11 @@ export function Menu() {
         };
 
         return (
-            <button className="btn btn-outline-success" onClick={handleBackup}>
+            <button className="btn btn-success" onClick={handleBackup}>
                 💾 Descargar Backup
             </button>
         );
     };
-
 
     // Mostrar loading mientras verifica el token
     if (cargando) {
@@ -249,10 +248,10 @@ export function Menu() {
                                     <strong>Supervisores</strong>
                                 </button>
                                 <button
-                                    className={`btn btn-outline-warning position-relative ${vista === "inactivas" ? "active-tab-warning" : ""}`}
+                                    className={`btn btn-outline-dark position-relative ${vista === "inactivas" ? "active-tab-warning" : ""}`}
                                     onClick={() => setVista("inactivas")}
                                 >
-                                    {vista === "inactivas" && <div className="active-tab-indicator-warning"></div>}
+                                    {vista === "inactivas" && <div className="active-tab-indicator-dark"></div>}
                                     <strong>Empleados Retirados</strong>
                                 </button>
                             </div>
@@ -284,11 +283,11 @@ export function Menu() {
                     )}
 
                     {isLoggedIn && vista === "menu" && (
-                        <div className="text-center mt-5">
+                        <div className="text-center mt-4">
                             <div className="card border-0 shadow">
-                                <div className="card-body py-5">
+                                <div className="card-body py-4">
                                     <i className="bi bi-check-circle-fill text-success" style={{ fontSize: "3rem" }}></i>
-                                    <h3 className="card-title text-primary mt-3">¡Bienvenido!</h3>
+                                    <h3 className="card-title mt-3 alinearTexto">¡Bienvenido!</h3>
                                     <p className="card-text lead">
                                         Sistema de gestión para personal administrativo y operativo de VIGITECOL
                                     </p>
@@ -303,7 +302,6 @@ export function Menu() {
                                         <HistorialAcciones />
                                     </div>
                                 </ProtectedElement>
-
 
                             </div>
                         </div>

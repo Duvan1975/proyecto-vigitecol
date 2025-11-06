@@ -17,7 +17,7 @@ export function TablaContrato() {
 
     const cargarEmpleadosConContratos = (pagina = 0) => {
         setCargando(true);
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/contratos?page=${pagina}`)
             .then((res) => res.json())
             .then((data) => {

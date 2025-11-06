@@ -26,8 +26,8 @@ const UserManagement = () => {
 
     return (
         <div className="container mt-4">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2>👥 Gestión de Usuarios</h2>
+            <div className="d-flex justify-content-between align-items-center mb-4 alinearTexto">
+                <h4>Gestión de Usuarios</h4>
                 {!showForm && !editingUser && (
                     <button
                         className="btn btn-primary"

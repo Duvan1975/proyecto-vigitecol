@@ -173,7 +173,7 @@ export function Tabla({
                 : `${baseUrl}/activos?page=${pagina}`;
         }
 
-        // 👉 Si es exportación, agregamos un flag al backend para indicar que es exportación
+        //Si es exportación, agregamos un flag al backend para indicar que es exportación
         if (exportar) {
             if (url.includes("?")) {
                 url += "&exportar=true";
@@ -813,7 +813,6 @@ export function Tabla({
                                             Exportar a Excel
                                         </button>
                                     </div>
-
                                 </div>
                             )}
 

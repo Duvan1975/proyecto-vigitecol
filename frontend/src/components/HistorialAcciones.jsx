@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Paginacion from "./Paginacion";
 import { authFetch } from "../utils/authFetch";
+import * as XLSX from "xlsx";
 
 export function HistorialAcciones() {
   const [historial, setHistorial] = useState([]);
@@ -43,19 +44,50 @@ export function HistorialAcciones() {
     // eslint-disable-next-line
   }, [paginaActual, visible]);
 
+  const exportarExcel = async () => {
+    try {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+      const response = await authFetch(`${backendUrl}/historial/todo`);
+      if (!response.ok) throw new Error("Error al obtener todos los registros");
+
+      const data = await response.json();
+
+      // Generar archivo Excel con todos los registros
+      const ws = XLSX.utils.json_to_sheet(
+        data.map((h) => ({
+          ID: h.id,
+          Usuario: h.usuario,
+          Acción: h.accion,
+          Descripción: h.descripcion,
+          Fecha: new Date(h.fecha).toLocaleString(),
+        }))
+      );
+
+      const range = XLSX.utils.decode_range(ws["!ref"]);
+      ws["!autofilter"] = { ref: XLSX.utils.encode_range(range) };
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Historial");
+      XLSX.writeFile(wb, "HistorialCompleto.xlsx");
+    } catch (error) {
+      console.error("Error exportando historial completo:", error);
+    }
+  };
+
   return (
     <div className="container mt-4">
-      <h3 className="text-center">📜 Historial de Acciones</h3>
-
-      {/* Botón para mostrar/ocultar historial */}
-      <div className="text-center mb-3">
-        <button
-          className="btn btn-primary"
-          onClick={() => setVisible(!visible)}
-        >
-          {visible ? "Ocultar historial" : "Mostrar historial"}
-        </button>
+      <div className="container mt-4">
+        <div className="d-flex justify-content-center align-items-center mb-3">
+          <h3 className="m-0 me-3 alinearTexto">Historial de Acciones</h3>
+          <button
+            className="btn btn-primary"
+            onClick={() => setVisible(!visible)}
+          >
+            {visible ? "Ocultar historial" : "Mostrar historial"}
+          </button>
+        </div>
       </div>
+
 
       {visible && (
         <>
@@ -70,6 +102,33 @@ export function HistorialAcciones() {
 
           {!cargando && historial.length > 0 && (
             <div className="table-responsive">
+
+              <div className="row align-items-center mb-1">
+                <div className="col text-start"></div> {/* espacio vacío para balancear */}
+                <div className="col text-center">
+                  <Paginacion
+                    paginaActual={paginaActual}
+                    totalPaginas={totalPaginas}
+                    onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
+                  />
+                </div>
+                <div className="col text-end d-flex align-items-center justify-content-end">
+                  <button
+                    className="btn btn-success  "
+                    onClick={exportarExcel}
+                    disabled={historial.length === 0}
+                  >
+                    Exportar a Excel
+                  </button>
+                </div>
+              </div>
+              <div className="mt-1 text-center">
+                <small>
+                  Mostrando página {paginaActual + 1} de {totalPaginas} —{" "}
+                  {tamanoPagina} por página, total de registros: {totalElementos}
+                </small>
+              </div>
+
               <table className="table table-striped table-bordered text-center align-middle">
                 <thead className="table-primary">
                   <tr>
@@ -96,18 +155,18 @@ export function HistorialAcciones() {
           )}
 
           {!cargando && historial.length === 0 && (
-            <p className="text-center mt-3">No hay registros en el historial.</p>
+            <p className="text-center mt-0">No hay registros en el historial.</p>
           )}
 
           {/* 🔹 Paginación */}
-          <div className="d-flex flex-column align-items-center mt-3">
+          <div className="d-flex flex-column align-items-center mt-0">
             <Paginacion
               paginaActual={paginaActual}
               totalPaginas={totalPaginas}
               onChange={(nuevaPagina) => setPaginaActual(nuevaPagina)}
             />
 
-            <div className="mt-2 text-center">
+            <div className="mt-1 text-center">
               <small>
                 Mostrando página {paginaActual + 1} de {totalPaginas} —{" "}
                 {tamanoPagina} por página, total de registros: {totalElementos}

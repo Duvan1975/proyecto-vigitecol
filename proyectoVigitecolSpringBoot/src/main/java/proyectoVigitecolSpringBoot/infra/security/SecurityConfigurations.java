@@ -97,6 +97,8 @@ public class SecurityConfigurations {
 
                         .requestMatchers(HttpMethod.GET, "/backup/download").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/historial").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/historial/todo").hasRole("ADMIN")
+
 
                         // Endpoints de prueba
                         .requestMatchers("/test/admin").hasAuthority("ROLE_ADMIN")
