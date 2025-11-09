@@ -53,6 +53,9 @@ public class Empleado {
     @Enumerated(EnumType.STRING)
     private Genero genero;
 
+    @Column(name = "foto")
+    private String foto;
+
     private String direccion;
     private String telefono;
     private String correo;
@@ -322,4 +325,8 @@ public class Empleado {
     public void setVehiculos(List<Vehiculo> vehiculos) {
         this.vehiculos = vehiculos;
     }
+
+    public String getFoto() { return foto; }
+
+    public void setFoto(String foto) { this.foto = foto; }
 }

@@ -102,6 +102,7 @@ export function Menu() {
         };
 
         return (
+
             <button className="btn btn-success" onClick={handleBackup}>
                 💾 Descargar Backup
             </button>
@@ -285,9 +286,9 @@ export function Menu() {
                     {isLoggedIn && vista === "menu" && (
                         <div className="text-center mt-4">
                             <div className="card border-0 shadow">
-                                <div className="card-body py-4">
+                                <div className="card-body py-5">
                                     <i className="bi bi-check-circle-fill text-success" style={{ fontSize: "3rem" }}></i>
-                                    <h3 className="card-title mt-3 alinearTexto">¡Bienvenido!</h3>
+                                    <h3 className="card-title mt-4 alinearTexto">¡Bienvenido!</h3>
                                     <p className="card-text lead">
                                         Sistema de gestión para personal administrativo y operativo de VIGITECOL
                                     </p>
@@ -295,14 +296,14 @@ export function Menu() {
                                         Selecciona una opción del menú superior para comenzar
                                     </p>
                                 </div>
-                                
+
                                 <ProtectedElement allowedRoles={["ADMIN"]}>
-                                    <div className="d-flex justify-content-center flex-wrap gap-2 mt-3">
+                                    <div className="text-center mt-3">
                                         <BackupButton />
                                         <HistorialAcciones />
                                     </div>
                                 </ProtectedElement>
-
+<br />
                             </div>
                         </div>
                     )}

@@ -14,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 
 import java.util.List;
 
@@ -46,7 +48,8 @@ public class SecurityConfigurations {
                             "http://192.168.20.142:3000"
 
                     ));
-                    corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+                    corsConfiguration.setAllowedMethods(List.of(
+                            "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
                     corsConfiguration.setAllowedHeaders(List.of("*"));
                     corsConfiguration.setAllowCredentials(true);
                     return corsConfiguration;
@@ -99,6 +102,15 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.GET, "/historial").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/historial/todo").hasRole("ADMIN")
 
+                        // ==================== FOTOS ====================
+                        //.requestMatchers(HttpMethod.POST, "/fotos").hasAnyAuthority("ROLE_ADMIN", "ROLE_RRHH")
+                        .requestMatchers(HttpMethod.POST, "/fotos/subir/**").hasRole("RRHH")
+
+
+                        //.requestMatchers(HttpMethod.POST, "/empleados/subir/**").hasAuthority("ROLE_RRHH")
+
+
+
 
                         // Endpoints de prueba
                         .requestMatchers("/test/admin").hasAuthority("ROLE_ADMIN")
@@ -122,5 +134,11 @@ public class SecurityConfigurations {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @Bean
+    public MultipartResolver multipartResolver() {
+        return new StandardServletMultipartResolver();
+    }
+
 
 }

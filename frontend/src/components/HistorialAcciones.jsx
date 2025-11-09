@@ -76,17 +76,17 @@ export function HistorialAcciones() {
 
   return (
     <div className="container mt-4">
-      <div className="container mt-4">
-        <div className="d-flex justify-content-center align-items-center mb-3">
-          <h3 className="m-0 me-3 alinearTexto">Historial de Acciones</h3>
+
+
+
           <button
             className="btn btn-primary"
             onClick={() => setVisible(!visible)}
           >
-            {visible ? "Ocultar historial" : "Mostrar historial"}
+            {visible ? "Ocultar historial" : "Historial de Acciones"}
           </button>
-        </div>
-      </div>
+
+
 
 
       {visible && (

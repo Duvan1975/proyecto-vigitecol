@@ -31,6 +31,4 @@ public class HistorialController {
     public List<HistorialAccion> obtenerTodoElHistorial() {
         return historialRepository.findAll(Sort.by(Sort.Direction.DESC, "fecha"));
     }
-
-
 }
