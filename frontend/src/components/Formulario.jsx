@@ -22,8 +22,48 @@ export function Formulario({ setVista }) {
         telefono: "",
         correo: "",
         tipoEmpleado: "",
-        cargo: ""
+        cargo: "", 
+        foto: null
     });
+
+    const [vistaPrevia, setVistaPrevia] = useState(null);
+
+    // Manejar la selección de archivo
+const manejarSeleccionFoto = (e) => {
+    const archivo = e.target.files[0];
+    if (archivo) {
+        setEmpleado({ ...empleado, foto: archivo });
+        
+        // Crear vista previa
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            setVistaPrevia(e.target.result);
+        };
+        reader.readAsDataURL(archivo);
+    }
+};
+
+// Función para subir la foto
+const subirFoto = async (idEmpleado, archivo) => {
+    const formData = new FormData();
+    formData.append('archivo', archivo);
+
+    try {
+        const response = await fetch(`http://localhost:8080/fotos/subir/${idEmpleado}`, {
+            method: 'POST',
+            body: formData,
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error al subir foto');
+        }
+        
+        return await response.text();
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+};
 
     //Estados para registrar familiares
     const [familiares, setFamiliares] = useState([]);
@@ -300,6 +340,29 @@ export function Formulario({ setVista }) {
     return (
         <div>
             <h3 className='alinearTexto'>Formulario de Registro de Empleados</h3>
+
+            {/* Input para la foto */}
+<div className="col-md-6">
+    <label className="form-label">Foto:</label>
+    <input
+        type="file"
+        className="form-control"
+        accept="image/*"
+        onChange={manejarSeleccionFoto}
+    />
+    
+    {/* Vista previa de la imagen */}
+    {vistaPrevia && (
+        <div className="mt-2">
+            <img 
+                src={vistaPrevia} 
+                alt="Vista previa" 
+                style={{ maxWidth: '200px', maxHeight: '200px' }}
+                className="img-thumbnail"
+            />
+        </div>
+    )}
+</div>
             <div className='row align-items-center g-2'>
                 <CuadrosTexto
                     tamanoinput="col-md-3"
@@ -1297,7 +1360,8 @@ export function Formulario({ setVista }) {
                         documentos,
                         vehiculos,
                         empleado,
-                        limpiarFormulario)}
+                        limpiarFormulario
+                    )}
                     className=" btn btn-success me-2"
                 >
                     Registrar Empleado

@@ -8,6 +8,8 @@ public record DatosActualizarEmpleado(
         @NotNull
         Long id,
 
+        String foto,
+
         @Size(min = 2, message = "Debe tener al menos 2 caracteres (letras)")
         @Pattern(
                 regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$",

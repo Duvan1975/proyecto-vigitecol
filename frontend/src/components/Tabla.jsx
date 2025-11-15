@@ -606,7 +606,10 @@ export function Tabla({
                         >
                             <option value="nombre">POR NOMBRE</option>
                             <option value="documento">N° DOCUMENTO</option>
-                            <option value="cargo">POR CARGO</option>
+
+                            {!mostrarInactivos && (
+                                <>
+                                                                <option value="cargo">POR CARGO</option>
                             <option value="personalMayorDe50">MAYORES DE 50 AÑOS</option>
                             <option value="estadoCivil">ESTADO CIVIL</option>
                             <option value="genero">GÉNERO</option>
@@ -617,6 +620,9 @@ export function Tabla({
                             <option value="periodoDePrueba">PERIODO DE PRUEBA</option>
                             <option value="conContrato">CON CONTRATO</option>
                             <option value="sinContrato">SIN CONTRATO</option>
+                                </>
+                            )}
+
                         </select>
                     </div>
 
@@ -650,7 +656,7 @@ export function Tabla({
                                     className="form-control"
                                     disabled={["personalMayorDe50",
                                         "cursosPorVencer",
-                                        "periodoDePrueba", 
+                                        "periodoDePrueba",
                                         "conContrato",
                                         "sinContrato"].includes(tipoBusqueda)}
                                 />
@@ -745,8 +751,8 @@ export function Tabla({
                             disabled={[
                                 "estadoCivil",
                                 "personalMayorDe50",
-                                "genero", 
-                                "conFamiliares", 
+                                "genero",
+                                "conFamiliares",
                                 "familiaresPorGenero",
                                 "libretaMilitar",
                                 "cargo",
@@ -901,11 +907,11 @@ ${tipoBusqueda === "sinContrato"
 
                             <thead className="table-primary">
                                 <tr>
+                                    <th>Foto</th>
                                     <th>Nombres</th>
                                     <th>Apellidos</th>
-                                    <th>Número Documento</th>
+                                    <th>Documento</th>
                                     <th>Edad</th>
-                                    <th>Estado Civil</th>
                                     <th>Teléfono</th>
                                     <th>Correo</th>
                                     <th>Cargo</th>
@@ -916,80 +922,119 @@ ${tipoBusqueda === "sinContrato"
                                 {resultadoBusqueda.length > 0 ? (
                                     resultadoBusqueda.map((emp, index) => (
                                         <tr key={index}>
+                                            <td>
+                                                {/* Mostrar foto */}
+                                                {emp.foto ? (
+                                                    <img
+                                                        src={`http://localhost:8080/fotos/${emp.foto}`}
+                                                        alt={`Foto de ${emp.nombres}`}
+                                                        style={{
+                                                            width: '100px',
+                                                            height: '100px',
+                                                            objectFit: 'cover'
+                                                        }}
+                                                    //className="img-thumbnail"
+                                                    />
+                                                ) : (
+                                                    <div
+                                                        style={{
+                                                            width: '100px',
+                                                            height: '100px',
+                                                            backgroundColor: '#f8f9fa',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            border: '1px solid #dee2e6'
+                                                        }}
+                                                    >
+                                                        <span style={{ fontSize: '12px', color: '#6c757d' }}>
+                                                            Sin foto
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </td>
+
                                             <td>{emp.nombres}</td>
                                             <td>{emp.apellidos}</td>
                                             <td>{emp.numeroDocumento}</td>
                                             <td>{emp.edad}</td>
-                                            <td>{emp.estadoCivil}</td>
                                             <td>{emp.telefono}</td>
                                             <td>{emp.correo}</td>
                                             <td>{emp.cargo}</td>
                                             <td>
-                                                <div className="d-flex justify-content-center gap-2">
+                                                <div className="d-flex flex-column gap-2" style={{ minWidth: "80px" }}>
                                                     {console.log('Emp actual:', emp, 'Rol:', localStorage.getItem("rol"))}
 
-                                                    <ProtectedElement allowedRoles={["RRHH"]}>
-                                                        <button
-                                                            onClick={() => {
-                                                                console.log('Click en botón, emp:', emp);
-                                                                setEmpleadoSeleccionado(emp);
-                                                                setMostrarModal(true);
-                                                            }}
-                                                            className="btn btn-sm btn-outline-primary me-0"
-                                                            title="Editar"
-                                                        >
-                                                            <i className="bi bi-pencil-fill"></i>
-                                                        </button>
-                                                    </ProtectedElement>
-                                                    <button
-                                                        onClick={() => {
-                                                            setEmpleadoParaHistorial(emp.id);
-                                                            setMostrarTablaContratos(true);  // activamos la tabla
-                                                        }}
-                                                        className="btn btn-sm btn-outline-secondary"
-                                                        title="Ver contratos"
-                                                    >
-                                                        <i className="bi bi-eye-fill"></i>
-                                                    </button>
-                                                    <button
-                                                        onClick={() => exportarEmpleadoIndividual(emp)}
-                                                        className="btn btn-sm btn-outline-success me-0"
-                                                        title="Exportar empleado"
-                                                    >
-                                                        <i className="bi bi-file-earmark-excel"></i>
-                                                    </button>
-                                                    {!mostrarInactivos && (
-
+                                                    {/* Primera fila de botones */}
+                                                    <div className="d-flex justify-content-center gap-2">
                                                         <ProtectedElement allowedRoles={["RRHH"]}>
                                                             <button
                                                                 onClick={() => {
-                                                                    Swal.fire({
-                                                                        title: '¿Estás seguro?',
-                                                                        text: "Esta acción desactivará al empleado.",
-                                                                        icon: 'warning',
-                                                                        showCancelButton: true,
-                                                                        confirmButtonColor: '#3085d6',
-                                                                        cancelButtonColor: '#d33',
-                                                                        confirmButtonText: 'Sí, desactivar',
-                                                                        cancelButtonText: 'Cancelar'
-                                                                    }).then((result) => {
-                                                                        if (result.isConfirmed) {
-                                                                            eliminarEmpleado(emp.id);
-                                                                            Swal.fire(
-                                                                                'Eliminado',
-                                                                                'El empleado ha sido retirado.',
-                                                                                'success'
-                                                                            );
-                                                                        }
-                                                                    });
+                                                                    console.log('Click en botón, emp:', emp);
+                                                                    setEmpleadoSeleccionado(emp);
+                                                                    setMostrarModal(true);
                                                                 }}
-                                                                className="btn btn-sm btn-outline-danger"
-                                                                title="Desactivar"
+                                                                className="btn btn-sm btn-outline-primary"
+                                                                title="Editar"
                                                             >
-                                                                <i className="bi bi-trash-fill"></i>
+                                                                <i className="bi bi-pencil-fill"></i>
                                                             </button>
                                                         </ProtectedElement>
-                                                    )}
+
+                                                        <button
+                                                            onClick={() => {
+                                                                setEmpleadoParaHistorial(emp.id);
+                                                                setMostrarTablaContratos(true);
+                                                            }}
+                                                            className="btn btn-sm btn-outline-secondary"
+                                                            title="Ver contratos"
+                                                        >
+                                                            <i className="bi bi-eye-fill"></i>
+                                                        </button>
+                                                    </div>
+
+                                                    {/* Segunda fila de botones */}
+                                                    <div className="d-flex justify-content-center gap-2">
+                                                        <button
+                                                            onClick={() => exportarEmpleadoIndividual(emp)}
+                                                            className="btn btn-sm btn-outline-success"
+                                                            title="Exportar empleado"
+                                                        >
+                                                            <i className="bi bi-file-earmark-excel"></i>
+                                                        </button>
+
+                                                        {!mostrarInactivos && (
+                                                            <ProtectedElement allowedRoles={["RRHH"]}>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        Swal.fire({
+                                                                            title: '¿Estás seguro?',
+                                                                            text: "Esta acción desactivará al empleado.",
+                                                                            icon: 'warning',
+                                                                            showCancelButton: true,
+                                                                            confirmButtonColor: '#3085d6',
+                                                                            cancelButtonColor: '#d33',
+                                                                            confirmButtonText: 'Sí, desactivar',
+                                                                            cancelButtonText: 'Cancelar'
+                                                                        }).then((result) => {
+                                                                            if (result.isConfirmed) {
+                                                                                eliminarEmpleado(emp.id);
+                                                                                Swal.fire(
+                                                                                    'Eliminado',
+                                                                                    'El empleado ha sido retirado.',
+                                                                                    'success'
+                                                                                );
+                                                                            }
+                                                                        });
+                                                                    }}
+                                                                    className="btn btn-sm btn-outline-danger"
+                                                                    title="Desactivar"
+                                                                >
+                                                                    <i className="bi bi-trash-fill"></i>
+                                                                </button>
+                                                            </ProtectedElement>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </td>
                                         </tr>
@@ -997,84 +1042,116 @@ ${tipoBusqueda === "sinContrato"
                                 ) : (
                                     empleados.map((emp) => (
                                         <tr key={emp.id}>
+
+                                            <td>
+                                                {/* Mostrar foto para empleados normales */}
+                                                {emp.foto ? (
+                                                    <img
+                                                        src={`http://localhost:8080/fotos/${emp.foto}`}
+                                                        alt={`Foto de ${emp.nombres}`}
+                                                        style={{
+                                                            width: '100px',
+                                                            height: '100px',
+                                                            objectFit: 'cover'
+                                                        }}
+                                                    //className="img-thumbnail"
+                                                    />
+                                                ) : (
+                                                    <div
+                                                        style={{
+                                                            width: '100px',
+                                                            height: '100px',
+                                                            backgroundColor: '#f8f9fa',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            border: '1px solid #dee2e6'
+                                                        }}
+                                                    >
+                                                        <span style={{ fontSize: '12px', color: '#6c757d' }}>
+                                                            Sin foto
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </td>
                                             <td>{emp.nombres}</td>
                                             <td>{emp.apellidos}</td>
                                             <td>{emp.numeroDocumento}</td>
                                             <td>{emp.edad}</td>
-                                            <td>{emp.estadoCivil}</td>
                                             <td>{emp.telefono}</td>
                                             <td>{emp.correo}</td>
                                             <td>{emp.cargo}</td>
                                             <td>
-                                                <div className="d-flex justify-content-center gap-2">
-
-                                                    <ProtectedElement allowedRoles={["RRHH"]}>
-                                                        <button
-                                                            onClick={() => {
-                                                                setEmpleadoSeleccionado(emp);
-                                                                setMostrarModal(true);
-                                                            }}
-                                                            className="btn btn-sm btn-outline-primary me-0"
-                                                            title="Editar"
-                                                        >
-                                                            <i className="bi bi-pencil-fill"></i>
-                                                        </button>
-                                                    </ProtectedElement>
-
-
-                                                    <button
-                                                        onClick={() => {
-                                                            setEmpleadoParaHistorial(emp.id);
-                                                            setMostrarTablaContratos(true);  // activamos la tabla
-
-                                                        }}
-                                                        className="btn btn-sm btn-outline-secondary"
-                                                        title="Ver contratos"
-                                                    >
-                                                        <i className="bi bi-eye-fill"></i>
-                                                    </button>
-
-                                                    <button
-                                                        onClick={() => exportarEmpleadoIndividual(emp)}
-                                                        className="btn btn-sm btn-outline-success me-0"
-                                                        title="Exportar empleado"
-                                                    >
-                                                        <i className="bi bi-file-earmark-excel"></i>
-                                                    </button>
-
-                                                    {!mostrarInactivos && tipoBusqueda !== "sinContrato" && (
-
+                                                <div className="d-flex flex-column gap-2" style={{ minWidth: "80px" }}>
+                                                    {/* Primera fila de botones */}
+                                                    <div className="d-flex justify-content-center gap-2">
                                                         <ProtectedElement allowedRoles={["RRHH"]}>
                                                             <button
                                                                 onClick={() => {
-                                                                    Swal.fire({
-                                                                        title: '¿Estás seguro?',
-                                                                        text: "Esta acción desactivará al empleado.",
-                                                                        icon: 'warning',
-                                                                        showCancelButton: true,
-                                                                        confirmButtonColor: '#3085d6',
-                                                                        cancelButtonColor: '#d33',
-                                                                        confirmButtonText: 'Sí, desactivar',
-                                                                        cancelButtonText: 'Cancelar'
-                                                                    }).then((result) => {
-                                                                        if (result.isConfirmed) {
-                                                                            eliminarEmpleado(emp.id);
-                                                                            Swal.fire(
-                                                                                'Desactivado',
-                                                                                'El empleado ha sido retirado.',
-                                                                                'success'
-                                                                            );
-                                                                        }
-                                                                    });
+                                                                    setEmpleadoSeleccionado(emp);
+                                                                    setMostrarModal(true);
                                                                 }}
-                                                                className="btn btn-sm btn-outline-danger"
-                                                                title="Desactivar"
+                                                                className="btn btn-sm btn-outline-primary"
+                                                                title="Editar"
                                                             >
-                                                                <i className="bi bi-trash-fill"></i>
+                                                                <i className="bi bi-pencil-fill"></i>
                                                             </button>
                                                         </ProtectedElement>
 
-                                                    )}
+                                                        <button
+                                                            onClick={() => {
+                                                                setEmpleadoParaHistorial(emp.id);
+                                                                setMostrarTablaContratos(true);
+                                                            }}
+                                                            className="btn btn-sm btn-outline-secondary"
+                                                            title="Ver contratos"
+                                                        >
+                                                            <i className="bi bi-eye-fill"></i>
+                                                        </button>
+                                                    </div>
+
+                                                    {/* Segunda fila de botones */}
+                                                    <div className="d-flex justify-content-center gap-2">
+                                                        <button
+                                                            onClick={() => exportarEmpleadoIndividual(emp)}
+                                                            className="btn btn-sm btn-outline-success"
+                                                            title="Exportar empleado"
+                                                        >
+                                                            <i className="bi bi-file-earmark-excel"></i>
+                                                        </button>
+
+                                                        {!mostrarInactivos && tipoBusqueda !== "sinContrato" && (
+                                                            <ProtectedElement allowedRoles={["RRHH"]}>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        Swal.fire({
+                                                                            title: '¿Estás seguro?',
+                                                                            text: "Esta acción desactivará al empleado.",
+                                                                            icon: 'warning',
+                                                                            showCancelButton: true,
+                                                                            confirmButtonColor: '#3085d6',
+                                                                            cancelButtonColor: '#d33',
+                                                                            confirmButtonText: 'Sí, desactivar',
+                                                                            cancelButtonText: 'Cancelar'
+                                                                        }).then((result) => {
+                                                                            if (result.isConfirmed) {
+                                                                                eliminarEmpleado(emp.id);
+                                                                                Swal.fire(
+                                                                                    'Desactivado',
+                                                                                    'El empleado ha sido retirado.',
+                                                                                    'success'
+                                                                                );
+                                                                            }
+                                                                        });
+                                                                    }}
+                                                                    className="btn btn-sm btn-outline-danger"
+                                                                    title="Desactivar"
+                                                                >
+                                                                    <i className="bi bi-trash-fill"></i>
+                                                                </button>
+                                                            </ProtectedElement>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </td>
                                         </tr>

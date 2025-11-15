@@ -9,6 +9,7 @@ import java.time.LocalDate;
 public record DatosListadoEmpleado(
         @NotNull
         Long id,
+        String foto,
         String nombres,
         String apellidos,
         TipoDocumento tipoDocumento,
@@ -33,6 +34,7 @@ public record DatosListadoEmpleado(
     public DatosListadoEmpleado(Empleado empleado) {
         this(
                 empleado.getId(),
+                empleado.getFoto(),
                 empleado.getNombres(),
                 empleado.getApellidos(),
                 empleado.getTipoDocumento(),

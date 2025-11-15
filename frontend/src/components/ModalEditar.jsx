@@ -22,6 +22,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     const [vehiculos, setVehiculos] = useState([]);
 
 
+
     //Estado para agregar familiares modificado para que siempre sea visible en la tabla familiares
     const [nuevoFamiliar, setNuevoFamiliar] = useState({
         tipoFamiliar: "",
@@ -361,62 +362,121 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         setVehiculos(nuevosVehiculos);
     };
 
-    const actualizarEmpleado = () => {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
-        authFetch(`${backendUrl}/empleados`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(formulario)
-        })
-            .then(async (response) => {
-                if (!response.ok) {
-                    const errores = await response.json();
-                    let mensaje;
+    const [fotoSeleccionada, setFotoSeleccionada] = useState(null);
+    const [vistaPrevia, setVistaPrevia] = useState(null);
 
-                    if (Array.isArray(errores)) {
-                        // Errores múltiples de validación
-                        mensaje = errores.map(err => `<strong>${err.campo}</strong>: ${err.error}`).join("<br>");
-                    } else if (errores.campo && errores.error) {
-                        // Error individual con campo (como un enum incorrecto)
-                        mensaje = `<strong>${errores.campo}</strong>: ${errores.error}`;
-                    } else if (errores.error) {
-                        // Error general sin campo
-                        mensaje = errores.error;
-                    } else {
-                        mensaje = "Ocurrió un error desconocido";
-                    }
+    // Efecto para cargar la foto actual cuando se abre el modal
+    useEffect(() => {
+        if (empleado && empleado.foto) {
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+            setVistaPrevia(`${backendUrl}/fotos/${empleado.foto}`);
+        } else {
+            setVistaPrevia("/usuario_default.png");
+        }
+        setFotoSeleccionada(null); // Resetear foto seleccionada al abrir
+    }, [empleado]);
 
-                    throw new Error(mensaje);
-                }
+    // Manejar selección de nueva foto
+    const manejarSeleccionFoto = (e) => {
+        const archivo = e.target.files[0];
+        if (archivo) {
+            setFotoSeleccionada(archivo);
 
-                return response.json();
-            })
-            .then((data) => {
-                const continuaAntes = empleado.continua;
-                const continuaDespues = contratos[0]?.continua;
-
-                const accion = continuaAntes !== continuaDespues ? "recargar" : "actualizar";
-
-                onActualizado(accion, data); // Se pasa la acción y el empleado actualizado
-
-                onClose(); // cierra el modal
-
-                Swal.fire({
-                    icon: "success",
-                    title: "Actualización exitosa",
-                    html: `Los datos de: <strong>${data.nombres} ${data.apellidos}</strong> fueron actualizados correctamente.`,
-                });
-            })
-            .catch((error) => {
-                Swal.fire({
-                    icon: "error",
-                    title: "Error en la actualización",
-                    html: error.message
-                });
-            });
+            // Crear vista previa
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setVistaPrevia(e.target.result);
+            };
+            reader.readAsDataURL(archivo);
+        }
     };
+
+    // Función para subir la foto
+    const subirFoto = async (idEmpleado, archivo) => {
+        const formData = new FormData();
+        formData.append('archivo', archivo);
+
+        try {
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+            const response = await authFetch(`${backendUrl}/fotos/subir/${idEmpleado}`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al subir foto');
+            }
+
+            return await response.text();
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+    };
+
+    const actualizarEmpleado = async () => {
+        try {
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+
+            // 1. Primero actualizar los datos del empleado (sin la foto)
+            const response = await authFetch(`${backendUrl}/empleados`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formulario)
+            });
+
+            if (!response.ok) {
+                const errores = await response.json();
+                let mensaje;
+
+                if (Array.isArray(errores)) {
+                    mensaje = errores.map(err => `<strong>${err.campo}</strong>: ${err.error}`).join("<br>");
+                } else if (errores.campo && errores.error) {
+                    mensaje = `<strong>${errores.campo}</strong>: ${errores.error}`;
+                } else if (errores.error) {
+                    mensaje = errores.error;
+                } else {
+                    mensaje = "Ocurrió un error desconocido";
+                }
+                throw new Error(mensaje);
+            }
+
+            const data = await response.json();
+
+            // 2. Si hay una nueva foto seleccionada, subirla
+            if (fotoSeleccionada && data.id) {
+                await subirFoto(data.id, fotoSeleccionada);
+            }
+
+            const continuaAntes = empleado.continua;
+            const continuaDespues = contratos[0]?.continua;
+            const accion = continuaAntes !== continuaDespues ? "recargar" : "actualizar";
+
+            onActualizado(accion, data);
+            onClose();
+
+            Swal.fire({
+                icon: "success",
+                title: "Actualización exitosa",
+                html: `Los datos de: <strong>
+                ${data.nombres} ${data.apellidos}
+                </strong> fueron actualizados correctamente.`,
+            });
+
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Error en la actualización",
+                html: error.message
+            });
+        }
+    };
+
+
+
+
 
     const actualizarFamiliar = (familiar) => {
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
@@ -1197,6 +1257,9 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         });
     };
 
+
+
+
     /*const contratoMasReciente = contratos.length > 0
         ? contratos.reduce((max, c) =>
             c.numeroContrato > max.numeroContrato ? c : max, contratos[0])
@@ -1208,77 +1271,129 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         <div className="modal" style={{ display: "block", backgroundColor: "#000000aa" }}>
             <div className="modal-dialog modal-lg">
                 <div className="modal-content p-4" style={{ backgroundColor: "#f0f0f0" }}>
-                    <h4 className="alinearTexto">Editar Empleado</h4>
+                    <h4 className="alinearTexto text-center">Editar Empleado</h4>
 
-                    <div className="row">
+
+
+                    <div className="row align-items-start">
+                        {/* Card de la foto - ocupa toda la altura */}
                         <div className="col-md-4">
-                            <label htmlFor=""> <strong>Nombres:</strong></label>
-                            <input type="text"
-                                name="nombres"
-                                value={formulario.nombres}
-                                onChange={handleChange}
-                                placeholder="Nombres"
-                                className="form-control mb-2"
-                            />
+                            <div className="card text-center" style={{ width: "100%", maxWidth: "16rem" }}>
+                                <img
+                                    src={vistaPrevia}
+                                    alt="Foto del empleado"
+                                    style={{
+                                        width: "160px",
+                                        height: "160px",
+                                        objectFit: "cover",
+                                        margin: "3px auto"
+                                    }}
+                                //className="img-thumbnail"
+                                />
+                                <div className="card-body p-1">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="form-control form-control-sm"
+                                        onChange={manejarSeleccionFoto}
+                                        id="fotoInput"
+                                        style={{ display: 'none' }}
+                                    />
+                                    <label
+                                        htmlFor="fotoInput"
+                                        className="btn btn-sm btn-outline-primary w-90"
+                                    >
+                                        Seleccionar Archivo
+                                    </label>
+                                </div>
+                            </div>
                         </div>
-                        <div className="col-md-4">
-                            <label htmlFor=""> <strong>Apellidos:</strong></label>
-                            <input type="text"
-                                name="apellidos"
-                                value={formulario.apellidos}
-                                onChange={handleChange}
-                                placeholder="Apellidos"
-                                className="form-control mb-2"
-                            />
-                        </div>
-                        <div className="col-md-4">
-                            <label htmlFor="tipoDocumento"><strong>Tipo de Documento:</strong></label>
-                            <select
-                                name="tipoDocumento"
-                                value={formulario.tipoDocumento}
-                                onChange={handleChange}
-                                className="form-control mb-2"
-                            >
-                                <option value="CC">CÉDULA DE CIUDADANÍA (CC)</option>
-                                <option value="CE">CÉDULA DE EXTRANJERÍA (CE)</option>
-                                <option value="TI">TARJETA DE IDENTIDAD (TI)</option>
-                                <option value="PPT">PERMISO DE PERMANENCIA (PPT)</option>
-                            </select>
+
+                        {/* Columna derecha con dos filas de inputs */}
+                        <div className="col-md-8">
+                            {/* Primera fila: Nombres y Apellidos */}
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <label htmlFor=""> <strong>Nombres:</strong></label>
+                                    <input
+                                        type="text"
+                                        name="nombres"
+                                        value={formulario.nombres}
+                                        onChange={handleChange}
+                                        placeholder="Nombres"
+                                        className="form-control mb-2"
+                                    />
+                                </div>
+
+                                <div className="col-md-6">
+                                    <label htmlFor=""> <strong>Apellidos:</strong></label>
+                                    <input
+                                        type="text"
+                                        name="apellidos"
+                                        value={formulario.apellidos}
+                                        onChange={handleChange}
+                                        placeholder="Apellidos"
+                                        className="form-control mb-2"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Segunda fila: Tipo Documento y Número Documento */}
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <label htmlFor="tipoDocumento"><strong>Tipo de Documento:</strong></label>
+                                    <select
+                                        name="tipoDocumento"
+                                        value={formulario.tipoDocumento}
+                                        onChange={handleChange}
+                                        className="form-control mb-2"
+                                    >
+                                        <option value="CC">CÉDULA DE CIUDADANÍA (CC)</option>
+                                        <option value="CE">CÉDULA DE EXTRANJERÍA (CE)</option>
+                                        <option value="TI">TARJETA DE IDENTIDAD (TI)</option>
+                                        <option value="PPT">PERMISO DE PERMANENCIA (PPT)</option>
+                                    </select>
+                                </div>
+
+                                <div className="col-md-6">
+                                    <label htmlFor=""> <strong>Número de Documento:</strong></label>
+                                    <input
+                                        type="number"
+                                        name="numeroDocumento"
+                                        value={formulario.numeroDocumento}
+                                        onChange={handleChange}
+                                        placeholder="Número de Documento"
+                                        className="form-control mb-2"
+                                    />
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <label htmlFor=""> <strong>Ciudad de Expedición:</strong></label>
+                                    <input type="text"
+                                        name="ciudadExpedicion"
+                                        value={formulario.ciudadExpedicion}
+                                        onChange={handleChange}
+                                        placeholder="Ciudad de Expedición"
+                                        className="form-control mb-2"
+                                    />
+                                </div>
+                                <div className="col-md-6">
+                                    <label htmlFor=""> <strong>Fecha de Nacimiento:</strong></label>
+                                    <input type="date"
+                                        name="fechaNacimiento"
+                                        value={formulario.fechaNacimiento}
+                                        onChange={handleChange}
+                                        placeholder="Seleccione la fecha de nacimiento"
+                                        className="form-control mb-2"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="row">
-                        <div className="col-md-4">
-                            <label htmlFor=""> <strong>Número de Documento:</strong></label>
-                            <input type="number"
-                                name="numeroDocumento"
-                                value={formulario.numeroDocumento}
-                                onChange={handleChange}
-                                placeholder="Número de Documento"
-                                className="form-control mb-2"
-                            />
-                        </div>
-                        <div className="col-md-4">
-                            <label htmlFor=""> <strong>Ciudad de Expedición:</strong></label>
-                            <input type="text"
-                                name="ciudadExpedicion"
-                                value={formulario.ciudadExpedicion}
-                                onChange={handleChange}
-                                placeholder="Ciudad de Expedición"
-                                className="form-control mb-2"
-                            />
-                        </div>
-                        <div className="col-md-4">
-                            <label htmlFor=""> <strong>Fecha de Nacimiento:</strong></label>
-                            <input type="date"
-                                name="fechaNacimiento"
-                                value={formulario.fechaNacimiento}
-                                onChange={handleChange}
-                                placeholder="Seleccione la fecha de nacimiento"
-                                className="form-control mb-2"
-                            />
-                        </div>
-                    </div>
+
+
 
                     <div className="row">
                         <div className="col-md-4">
@@ -2461,9 +2576,9 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                     denyButtonText: `No guardar`
                                 }).then((result) => {
                                     if (result.isConfirmed) {
-                                        actualizarEmpleado(); //Se invoca la function para actualizar los datos
-                                        Swal.fire("Guardado!", "", "success");
-                                    } else if (result.isDenied) {
+                                        actualizarEmpleado(); // Ahora es async pero no necesita await aquí
+                                    }
+                                    else if (result.isDenied) {
                                         Swal.fire("Los cambios no se guardaron", "", "info");
                                     }
                                 });

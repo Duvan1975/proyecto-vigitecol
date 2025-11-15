@@ -41,6 +41,7 @@ public class FotoService {
         Files.copy(archivo.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
 
         // Retornar ruta relativa
-        return destino.toString();
+        //return destino.toString();
+        return nombreArchivo;
     }
 }

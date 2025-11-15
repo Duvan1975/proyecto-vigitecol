@@ -14,14 +14,18 @@ export async function AgregarTabla(
     limpiarFormulario) {
 
     try {
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
-const responseEmpleado = await authFetch(`${backendUrl}/empleados`, {
-    method: "POST",
-    headers: {
-        "Content-type": "application/json",
-    },
-    body: JSON.stringify(empleado),
-});
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+
+        // Extraer la foto del objeto empleado para no enviarla en el JSON
+        const { foto, ...empleadoSinFoto } = empleado;
+
+        const responseEmpleado = await authFetch(`${backendUrl}/empleados`, {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json",
+            },
+            body: JSON.stringify(empleadoSinFoto),
+        });
 
         if (!responseEmpleado.ok) {
             const errores = await responseEmpleado.json();
@@ -44,6 +48,37 @@ const responseEmpleado = await authFetch(`${backendUrl}/empleados`, {
 
         const empleadoData = await responseEmpleado.json();
         const empleadoId = empleadoData.id || empleadoData.Id;
+
+        // SUBIR LA FOTO SI EXISTE
+        if (foto && empleadoId) {
+            try {
+                const formData = new FormData();
+                formData.append('archivo', foto);
+
+                const responseFoto = await authFetch(`${backendUrl}/fotos/subir/${empleadoId}`, {
+                    method: 'POST',
+                    body: formData,
+                    // No establecer Content-Type header, el navegador lo hará automáticamente con el boundary
+                });
+
+                if (!responseFoto.ok) {
+                    throw new Error('Error al subir foto');
+                }
+
+                const resultadoFoto = await responseFoto.text();
+                console.log('Foto subida:', resultadoFoto);
+
+            } catch (error) {
+                console.error('Error al subir foto:', error);
+                // Puedes decidir si quieres mostrar un error o solo loggear
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Empleado registrado',
+                    text: 'El empleado se registró correctamente pero hubo un error al subir la foto',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+        }
 
         //Enviar todos los familiares juntos
         const familiaresLimpios = familiares.filter(f =>
@@ -174,7 +209,7 @@ const responseEmpleado = await authFetch(`${backendUrl}/empleados`, {
             d.tipoOtroDocumento
         ).map((d) => ({
             tipoOtroDocumento: d.tipoOtroDocumento,
-            fechaRegistro: d.fechaRegistro || null, 
+            fechaRegistro: d.fechaRegistro || null,
             descripcionDocumento: d.descripcionDocumento || null
         }));
 

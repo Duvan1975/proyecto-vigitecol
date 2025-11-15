@@ -105,6 +105,8 @@ public class SecurityConfigurations {
                         // ==================== FOTOS ====================
                         //.requestMatchers(HttpMethod.POST, "/fotos").hasAnyAuthority("ROLE_ADMIN", "ROLE_RRHH")
                         .requestMatchers(HttpMethod.POST, "/fotos/subir/**").hasRole("RRHH")
+                        .requestMatchers(HttpMethod.GET, "/fotos/**").permitAll()
+
 
 
                         //.requestMatchers(HttpMethod.POST, "/empleados/subir/**").hasAuthority("ROLE_RRHH")

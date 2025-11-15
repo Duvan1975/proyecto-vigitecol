@@ -95,6 +95,7 @@ public class EmpleadoService {
         //Creamos la respuesta
         DatosRespuestaEmpleado datosRespuestaEmpleado = new DatosRespuestaEmpleado(
                 empleado.getId(),
+                empleado.getFoto(),
                 empleado.getNombres(),
                 empleado.getApellidos(),
                 empleado.getNumeroDocumento(),
@@ -206,6 +207,7 @@ public class EmpleadoService {
 
         return ResponseEntity.ok(new DatosRespuestaEmpleado(
                 empleado.getId(),
+                empleado.getFoto(),
                 empleado.getNombres(),
                 empleado.getApellidos(),
                 empleado.getNumeroDocumento(),
@@ -249,6 +251,7 @@ public class EmpleadoService {
 
         var datosEmpleado = new DatosActualizarEmpleado(
                 empleado.getId(),
+                empleado.getFoto(),
                 empleado.getNombres(),
                 empleado.getApellidos(),
                 empleado.getTipoDocumento(),
@@ -276,6 +279,7 @@ public class EmpleadoService {
 
         var datosEmpleado = new DatosActualizarEmpleado(
                 empleado.getId(),
+                empleado.getFoto(),
                 empleado.getNombres(),
                 empleado.getApellidos(),
                 empleado.getTipoDocumento(),
@@ -323,6 +327,7 @@ public class EmpleadoService {
                 })
                 .map(empleado -> new DatosActualizarEmpleado(
                         empleado.getId(),
+                        empleado.getFoto(),
                         empleado.getNombres(),
                         empleado.getApellidos(),
                         empleado.getTipoDocumento(),
@@ -356,6 +361,7 @@ public class EmpleadoService {
         var resultado = empleados.stream()
                 .map(empleado -> new DatosActualizarEmpleado(
                         empleado.getId(),
+                        empleado.getFoto(),
                         empleado.getNombres(),
                         empleado.getApellidos(),
                         empleado.getTipoDocumento(),
@@ -396,6 +402,7 @@ public class EmpleadoService {
                 })
                 .map(empleado -> new DatosActualizarEmpleado(
                         empleado.getId(),
+                        empleado.getFoto(),
                         empleado.getNombres(),
                         empleado.getApellidos(),
                         empleado.getTipoDocumento(),
@@ -429,6 +436,7 @@ public class EmpleadoService {
         var resultado = empleados.stream()
                 .map(empleado -> new DatosActualizarEmpleado(
                         empleado.getId(),
+                        empleado.getFoto(),
                         empleado.getNombres(),
                         empleado.getApellidos(),
                         empleado.getTipoDocumento(),
