@@ -91,14 +91,7 @@ export function HistorialAcciones() {
 
       {visible && (
         <>
-          {cargando && (
-            <div className="text-center">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Cargando...</span>
-              </div>
-              <p className="mt-2">Cargando historial...</p>
-            </div>
-          )}
+
 
           {!cargando && historial.length > 0 && (
             <div className="table-responsive">
