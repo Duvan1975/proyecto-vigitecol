@@ -609,17 +609,17 @@ export function Tabla({
 
                             {!mostrarInactivos && (
                                 <>
-                                                                <option value="cargo">POR CARGO</option>
-                            <option value="personalMayorDe50">MAYORES DE 50 AÑOS</option>
-                            <option value="estadoCivil">ESTADO CIVIL</option>
-                            <option value="genero">GÉNERO</option>
-                            <option value="familiaresPorGenero">PADRES/MADRES</option>
-                            <option value="libretaMilitar">LIBRETA MILITAR</option>
-                            <option value="conFamiliares">HIJOS/HIJASTROS</option>
-                            <option value="cursosPorVencer">CURSOS A VENCER</option>
-                            <option value="periodoDePrueba">PERIODO DE PRUEBA</option>
-                            <option value="conContrato">CON CONTRATO</option>
-                            <option value="sinContrato">SIN CONTRATO</option>
+                                    <option value="cargo">POR CARGO</option>
+                                    <option value="personalMayorDe50">MAYORES DE 50 AÑOS</option>
+                                    <option value="estadoCivil">ESTADO CIVIL</option>
+                                    <option value="genero">GÉNERO</option>
+                                    <option value="familiaresPorGenero">PADRES/MADRES</option>
+                                    <option value="libretaMilitar">LIBRETA MILITAR</option>
+                                    <option value="conFamiliares">HIJOS/HIJASTROS</option>
+                                    <option value="cursosPorVencer">CURSOS A VENCER</option>
+                                    <option value="periodoDePrueba">PERIODO DE PRUEBA</option>
+                                    <option value="conContrato">CON CONTRATO</option>
+                                    <option value="sinContrato">SIN CONTRATO</option>
                                 </>
                             )}
 
@@ -926,14 +926,13 @@ ${tipoBusqueda === "sinContrato"
                                                 {/* Mostrar foto */}
                                                 {emp.foto ? (
                                                     <img
-                                                        src={`http://localhost:8080/fotos/${emp.foto}`}
+                                                        src={process.env.REACT_APP_BACKEND_URL || `http://localhost:8080/fotos/${emp.foto}`}
                                                         alt={`Foto de ${emp.nombres}`}
                                                         style={{
                                                             width: '100px',
                                                             height: '100px',
                                                             objectFit: 'cover'
                                                         }}
-                                                    //className="img-thumbnail"
                                                     />
                                                 ) : (
                                                     <div
@@ -1047,14 +1046,14 @@ ${tipoBusqueda === "sinContrato"
                                                 {/* Mostrar foto para empleados normales */}
                                                 {emp.foto ? (
                                                     <img
-                                                        src={`http://localhost:8080/fotos/${emp.foto}`}
+                                                        src={process.env.REACT_APP_BACKEND_URL || `http://localhost:8080/fotos/${emp.foto}`}
+                                                        //src={emp.foto || "/usuario_default.png"}
                                                         alt={`Foto de ${emp.nombres}`}
                                                         style={{
                                                             width: '100px',
                                                             height: '100px',
                                                             objectFit: 'cover'
                                                         }}
-                                                    //className="img-thumbnail"
                                                     />
                                                 ) : (
                                                     <div

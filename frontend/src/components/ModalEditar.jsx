@@ -79,6 +79,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
     const [formulario, setFormulario] = useState({
         id: "",
+        foto: null,
         nombres: "",
         apellidos: "",
         tipoDocumento: "",

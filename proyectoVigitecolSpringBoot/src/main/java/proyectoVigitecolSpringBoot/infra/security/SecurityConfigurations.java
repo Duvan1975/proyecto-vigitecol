@@ -103,16 +103,8 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.GET, "/historial/todo").hasRole("ADMIN")
 
                         // ==================== FOTOS ====================
-                        //.requestMatchers(HttpMethod.POST, "/fotos").hasAnyAuthority("ROLE_ADMIN", "ROLE_RRHH")
                         .requestMatchers(HttpMethod.POST, "/fotos/subir/**").hasRole("RRHH")
                         .requestMatchers(HttpMethod.GET, "/fotos/**").permitAll()
-
-
-
-                        //.requestMatchers(HttpMethod.POST, "/empleados/subir/**").hasAuthority("ROLE_RRHH")
-
-
-
 
                         // Endpoints de prueba
                         .requestMatchers("/test/admin").hasAuthority("ROLE_ADMIN")

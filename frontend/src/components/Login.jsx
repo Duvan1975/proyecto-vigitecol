@@ -6,14 +6,14 @@ import { debugEnv } from '../debug-env';
 console.log("DEBUG ENV:", debugEnv);
 
 export function Login({ onLoginSuccess }) {
-    const [admin, setAdmin] = useState(""); 
+    const [admin, setAdmin] = useState("");
     const [clave, setClave] = useState("");
 
     const handleLogin = async () => {
         try {
             //const backendUrl = "https://proyecto-vigitecol-1.onrender.com";
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080" || "http://localhost:8081";
-        const response = await fetch(`${backendUrl}/login`, {
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080" || "http://localhost:8081";
+            const response = await fetch(`${backendUrl}/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -66,36 +66,36 @@ export function Login({ onLoginSuccess }) {
     };
 
     const handleForgotPassword = async () => {
-  const { value: email } = await Swal.fire({
-    title: 'Recuperar contraseña',
-    input: 'email',
-    inputLabel: 'Ingresa tu correo registrado',
-    inputPlaceholder: 'correo@ejemplo.com',
-    showCancelButton: true,
-    confirmButtonText: 'Enviar',
-    cancelButtonText: 'Cancelar'
-  });
+        const { value: email } = await Swal.fire({
+            title: 'Recuperar contraseña',
+            input: 'email',
+            inputLabel: 'Ingresa tu correo registrado',
+            inputPlaceholder: 'correo@ejemplo.com',
+            showCancelButton: true,
+            confirmButtonText: 'Enviar',
+            cancelButtonText: 'Cancelar'
+        });
 
-  if (email) {
-    try {
-      // CAMBIA ESTA LÍNEA - Usa la variable de entorno
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
-      const response = await fetch(`${backendUrl}/password-reset/request`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ admin: email })
-      });
-      const data = await response.json();
-      if (response.ok) {
-        Swal.fire('¡Listo!', data.message || 'Si el usuario existe, se enviaron instrucciones a tu correo.', 'success');
-      } else {
-        Swal.fire('Error', data.error || 'No se pudo enviar el correo.', 'error');
-      }
-    } catch (error) {
-      Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
-    }
-  }
-};
+        if (email) {
+            try {
+                // CAMBIA ESTA LÍNEA - Usa la variable de entorno
+                const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+                const response = await fetch(`${backendUrl}/password-reset/request`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ admin: email })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    Swal.fire('¡Listo!', data.message || 'Si el usuario existe, se enviaron instrucciones a tu correo.', 'success');
+                } else {
+                    Swal.fire('Error', data.error || 'No se pudo enviar el correo.', 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
+            }
+        }
+    };
 
     return (
         <div className="container-fluid d-flex justify-content-center align-items-center min-vh-100 bg-light">
