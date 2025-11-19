@@ -926,12 +926,15 @@ ${tipoBusqueda === "sinContrato"
                                                 {/* Mostrar foto */}
                                                 {emp.foto ? (
                                                     <img
-                                                        src={process.env.REACT_APP_BACKEND_URL || `http://localhost:8080/fotos/${emp.foto}`}
+                                                        src={`${process.env.REACT_APP_BACKEND_URL || "http://localhost:8080"}/fotos/${emp.foto}`}
                                                         alt={`Foto de ${emp.nombres}`}
                                                         style={{
                                                             width: '100px',
                                                             height: '100px',
                                                             objectFit: 'cover'
+                                                        }}
+                                                        onError={(e) => {
+                                                            e.target.src = "/usuario_default.png";
                                                         }}
                                                     />
                                                 ) : (
@@ -1041,18 +1044,20 @@ ${tipoBusqueda === "sinContrato"
                                 ) : (
                                     empleados.map((emp) => (
                                         <tr key={emp.id}>
-
                                             <td>
                                                 {/* Mostrar foto para empleados normales */}
                                                 {emp.foto ? (
                                                     <img
-                                                        src={process.env.REACT_APP_BACKEND_URL || `http://localhost:8080/fotos/${emp.foto}`}
-                                                        //src={emp.foto || "/usuario_default.png"}
+                                                        src={`${process.env.REACT_APP_BACKEND_URL || "http://localhost:8080"}/fotos/${emp.foto}`}
                                                         alt={`Foto de ${emp.nombres}`}
                                                         style={{
                                                             width: '100px',
                                                             height: '100px',
                                                             objectFit: 'cover'
+                                                        }}
+                                                        onError={(e) => {
+                                                            // Si hay error al cargar la imagen, mostrar placeholder
+                                                            e.target.src = "/usuario_default.png";
                                                         }}
                                                     />
                                                 ) : (
