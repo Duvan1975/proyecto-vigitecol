@@ -1,4 +1,4 @@
-package proyectoVigitecolSpringBoot.config;
+/*package proyectoVigitecolSpringBoot.config;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
@@ -30,6 +30,6 @@ public class CloudinaryConfig {
                 "secure", true
         ));
     }
-}
+}*/
 
 

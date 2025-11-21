@@ -365,14 +365,17 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
     const [fotoSeleccionada, setFotoSeleccionada] = useState(null);
     const [vistaPrevia, setVistaPrevia] = useState(null);
+    const [mostrarInputFoto, setMostrarInputFoto] = useState(true);
 
     // Efecto para cargar la foto actual cuando se abre el modal
     useEffect(() => {
         if (empleado && empleado.foto) {
             const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
             setVistaPrevia(`${backendUrl}/fotos/${empleado.foto}`);
+            setMostrarInputFoto(false); // Mostrar botón "Quitar Imagen" si ya tiene foto
         } else {
             setVistaPrevia("/usuario_default.png");
+            setMostrarInputFoto(true); // Mostrar botón "Seleccionar Archivo" si no tiene foto
         }
         setFotoSeleccionada(null); // Resetear foto seleccionada al abrir
     }, [empleado]);
@@ -389,10 +392,25 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                 setVistaPrevia(e.target.result);
             };
             reader.readAsDataURL(archivo);
+
+            setMostrarInputFoto(false); // Cambiar a botón "Quitar Imagen"
         }
     };
 
-    // Función para subir la foto
+    // Función para quitar la imagen y restaurar la por defecto
+    const quitarImagen = () => {
+        setFotoSeleccionada(null);
+        setVistaPrevia("/usuario_default.png");
+        setMostrarInputFoto(true);
+
+        // También limpiar el input file
+        const fileInput = document.getElementById('fotoInput');
+        if (fileInput) {
+            fileInput.value = '';
+        }
+    };
+
+    // Función para subir la foto (la que ya tienes)
     const subirFoto = async (idEmpleado, archivo) => {
         const formData = new FormData();
         formData.append('archivo', archivo);
@@ -419,6 +437,12 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         try {
             const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
+        // Preparar datos del empleado (si se quitó la imagen, limpiar el campo foto)
+        const datosEmpleado = { ...formulario };
+        if (mostrarInputFoto && vistaPrevia === "/usuario_default.png") {
+            // Si el usuario quitó la imagen, enviar null para el campo foto
+            datosEmpleado.foto = null;
+        }
             // 1. Primero actualizar los datos del empleado (sin la foto)
             const response = await authFetch(`${backendUrl}/empleados`, {
                 method: "PUT",
@@ -1289,7 +1313,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                         objectFit: "cover",
                                         margin: "3px auto"
                                     }}
-                                //className="img-thumbnail"
                                 />
                                 <div className="card-body p-1">
                                     <input
@@ -1300,12 +1323,24 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                         id="fotoInput"
                                         style={{ display: 'none' }}
                                     />
-                                    <label
-                                        htmlFor="fotoInput"
-                                        className="btn btn-sm btn-outline-primary w-90"
-                                    >
-                                        Seleccionar Archivo
-                                    </label>
+
+                                    {/* Botón alternante */}
+                                    {mostrarInputFoto ? (
+                                        <label
+                                            htmlFor="fotoInput"
+                                            className="btn btn-sm btn-outline-primary w-90"
+                                        >
+                                            Seleccionar Archivo
+                                        </label>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            className="btn btn-sm btn-outline-secondary w-90"
+                                            onClick={quitarImagen}
+                                        >
+                                            Quitar Imagen
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>
