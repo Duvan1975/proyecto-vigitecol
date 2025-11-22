@@ -23,12 +23,6 @@ public class AfiliacionService {
     @Autowired
     private AfiliacionRepository afiliacionRepository;
 
-    @Autowired
-    private UsuarioService usuarioService;
-
-    @Autowired
-    private HistorialRepository historialRepository;
-
     public void registrarAfiliacion(Long empleadoId, List<DatosRegistroAfiliacion> listaDatos) {
         var empleado = empleadoRepository.findById(empleadoId)
                 .orElseThrow(() -> new RuntimeException("Empleado NO encontrado"));
@@ -37,13 +31,13 @@ public class AfiliacionService {
                 .toList();
         afiliacionRepository.saveAll(afiliaciones);
 
-        String actor = usuarioService.obtenerUsuarioActual();
+        /*String actor = usuarioService.obtenerUsuarioActual();
 
         historialRepository.save(new HistorialAccion(
                 actor,
                 "REGISTRAR_AFILIACION",
                 "Registró afiliaciones del empleado: " + empleado.getNombres() +" "+ empleado.getApellidos()
-        ));
+        ));*/
     }
 
     public Page<Afiliacion> listarAfiliaciones(Pageable paginacion) {
@@ -73,12 +67,12 @@ public class AfiliacionService {
 
         afiliacionRepository.save(afiliacion);
 
-        String actor = usuarioService.obtenerUsuarioActual();
+        /*String actor = usuarioService.obtenerUsuarioActual();
         historialRepository.save(new HistorialAccion(
                 actor,
                 "ACTUALIZAR_AFILIACION",
                 "Actualizó la afiliación con ID: " + afiliacion.getAfiliacionId()
-        ));
+        ));*/
 
         return new DatosRespuestaAfiliacion(
                 afiliacion.getAfiliacionId(),
@@ -94,11 +88,11 @@ public class AfiliacionService {
         }
         afiliacionRepository.deleteById(id); // Devuelve 204 No Content
 
-        String actor = usuarioService.obtenerUsuarioActual();
+        /*String actor = usuarioService.obtenerUsuarioActual();
         historialRepository.save(new HistorialAccion(
                 actor,
                 "ELIMINAR_AFILIACION",
                 "Eliminó la afiliación con ID: " + id
-        ));
+        ));*/
     }
 }

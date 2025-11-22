@@ -437,12 +437,12 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         try {
             const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
-        // Preparar datos del empleado (si se quitó la imagen, limpiar el campo foto)
-        const datosEmpleado = { ...formulario };
-        if (mostrarInputFoto && vistaPrevia === "/usuario_default.png") {
-            // Si el usuario quitó la imagen, enviar null para el campo foto
-            datosEmpleado.foto = null;
-        }
+            // Preparar datos del empleado (si se quitó la imagen, limpiar el campo foto)
+            const datosEmpleado = { ...formulario };
+            if (mostrarInputFoto && vistaPrevia === "/usuario_default.png") {
+                // Si el usuario quitó la imagen, enviar null para el campo foto
+                datosEmpleado.foto = null;
+            }
             // 1. Primero actualizar los datos del empleado (sin la foto)
             const response = await authFetch(`${backendUrl}/empleados`, {
                 method: "PUT",
