@@ -29,8 +29,8 @@ public class BackupScheduler {
     private final String password = System.getenv("AIVEN_DB_PASSWORD");
     private final String database = "vigitecol_db";
 
-    // 🔥 Cada mes, día 1, a las 02:00 AM
-    @Scheduled(cron = "0 0 * * * *")
+    // 🔥 Cada Ssemana, a las 09:00 AM
+    @Scheduled(cron = "0 0 9 * * MON")
     public void generarBackupAutomatico() {
         try {
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
