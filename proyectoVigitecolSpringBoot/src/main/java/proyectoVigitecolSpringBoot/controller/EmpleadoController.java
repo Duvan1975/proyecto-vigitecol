@@ -278,4 +278,9 @@ public class EmpleadoController {
 
         return ResponseEntity.ok(resultado);
     }
+
+    @DeleteMapping("/definitivo/{id}")
+    public ResponseEntity<?> eliminarEmpleadoDefinitivo(@PathVariable Long id) {
+        return empleadoService.eliminarEmpleadoDefinitivo(id);
+    }
 }

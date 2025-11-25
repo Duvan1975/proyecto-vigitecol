@@ -1,6 +1,7 @@
 package proyectoVigitecolSpringBoot.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,19 +19,23 @@ import java.time.format.DateTimeFormatter;
 @RequestMapping("/backup")
 public class BackupController {
 
-    @Autowired
-    private UsuarioService usuarioService;
+    @Value("${app.mysqldump.path}")
+    private String mysqldumpPath;
+
+    private final UsuarioService usuarioService;
+    private final HistorialRepository historialRepository;
 
     @Autowired
-    private HistorialRepository historialRepository;
+    public BackupController(UsuarioService usuarioService, HistorialRepository historialRepository) {
+        this.usuarioService = usuarioService;
+        this.historialRepository = historialRepository;
+    }
 
     @GetMapping("/download")
     public ResponseEntity<InputStreamResource> downloadBackup() {
         try {
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
             String backupFile = "backup_" + timestamp + ".sql";
-
-            String mysqldumpPath = "C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysqldump.exe";
 
             String host = "mysql-14d288cf-ballexplorer1975-fb53.d.aivencloud.com";
             String port = "20771";

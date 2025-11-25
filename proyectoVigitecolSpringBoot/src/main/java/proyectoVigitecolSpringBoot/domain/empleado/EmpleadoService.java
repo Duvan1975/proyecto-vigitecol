@@ -710,4 +710,41 @@ public class EmpleadoService {
                 vehiculos
         );
     }
+
+    @Transactional
+    public ResponseEntity<?> eliminarEmpleadoDefinitivo(Long id) {
+        Empleado empleado = empleadoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
+
+        // 1. Validar que NO tenga contratos asociados
+        /*boolean tieneContratos = contratoRepository.existsByEmpleadoId(id);
+        if (tieneContratos) {
+            return ResponseEntity.badRequest()
+                    .body("No es posible eliminar el empleado porque tiene contratos asociados. " +
+                            "Primero debe eliminar o limpiar estos registros.");
+        }
+
+        // 2. (Opcional) Validar otras dependencias si existen:
+        // ejemplo: foto, historial, asistencias, etc.
+    /*
+    if (historialRepository.existsByEmpleadoId(id)) {
+        return ResponseEntity.badRequest()
+                .body("El empleado tiene historial asociado. No puede eliminarse.");
+    }
+    */
+
+        // 3. Si no tiene relaciones, eliminar definitivamente
+        String actor = usuarioService.obtenerUsuarioActual();
+        historialRepository.save(new HistorialAccion(
+                actor,
+                "ELIMINACION_DEFINITIVA_EMPLEADO",
+                "Eliminó definitivamente al empleado: " + empleado.getNombres() + " " + empleado.getApellidos() +
+                        " (Documento: " + empleado.getNumeroDocumento() + ")"
+        ));
+
+        empleadoRepository.delete(empleado);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }

@@ -1,6 +1,7 @@
 package proyectoVigitecolSpringBoot.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import proyectoVigitecolSpringBoot.domain.historial.HistorialAccion;
@@ -8,20 +9,17 @@ import proyectoVigitecolSpringBoot.domain.historial.HistorialRepository;
 import proyectoVigitecolSpringBoot.domain.usuarios.UsuarioService;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Component
 public class BackupScheduler {
 
-    @Autowired
-    private HistorialRepository historialRepository;
+    @Value("${app.mysqldump.path}")
+    private String mysqldumpPath;
 
-    @Autowired
-    private UsuarioService usuarioService;
-
-    private final String mysqldumpPath = "C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysqldump.exe";
+    private final HistorialRepository historialRepository;
+    private final UsuarioService usuarioService;
 
     private final String host = "mysql-14d288cf-ballexplorer1975-fb53.d.aivencloud.com";
     private final String port = "20771";
@@ -29,7 +27,13 @@ public class BackupScheduler {
     private final String password = System.getenv("AIVEN_DB_PASSWORD");
     private final String database = "vigitecol_db";
 
-    // 🔥 Cada Ssemana, a las 09:00 AM
+    @Autowired
+    public BackupScheduler(HistorialRepository historialRepository, UsuarioService usuarioService) {
+        this.historialRepository = historialRepository;
+        this.usuarioService = usuarioService;
+    }
+
+    // 🔥 Cada Semana, a las 09:00 AM
     @Scheduled(cron = "0 0 9 * * MON")
     public void generarBackupAutomatico() {
         try {

@@ -220,6 +220,26 @@ export function Tabla({
         }
     };
 
+        const eliminarEmpleadoDefinitivo = async (id) => {
+
+        try {
+            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
+            const response = await authFetch(`${backendUrl}/empleados/definitivo/${id}`, {
+                method: 'DELETE'
+            });
+            if (response.ok) {
+                //Eliminar del estado para actualizar la tabla
+                setEmpleados(empleados.filter(empleado => empleado.id !== id));
+                cargarEmpleados(); // Esto cargará el listado completo y actualizado
+            }
+            else {
+                console.error("Error al eliminar empleado")
+            }
+        } catch (error) {
+            console.error("Error en la petición DELETE", error);
+        }
+    };
+
     const realizarBusquedaFiltrada = async (tipo, valor, nombreFiltro) => {
         if (!valor) {
             Swal.fire({
@@ -1150,6 +1170,37 @@ ${tipoBusqueda === "sinContrato"
                                                                     }}
                                                                     className="btn btn-sm btn-outline-danger"
                                                                     title="Desactivar"
+                                                                >
+                                                                    <i className="bi bi-trash-fill"></i>
+                                                                </button>
+                                                            </ProtectedElement>
+                                                        )}
+                                                        {!mostrarInactivos && tipoBusqueda === "sinContrato" && (
+                                                            <ProtectedElement allowedRoles={["ADMIN"]}>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        Swal.fire({
+                                                                            title: '¿Estás seguro?',
+                                                                            text: "Esta acción eliminará al empleado definitivamente.",
+                                                                            icon: 'warning',
+                                                                            showCancelButton: true,
+                                                                            confirmButtonColor: '#3085d6',
+                                                                            cancelButtonColor: '#d33',
+                                                                            confirmButtonText: 'Sí, eliminar',
+                                                                            cancelButtonText: 'Cancelar'
+                                                                        }).then((result) => {
+                                                                            if (result.isConfirmed) {
+                                                                                eliminarEmpleadoDefinitivo(emp.id);
+                                                                                Swal.fire(
+                                                                                    'Eliminado',
+                                                                                    'El empleado ha sido eliminado de la base de datos.',
+                                                                                    'success'
+                                                                                );
+                                                                            }
+                                                                        });
+                                                                    }}
+                                                                    className="btn btn-sm btn-outline-danger"
+                                                                    title="Eliminar"
                                                                 >
                                                                     <i className="bi bi-trash-fill"></i>
                                                                 </button>

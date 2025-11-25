@@ -49,8 +49,6 @@ public class SecurityConfigurations {
                             "http://192.168.2.190:3000",
                             "http://192.168.1.176:3000"
 
-
-
                             ));
                     corsConfiguration.setAllowedMethods(List.of(
                             "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
@@ -78,7 +76,7 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.POST, "/empleados").hasAuthority("ROLE_RRHH")
                         .requestMatchers(HttpMethod.PUT, "/empleados/**").hasAuthority("ROLE_RRHH")
                         .requestMatchers(HttpMethod.PUT, "/empleados/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/empleados/**").hasAuthority("ROLE_RRHH")
+                        .requestMatchers(HttpMethod.DELETE, "/empleados/**").hasAnyAuthority("ROLE_RRHH", "ROLE_ADMIN")
 
                         // ==================== CONTRATOS ====================
                         .requestMatchers(HttpMethod.POST, "/contratos").hasAuthority("ROLE_RRHH")
