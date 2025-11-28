@@ -116,27 +116,46 @@ export function HistorialAcciones() {
       {visible && (
         <>
           {/* 🔹 Filtro */}
-          <div className="d-flex gap-2 mt-4">
-            <input
-              type="date"
-              className="form-control"
-              value={fechaDesde}
-              onChange={(e) => setFechaDesde(e.target.value)}
-            />
-            <input
-              type="date"
-              className="form-control"
-              value={fechaHasta}
-              onChange={(e) => setFechaHasta(e.target.value)}
-            />
-            <button className="btn btn-secondary" onClick={aplicarFiltro}>
-              Filtrar
-            </button>
-            {modoFiltro && (
+          <div className="row d-flex align-items-end gap-2">
+
+            <div className="col-md-3">
+              <label><strong>Fecha Desde:</strong></label>
+              <input
+                type="date"
+                className="form-control"
+                value={fechaDesde}
+                onChange={(e) => setFechaDesde(e.target.value)}
+              />
+            </div>
+
+            <div className="col-md-3">
+              <label><strong>Fecha Hasta:</strong></label>
+              <input
+                type="date"
+                className="form-control"
+                value={fechaHasta}
+                onChange={(e) => setFechaHasta(e.target.value)}
+              />
+            </div>
+
+            {/* Botones juntos en línea */}
+            <div className="col-md-4 d-flex align-items-end gap-2">
+
+              <button className="btn btn-secondary" onClick={aplicarFiltro}>
+                Filtrar
+              </button>
+
+              {/* Limpiar siempre visible */}
               <button className="btn btn-warning" onClick={limpiarFiltro}>
                 Limpiar
               </button>
-            )}
+
+              <button className="btn btn-success" onClick={exportarExcel}>
+                Exportar a Excel
+              </button>
+
+            </div>
+
           </div>
 
           {/* TABLA */}
@@ -177,12 +196,6 @@ export function HistorialAcciones() {
                   Página {paginaActual + 1} de {totalPaginas} — {tamanoPagina} por
                   página (Total: {totalElementos})
                 </small>
-              </div>
-
-              <div className="text-end mt-2">
-                <button className="btn btn-success" onClick={exportarExcel}>
-                  Exportar a Excel
-                </button>
               </div>
             </div>
           )}

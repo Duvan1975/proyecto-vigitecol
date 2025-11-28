@@ -113,17 +113,24 @@ public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
     );
 
 
+
     @Query("""
-            SELECT e FROM Empleado e
-            JOIN Contrato c ON c.empleado = e
-            WHERE c.numeroContrato = 1
-            AND c.continua = true
-            AND c.fechaIngreso BETWEEN :fechaMin AND :fechaMax
-            """)
+        SELECT e FROM Empleado e
+        JOIN Contrato c ON c.empleado = e
+        WHERE c.numeroContrato = 1
+        AND c.continua = true
+        AND c.fechaIngreso BETWEEN :fechaMin AND :fechaMax
+        AND NOT EXISTS (
+            SELECT 1 FROM Contrato c2
+            WHERE c2.empleado = e AND c2.numeroContrato > 1
+        )
+        """)
     Page<Empleado> findEmpleadosEnPeriodoDePruebaVencido(
             @Param("fechaMin") LocalDate fechaMin,
             @Param("fechaMax") LocalDate fechaMax,
             Pageable pageable);
+
+
 
     @Query("""
                 SELECT e FROM Empleado e

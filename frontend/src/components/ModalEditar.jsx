@@ -2619,7 +2619,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                     }
                                 });
                             }} className="btn btn-warning me-2">
-                                Actualizar
+                                Actualizar Todo
                             </button>
                             <button
                                 onClick={() => {

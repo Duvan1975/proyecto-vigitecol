@@ -512,7 +512,7 @@ export function Formulario({ setVista }) {
                 />
                 <CuadrosSelect
                     tamanoinput="col-md-3"
-                    titulolabel="GÉNERO:"
+                    titulolabel="Género:"
                     nombreinput="genero"
                     idinput="genero"
                     value={empleado.genero}
@@ -1099,7 +1099,7 @@ export function Formulario({ setVista }) {
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-3"
-                    titulolabel="Descripción:"
+                    titulolabel="Observaciones:"
                     tipoinput="text"
                     nombreinput="descripcionDocumento"
                     idinput="descripcionDocumento"

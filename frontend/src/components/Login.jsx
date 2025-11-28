@@ -56,13 +56,24 @@ export function Login({ onLoginSuccess }) {
                 }
             });
 
-        } catch (error) {
-            Swal.fire({
-                icon: "error",
-                title: "Error al iniciar sesión",
-                text: error.message || "Error al ingresar usuario o contraseña"
-            });
-        }
+} catch (error) {
+
+    let mensaje = "Error al ingresar usuario o contraseña";
+
+    // Detectar error de red ("no hay internet" o "no conecta al backend")
+    if (error.message === "Failed to fetch") {
+        mensaje = "Verifica tu conexión a internet o intenta nuevamente en unos minutos.";
+    } else if (error.message) {
+        mensaje = error.message;
+    }
+
+    Swal.fire({
+        icon: "error",
+        title: "No fue posible conectar con el sistema.",
+        text: mensaje
+    });
+}
+
     };
 
     const handleForgotPassword = async () => {

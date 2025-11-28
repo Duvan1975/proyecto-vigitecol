@@ -634,6 +634,8 @@ public class EmpleadoService {
                 });
     }
 
+
+
     public Page<DatosEmpleadoConEstudios> findConEstudios(Pageable pageable) {
         return empleadoRepository.findEmpleadosConEstudios(pageable)
                 .map(DatosEmpleadoConEstudios::new);
