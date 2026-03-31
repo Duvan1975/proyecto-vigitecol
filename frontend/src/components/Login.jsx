@@ -56,23 +56,23 @@ export function Login({ onLoginSuccess }) {
                 }
             });
 
-} catch (error) {
+        } catch (error) {
 
-    let mensaje = "Error al ingresar usuario o contraseña";
+            let mensaje = "Error al ingresar usuario o contraseña";
 
-    // Detectar error de red ("no hay internet" o "no conecta al backend")
-    if (error.message === "Failed to fetch") {
-        mensaje = "Verifica tu conexión a internet o intenta nuevamente en unos minutos.";
-    } else if (error.message) {
-        mensaje = error.message;
-    }
+            // Detectar error de red ("no hay internet" o "no conecta al backend")
+            if (error.message === "Failed to fetch") {
+                mensaje = "Verifica tu conexión a internet o intenta nuevamente en unos minutos.";
+            } else if (error.message) {
+                mensaje = error.message;
+            }
 
-    Swal.fire({
-        icon: "error",
-        title: "No fue posible conectar con el sistema.",
-        text: mensaje
-    });
-}
+            Swal.fire({
+                icon: "error",
+                title: "No fue posible conectar con el sistema.",
+                text: mensaje
+            });
+        }
 
     };
 

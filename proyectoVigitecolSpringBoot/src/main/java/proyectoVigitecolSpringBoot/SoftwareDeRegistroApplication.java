@@ -22,11 +22,11 @@ public class SoftwareDeRegistroApplication {
 		@Bean
 		CommandLineRunner init(UsuarioService usuarioService, PasswordEncoder passwordEncoder) {
 			return args -> {
-				// Crear usuario admin inicial si no existe
+				// Crear usuario admin inicial si no existe la clave es admin123
 				if (usuarioService.count() == 0) {
 					Usuario admin = new Usuario();
 					admin.setAdmin("admin@vigitecol.com");
-					admin.setClave(passwordEncoder.encode("admin123"));
+					admin.setClave(passwordEncoder.encode("$2a$12$BG4stzHRXEKJF/prBOS9h.fqoB.rp7/X7dr0eXLAWyjUPjhT/E12m"));
 					admin.setRol(Rol.ADMIN);
 					admin.setEstado(true);
 					usuarioService.save(admin);
