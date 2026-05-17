@@ -10,10 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 import proyectoVigitecolSpringBoot.domain.afiliacion.AfiliacionRepository;
 import proyectoVigitecolSpringBoot.domain.afiliacion.DatosListadoAfiliacion;
-import proyectoVigitecolSpringBoot.domain.contrato.Contrato;
-import proyectoVigitecolSpringBoot.domain.contrato.ContratoRepository;
-import proyectoVigitecolSpringBoot.domain.contrato.DatosContratoDTO;
-import proyectoVigitecolSpringBoot.domain.contrato.DatosListadoContrato;
+import proyectoVigitecolSpringBoot.domain.contrato.*;
 import proyectoVigitecolSpringBoot.domain.curso.Curso;
 import proyectoVigitecolSpringBoot.domain.curso.CursoRepository;
 import proyectoVigitecolSpringBoot.domain.curso.DatosListadoCurso;
@@ -749,4 +746,40 @@ public class EmpleadoService {
         return ResponseEntity.noContent().build();
     }
 
+    public Page<DatosEmpleadoContratoPorVencer> findContratosPorVencer(
+            Pageable pageable) {
+
+        LocalDate fechaActual = LocalDate.now();
+
+        LocalDate fechaLimite = LocalDate.now().plusDays(60);
+
+        return empleadoRepository.findContratosPorVencer(
+                        fechaActual,
+                        fechaLimite,
+                        pageable
+                )
+                .map(empleado -> {
+
+                    Contrato contratoActivo = empleado.getContratos().stream()
+
+                            .filter(c -> c.getContinua())
+
+                            .filter(c -> c.getFechaRetiro() != null)
+
+                            .max(Comparator.comparingInt(
+                                    Contrato::getNumeroContrato
+                            ))
+
+                            .orElse(null);
+
+                    List<DatosContratoPorVencerDTO> contratos = contratoActivo != null
+                            ? List.of(new DatosContratoPorVencerDTO(contratoActivo))
+                            : List.of();
+
+                    return new DatosEmpleadoContratoPorVencer(
+                            empleado,
+                            contratos
+                    );
+                });
+    }
 }

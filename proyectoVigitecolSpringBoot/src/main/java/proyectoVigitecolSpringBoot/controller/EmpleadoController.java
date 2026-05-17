@@ -283,4 +283,20 @@ public class EmpleadoController {
     public ResponseEntity<?> eliminarEmpleadoDefinitivo(@PathVariable Long id) {
         return empleadoService.eliminarEmpleadoDefinitivo(id);
     }
+
+    @GetMapping("/contratos/por-vencer")
+    public ResponseEntity<Page<DatosEmpleadoContratoPorVencer>>
+    contratosPorVencer(
+
+            @PageableDefault(
+                    size = 10,
+                    sort = "apellidos"
+            ) Pageable pageable
+    ) {
+
+        Page<DatosEmpleadoContratoPorVencer> resultado =
+                empleadoService.findContratosPorVencer(pageable);
+
+        return ResponseEntity.ok(resultado);
+    }
 }
