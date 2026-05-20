@@ -23,6 +23,7 @@ const ExportModal = ({
         genero: true,
         direccion: true,
         telefono: true,
+        telefonoSecundario: true,
         correo: true,
         tipoEmpleado: true,
         cargo: true,
@@ -55,6 +56,7 @@ const ExportModal = ({
                 if (columnasSeleccionadas.genero) filtrado["Género"] = emp.genero || "";
                 if (columnasSeleccionadas.direccion) filtrado["Dirección"] = emp.direccion || "";
                 if (columnasSeleccionadas.telefono) filtrado["Teléfono"] = emp.telefono || "";
+                if (columnasSeleccionadas.telefonoSecundario) filtrado["Teléfono Secundario"] = emp.telefonoSecundario || "";
                 if (columnasSeleccionadas.correo) filtrado["Correo"] = emp.correo || "";
                 if (columnasSeleccionadas.tipoEmpleado) filtrado["Tipo Empleado"] = emp.tipoEmpleado || "";
                 if (columnasSeleccionadas.cargo) filtrado["Cargo"] = emp.cargo || "";

@@ -176,6 +176,12 @@ public class EmpleadoService {
         if (datos.telefono() != null && !datos.telefono().isBlank()) {
             empleado.setTelefono(datos.telefono());
         }
+        empleado.setTelefonoSecundario(
+                datos.telefonoSecundario() != null &&
+                        !datos.telefonoSecundario().isBlank()
+                        ? datos.telefonoSecundario()
+                        : null
+        );
         // Validar que el correo no esté registrado en otro empleado
         if (datos.correo() != null && !datos.correo().isBlank()) {
             boolean correoDuplicado = empleadoRepository.existsByCorreo(datos.correo())
@@ -193,6 +199,13 @@ public class EmpleadoService {
         if (datos.cargo() != null && !datos.cargo().isBlank()) {
             empleado.setCargo(datos.cargo());
         }
+
+        empleado.setObservaciones(
+                datos.observaciones() != null &&
+                        !datos.observaciones().isBlank()
+                        ? datos.observaciones()
+                        : null
+        );
 
         String actor = usuarioService.obtenerUsuarioActual();
         historialRepository.save(new HistorialAccion(
@@ -263,9 +276,11 @@ public class EmpleadoService {
                 empleado.getGenero(),
                 empleado.getDireccion(),
                 empleado.getTelefono(),
+                empleado.getTelefonoSecundario(),
                 empleado.getCorreo(),
                 empleado.getTipoEmpleado(),
-                empleado.getCargo()
+                empleado.getCargo(),
+                empleado.getObservaciones()
         );
         return ResponseEntity.ok(datosEmpleado);
     }
@@ -291,9 +306,11 @@ public class EmpleadoService {
                 empleado.getGenero(),
                 empleado.getDireccion(),
                 empleado.getTelefono(),
+                empleado.getTelefonoSecundario(),
                 empleado.getCorreo(),
                 empleado.getTipoEmpleado(),
-                empleado.getCargo()
+                empleado.getCargo(),
+                empleado.getObservaciones()
         );
         return ResponseEntity.ok(datosEmpleado);
     }
@@ -339,9 +356,11 @@ public class EmpleadoService {
                         empleado.getGenero(),
                         empleado.getDireccion(),
                         empleado.getTelefono(),
+                        empleado.getTelefonoSecundario(),
                         empleado.getCorreo(),
                         empleado.getTipoEmpleado(),
-                        empleado.getCargo()
+                        empleado.getCargo(),
+                        empleado.getObservaciones()
                 ))
                 .toList();
 
@@ -373,9 +392,11 @@ public class EmpleadoService {
                         empleado.getGenero(),
                         empleado.getDireccion(),
                         empleado.getTelefono(),
+                        empleado.getTelefonoSecundario(),
                         empleado.getCorreo(),
                         empleado.getTipoEmpleado(),
-                        empleado.getCargo()
+                        empleado.getCargo(),
+                        empleado.getObservaciones()
                 )).toList();
 
         return ResponseEntity.ok(resultado);
@@ -414,9 +435,11 @@ public class EmpleadoService {
                         empleado.getGenero(),
                         empleado.getDireccion(),
                         empleado.getTelefono(),
+                        empleado.getTelefonoSecundario(),
                         empleado.getCorreo(),
                         empleado.getTipoEmpleado(),
-                        empleado.getCargo()
+                        empleado.getCargo(),
+                        empleado.getObservaciones()
                 ))
                 .toList();
 
@@ -448,9 +471,11 @@ public class EmpleadoService {
                         empleado.getGenero(),
                         empleado.getDireccion(),
                         empleado.getTelefono(),
+                        empleado.getTelefonoSecundario(),
                         empleado.getCorreo(),
                         empleado.getTipoEmpleado(),
-                        empleado.getCargo()
+                        empleado.getCargo(),
+                        empleado.getObservaciones()
                 )).toList();
 
         return ResponseEntity.ok(resultado);
@@ -630,8 +655,6 @@ public class EmpleadoService {
                     );
                 });
     }
-
-
 
     public Page<DatosEmpleadoConEstudios> findConEstudios(Pageable pageable) {
         return empleadoRepository.findEmpleadosConEstudios(pageable)

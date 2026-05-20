@@ -24,12 +24,16 @@ public record DatosListadoEmpleado(
         EstadoCivil estadoCivil,
         Genero genero,
         String direccion,
-        @Pattern(regexp = "\\d{7,15}",message = "Debe contener solo números entre 7 y 15 digitos")
+        @Pattern(regexp = "\\d{10,15}",message = "Debe contener solo números entre 10 y 15 digitos")
         String telefono,
+
+        @Pattern(regexp = "\\d{10,15}",message = "Debe contener solo números entre 10 y 15 digitos")
+        String telefonoSecundario,
         @Email(message = "Debe ser un correo electrónico válido")
         String correo,
         TipoEmpleado tipoEmpleado,
-        String cargo
+        String cargo,
+        String observaciones
 ) {
     public DatosListadoEmpleado(Empleado empleado) {
         this(
@@ -49,9 +53,11 @@ public record DatosListadoEmpleado(
                 empleado.getGenero(),
                 empleado.getDireccion(),
                 empleado.getTelefono(),
+                empleado.getTelefonoSecundario(),
                 empleado.getCorreo(),
                 empleado.getTipoEmpleado(),
-                empleado.getCargo()
+                empleado.getCargo(),
+                empleado.getObservaciones()
         );
     }
 }

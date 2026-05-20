@@ -20,9 +20,11 @@ export function Formulario({ setVista }) {
         genero: "",
         direccion: "",
         telefono: "",
+        telefonoSecundario: "",
         correo: "",
         tipoEmpleado: "",
         cargo: "",
+        observaciones: "",
         foto: null
     });
 
@@ -124,7 +126,8 @@ export function Formulario({ setVista }) {
 
     //Estado para registrar Contrato
     const [contrato, setContrato] = useState({
-        fechaIngreso: ""
+        fechaIngreso: "",
+        fechaRetiro: "",
     });
 
     // Agregar familiar a la lista y limpiar campos
@@ -245,9 +248,11 @@ export function Formulario({ setVista }) {
             genero: "",
             direccion: "",
             telefono: "",
+            telefonoSecundario: "",
             correo: "",
             tipoEmpleado: "",
             cargo: "",
+            observaciones: "",
         });
         setContrato({
             fechaIngreso: "",
@@ -541,7 +546,7 @@ export function Formulario({ setVista }) {
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-3"
-                    titulolabel="Teléfono:"
+                    titulolabel="Teléfono 1:"
                     tipoinput="number"
                     nombreinput="telefono"
                     idinput="telefono"
@@ -549,6 +554,17 @@ export function Formulario({ setVista }) {
                     value={empleado.telefono}
                     onChange={(e) => setEmpleado({ ...empleado, telefono: e.target.value })}
                     required={true}
+                />
+
+                <CuadrosTexto
+                    tamanoinput="col-md-3"
+                    titulolabel="Teléfono 2 (Opcional):"
+                    tipoinput="number"
+                    nombreinput="telefonoSecundario"
+                    idinput="telefonoSecundario"
+                    placeholderinput="Ingrese el número telefónico secundario"
+                    value={empleado.telefonoSecundario}
+                    onChange={(e) => setEmpleado({ ...empleado, telefonoSecundario: e.target.value })}
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-3"
@@ -1356,6 +1372,31 @@ export function Formulario({ setVista }) {
                     value={contrato.fechaIngreso}
                     onChange={(e) => setContrato({ ...contrato, fechaIngreso: e.target.value })}
                 />
+
+                <CuadrosTexto
+                    tamanoinput="col-md-3"
+                    titulolabel="Fecha de Retiro:"
+                    tipoinput="date"
+                    nombreinput="fechaRetiro"
+                    idinput="fechaRetiro"
+                    value={contrato.fechaRetiro}
+                    onChange={(e) => setContrato({ ...contrato, fechaRetiro: e.target.value })}
+                />
+            </div>
+
+            <div className="row align-items-center g-2">
+                <div className="col-md-12">
+                    <label htmlFor="observaciones"><strong>Observaciones:</strong></label>
+                    <textarea
+                        name="observaciones"
+                        id="observaciones"
+                        placeholder="Ingrese observaciones"
+                        className="form-control"
+                        rows={4}
+                        value={empleado.observaciones}
+                        onChange={(e) => setEmpleado({ ...empleado, observaciones: e.target.value })}
+                    />
+                </div>
             </div>
 
             <br />

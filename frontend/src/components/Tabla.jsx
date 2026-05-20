@@ -7,6 +7,7 @@ import Paginacion from "./Paginacion";
 import { TablaFamiliar } from "./TablaFamiliar";
 import { TablaCurso } from "./TablaCurso";
 import { TablaContratoConPeriodoDePrueba } from "./TablaContratoConPeriodoDePrueba";
+import { TablaContratosPorVencer } from "./TablaContratosPorVencer";
 import { authFetch } from "../utils/authFetch";
 import ProtectedElement from "../utils/ProtectedElement";
 import ExportModal from "./ExportModal";
@@ -638,6 +639,7 @@ export function Tabla({
                                     <option value="conFamiliares">HIJOS/HIJASTROS</option>
                                     <option value="cursosPorVencer">CURSOS A VENCER</option>
                                     <option value="periodoDePrueba">PERIODO DE PRUEBA</option>
+                                    <option value="contratosPorVencer">CONTRATOS POR VENCER</option>
                                     <option value="conContrato">CON CONTRATO</option>
                                     <option value="sinContrato">SIN CONTRATO</option>
                                 </>
@@ -677,6 +679,7 @@ export function Tabla({
                                     disabled={["personalMayorDe50",
                                         "cursosPorVencer",
                                         "periodoDePrueba",
+                                        "contratosPorVencer",
                                         "conContrato",
                                         "sinContrato"].includes(tipoBusqueda)}
                                 />
@@ -778,6 +781,7 @@ export function Tabla({
                                 "cargo",
                                 "cursosPorVencer",
                                 "periodoDePrueba",
+                                "contratosPorVencer",
                                 "conContrato",
                                 "sinContrato"]
                                 .includes(tipoBusqueda)}
@@ -814,7 +818,8 @@ export function Tabla({
                 tipoBusqueda !== "conFamiliares" &&
                 tipoBusqueda !== "cursosPorVencer" &&
                 tipoBusqueda !== "periodoDePrueba" &&
-                tipoBusqueda !== "familiaresPorGenero" && (
+                tipoBusqueda !== "familiaresPorGenero" &&
+                tipoBusqueda !== "contratosPorVencer" && (
                     <>
                         <div>
                             <h4 className="alinearTexto">
@@ -899,6 +904,11 @@ export function Tabla({
                     <TablaContratoConPeriodoDePrueba />
                 </div>
             )}
+            {tipoBusqueda === "contratosPorVencer" && (
+                <div className="mt-4">
+                    <TablaContratosPorVencer />
+                </div>
+            )}
 
             <ExportModal
                 isOpen={isModalOpen}
@@ -915,7 +925,8 @@ export function Tabla({
                 tipoBusqueda !== "conFamiliares" &&
                 tipoBusqueda !== "cursosPorVencer" &&
                 tipoBusqueda !== "periodoDePrueba" &&
-                tipoBusqueda !== "familiaresPorGenero" && (
+                tipoBusqueda !== "familiaresPorGenero" &&
+                tipoBusqueda !== "contratosPorVencer" && (
                     <>
                         <table className={`table table-bordered border-primary table-striped table-hover 
 ${tipoBusqueda === "sinContrato"
@@ -1220,6 +1231,7 @@ ${tipoBusqueda === "sinContrato"
                 tipoBusqueda !== "conFamiliares" &&
                 tipoBusqueda !== "cursosPorVencer" &&
                 tipoBusqueda !== "periodoDePrueba" &&
+                tipoBusqueda !== "contratosPorVencer" &&
                 tipoBusqueda !== "familiaresPorGenero" && (
                     <>
                         {(resultadoBusqueda === null || resultadoBusqueda.length === 0) && (

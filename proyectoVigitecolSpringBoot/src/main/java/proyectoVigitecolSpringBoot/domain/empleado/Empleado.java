@@ -58,12 +58,19 @@ public class Empleado {
 
     private String direccion;
     private String telefono;
+
+    @Column(name = "telefono_secundario")
+    private String telefonoSecundario;
+
     private String correo;
 
     @Enumerated(EnumType.STRING)
     private TipoEmpleado tipoEmpleado;
 
     private String cargo;
+
+    @Column(name = "observaciones")
+    private String observaciones;
 
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Contrato> contratos = new ArrayList<>();
@@ -105,9 +112,11 @@ public class Empleado {
         this.genero = datos.genero();
         this.direccion = datos.direccion();
         this.telefono = datos.telefono();
+        this.telefonoSecundario = datos.telefonoSecundario();
         this.correo = datos.correo();
         this.tipoEmpleado = datos.tipoEmpleado();
         this.cargo = datos.cargo();
+        this.observaciones = datos.observaciones();
     }
     //Constructor vacío
     public Empleado() {
@@ -231,6 +240,14 @@ public class Empleado {
         return telefono;
     }
 
+    public String getTelefonoSecundario() {
+        return telefonoSecundario;
+    }
+
+    public void setTelefonoSecundario(String telefonoSecundario) {
+        this.telefonoSecundario = telefonoSecundario;
+    }
+
     public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
@@ -257,6 +274,14 @@ public class Empleado {
 
     public void setCargo(String cargo) {
         this.cargo = cargo;
+    }
+
+    public String getObservaciones() {
+        return observaciones;
+    }
+
+    public void setObservaciones(String observaciones) {
+        this.observaciones = observaciones;
     }
 
     public List<Contrato> getContratos() {

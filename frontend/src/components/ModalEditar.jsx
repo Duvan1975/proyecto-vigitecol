@@ -93,13 +93,22 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         genero: "",
         direccion: "",
         telefono: "",
+        telefonoSecundario: "",
         correo: "",
         tipoEmpleado: "",
-        cargo: ""
+        cargo: "", 
+        observaciones: ""
     });
+    // Effect unificado para cargar todos los datos del empleado
     useEffect(() => {
         if (empleado) {
-            setFormulario(empleado);
+            // Limpiar telefonoSecundario si viene null/undefined
+            const empleadoLimpio = {
+                ...empleado,
+                telefonoSecundario: empleado.telefonoSecundario ?? "",
+                observaciones: empleado.observaciones ?? ""
+            };
+            setFormulario(empleadoLimpio);
             const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
             // Obtener el último contrato del empleado
@@ -127,18 +136,9 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                     console.error("Error al obtener contrato:", error);
                     setContratos([]); // Si hay error, dejar vacío
                 });
-        }
-    }, [empleado]);
-
-    useEffect(() => {
-        if (empleado) {
-            setFormulario(empleado);
-            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
             //Obtener familiares del empleado por ID
-            authFetch(`${backendUrl}/familiares/por-empleado/${empleado.id}`, {
-
-            })
+            authFetch(`${backendUrl}/familiares/por-empleado/${empleado.id}`)
                 .then(res => res.json())
                 .then(data => {
                     const familiaresPreparados = (Array.isArray(data) ? data : []).map(f => ({
@@ -149,18 +149,9 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                     }));
                     setFamiliares(familiaresPreparados);
                 });
-        }
-    }, [empleado]);
-
-    useEffect(() => {
-        if (empleado) {
-            setFormulario(empleado);
-            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
             //Obtener cursos del empleado por ID
-            authFetch(`${backendUrl}/cursos/por-empleado/${empleado.id}`, {
-
-            })
+            authFetch(`${backendUrl}/cursos/por-empleado/${empleado.id}`)
                 .then(res => res.json())
                 .then(data => {
                     const cursosPreparados = (Array.isArray(data) ? data : []).map(cu => ({
@@ -172,18 +163,9 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                     }));
                     setCursos(cursosPreparados);
                 });
-        }
-    }, [empleado]);
-
-    useEffect(() => {
-        if (empleado) {
-            setFormulario(empleado);
-            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
             //Obtener estudios del empleado por ID
-            authFetch(`${backendUrl}/estudios/por-empleado/${empleado.id}`, {
-
-            })
+            authFetch(`${backendUrl}/estudios/por-empleado/${empleado.id}`)
                 .then(res => res.json())
                 .then(data => {
                     const estudiosPreparados = (Array.isArray(data) ? data : []).map(es => ({
@@ -194,18 +176,9 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                     }));
                     setEstudios(estudiosPreparados);
                 });
-        }
-    }, [empleado]);
-
-    useEffect(() => {
-        if (empleado) {
-            setFormulario(empleado);
-            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
             //Obtener experiencias laborales del empleado por ID
-            authFetch(`${backendUrl}/experienciasLaborales/por-empleado/${empleado.id}`, {
-
-            })
+            authFetch(`${backendUrl}/experienciasLaborales/por-empleado/${empleado.id}`)
                 .then(res => res.json())
                 .then(data => {
                     const experienciasPreparadas = (Array.isArray(data) ? data : []).map(ex => ({
@@ -214,18 +187,9 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                     }));
                     setExperienciasLaborales(experienciasPreparadas);
                 });
-        }
-    }, [empleado]);
-
-    useEffect(() => {
-        if (empleado) {
-            setFormulario(empleado);
-            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
             //Obtener afiliaciones del empleado por ID
-            authFetch(`${backendUrl}/afiliaciones/por-empleado/${empleado.id}`, {
-
-            })
+            authFetch(`${backendUrl}/afiliaciones/por-empleado/${empleado.id}`)
                 .then(res => res.json())
                 .then(data => {
                     const afiliacionesPreparadas = (Array.isArray(data) ? data : []).map(af => ({
@@ -236,18 +200,9 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                     }));
                     setAfiliaciones(afiliacionesPreparadas);
                 });
-        }
-    }, [empleado]);
-
-    useEffect(() => {
-        if (empleado) {
-            setFormulario(empleado);
-            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
             //Obtener documentos del empleado por ID
-            authFetch(`${backendUrl}/documentos/por-empleado/${empleado.id}`, {
-
-            })
+            authFetch(`${backendUrl}/documentos/por-empleado/${empleado.id}`)
                 .then(res => res.json())
                 .then(data => {
                     const documentosPreparados = (Array.isArray(data) ? data : []).map(d => ({
@@ -258,18 +213,9 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                     }));
                     setDocumentos(documentosPreparados);
                 });
-        }
-    }, [empleado]);
-
-    useEffect(() => {
-        if (empleado) {
-            setFormulario(empleado);
-            const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
             //Obtener vehiculos del empleado por ID
-            authFetch(`${backendUrl}/vehiculos/por-empleado/${empleado.id}`, {
-
-            })
+            authFetch(`${backendUrl}/vehiculos/por-empleado/${empleado.id}`)
                 .then(res => res.json())
                 .then(data => {
                     const vehiculosPreparados = (Array.isArray(data) ? data : []).map(v => ({
@@ -437,19 +383,25 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         try {
             const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
 
-            // Preparar datos del empleado (si se quitó la imagen, limpiar el campo foto)
+            // Preparar datos del empleado limpiando campos null/undefined
             const datosEmpleado = { ...formulario };
+
+            // Limpiar telefonoSecundario si viene null/undefined
+            datosEmpleado.telefonoSecundario = datosEmpleado.telefonoSecundario ?? "";
+            datosEmpleado.observaciones = datosEmpleado.observaciones ?? "";
+
             if (mostrarInputFoto && vistaPrevia === "/usuario_default.png") {
                 // Si el usuario quitó la imagen, enviar null para el campo foto
                 datosEmpleado.foto = null;
             }
+
             // 1. Primero actualizar los datos del empleado (sin la foto)
             const response = await authFetch(`${backendUrl}/empleados`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(formulario)
+                body: JSON.stringify(datosEmpleado)
             });
 
             if (!response.ok) {
@@ -498,10 +450,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             });
         }
     };
-
-
-
-
 
     const actualizarFamiliar = (familiar) => {
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
@@ -1282,9 +1230,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         });
     };
 
-
-
-
     /*const contratoMasReciente = contratos.length > 0
         ? contratos.reduce((max, c) =>
             c.numeroContrato > max.numeroContrato ? c : max, contratos[0])
@@ -1296,9 +1241,18 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         <div className="modal" style={{ display: "block", backgroundColor: "#000000aa" }}>
             <div className="modal-dialog modal-lg">
                 <div className="modal-content p-4" style={{ backgroundColor: "#f0f0f0" }}>
-                    <h4 className="alinearTexto text-center">Editar Empleado</h4>
-
-
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                        <h4 className="alinearTexto mb-0">Editar Empleado</h4>
+                        <button
+                            type="button"
+                            className="btn-close"
+                            onClick={() => {
+                                if (empleado) setFormulario(empleado); // Restaurar los datos originales
+                                onClose(); // Cierra el modal
+                            }}
+                            aria-label="Cerrar"
+                        ></button>
+                    </div>
 
                     <div className="row align-items-start">
                         {/* Card de la foto - ocupa toda la altura */}
@@ -1428,9 +1382,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                         </div>
                     </div>
 
-
-
-
                     <div className="row">
                         <div className="col-md-4">
                             <label htmlFor=""> <strong>Lugar de Nacimiento:</strong></label>
@@ -1496,7 +1447,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                             />
                         </div>
                         <div className="col-md-4">
-                            <label htmlFor=""> <strong>Teléfono:</strong></label>
+                            <label htmlFor=""> <strong>Teléfono 1:</strong></label>
                             <input type="number"
                                 name="telefono"
                                 value={formulario.telefono}
@@ -1530,6 +1481,20 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                 <option value="OPERATIVO">OPERATIVO</option>
                             </select>
                         </div>
+
+                        <div className="col-md-4">
+                            <label htmlFor=""> <strong>Teléfono 2:</strong></label>
+                            <input type="number"
+                                name="telefonoSecundario"
+                                value={formulario.telefonoSecundario || ""}
+                                onChange={handleChange}
+                                placeholder="Teléfono Secundario"
+                                className="form-control mb-2"
+                            />
+                        </div>
+
+                    </div>
+                    <div className="row">
                         <div className="col-md-4">
                             <label htmlFor=""> <strong>Cargo:</strong></label>
                             <input type="text"
@@ -1540,8 +1505,6 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                 className="form-control mb-2"
                             />
                         </div>
-                    </div>
-                    <div className="row">
                         <div className="col-md-4">
                             <label htmlFor=""> <strong>Tipo de Población:</strong></label>
                             <select
@@ -1557,6 +1520,16 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                 <option value="PALENQUERO">PALENQUERO</option>
                                 <option value="NO_APLICA">NO APLICA</option>
                             </select>
+                        </div>
+                        <div className="col-md-4">
+                            <label htmlFor=""> <strong>Observaciones:</strong></label>
+                            <input type="text"
+                                name="observaciones"
+                                value={formulario.observaciones}
+                                onChange={handleChange}
+                                placeholder="Observaciones"
+                                className="form-control mb-2"
+                            />
                         </div>
                     </div>
                     <div>
