@@ -9,6 +9,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.annotation.*;
 import proyectoVigitecolSpringBoot.domain.usuarios.DatosAutenticacionUsuario;
 import proyectoVigitecolSpringBoot.domain.usuarios.Usuario;
@@ -57,6 +58,10 @@ public class AutenticacionController {
 
             return ResponseEntity.ok(response);
 
+        } catch (DisabledException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error",
+                            "Cuenta desactivada. Contacte al administrador del sistema."));
         } catch (BadCredentialsException | UsernameNotFoundException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Usuario o contraseña incorrectos"));

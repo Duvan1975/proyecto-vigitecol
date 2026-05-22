@@ -31,15 +31,15 @@ public class UsuarioController {
     }
 
     // Solo ADMIN puede actualizar usuarios
-    @Transactional
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
-        try {
-            Usuario usuarioActualizado = usuarioService.actualizarUsuario(id, usuario);
-            return ResponseEntity.ok(usuarioActualizado);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(null);
-        }
+    public ResponseEntity<Usuario> actualizarUsuario(
+            @PathVariable Long id,
+            @RequestBody Usuario usuario) {
+
+        Usuario usuarioActualizado =
+                usuarioService.actualizarUsuario(id, usuario);
+
+        return ResponseEntity.ok(usuarioActualizado);
     }
 
     @PatchMapping("/{id}/estado")

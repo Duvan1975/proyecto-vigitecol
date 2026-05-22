@@ -51,17 +51,24 @@ export const EditUserForm = ({ user, onUserUpdated, onCancel }) => {
 
             onUserUpdated();
         } catch (error) {
-    const mensaje = error.message || "Ocurrió un error al guardar los cambios.";
+            const mensaje = (error && error.message) ? error.message : "Ocurrió un error al guardar los cambios.";
 
-    await Swal.fire({
-        icon: "error",
-        title: "❌ Error al actualizar",
-        text: mensaje.includes("correo") 
-            ? mensaje 
-            : "Verifica que el correo no esté duplicado o revisa los datos ingresados.",
-        confirmButtonColor: "#dc3545"
-    });
-}
+            // Mostrar mensajes específicos: correo duplicado o reglas de contraseña
+            const lower = mensaje.toLowerCase();
+            const isCorreo = lower.includes("correo") || lower.includes("email") || lower.includes("usuario") || lower.includes("ya existe");
+            const isPasswordRule = lower.includes("contrase") || lower.includes("mínimo") || lower.includes("mayúscula") || lower.includes("minúscula") || lower.includes("carácter especial") || lower.includes("número");
+
+            let textoAMostrar = "Verifica que el correo no esté duplicado o revisa los datos ingresados.";
+            if (isCorreo) textoAMostrar = mensaje;
+            else if (isPasswordRule) textoAMostrar = mensaje;
+
+            await Swal.fire({
+                icon: "error",
+                title: "❌ Error al actualizar",
+                text: textoAMostrar,
+                confirmButtonColor: "#dc3545"
+            });
+        }
     };
 
     const handleChangeEstado = async (nuevoEstado) => {

@@ -102,7 +102,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     // Effect unificado para cargar todos los datos del empleado
     useEffect(() => {
         if (empleado) {
-            // Limpiar telefonoSecundario si viene null/undefined
+            // Limpiar campos si vienen null/undefined
             const empleadoLimpio = {
                 ...empleado,
                 telefonoSecundario: empleado.telefonoSecundario ?? "",
@@ -386,7 +386,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             // Preparar datos del empleado limpiando campos null/undefined
             const datosEmpleado = { ...formulario };
 
-            // Limpiar telefonoSecundario si viene null/undefined
+            // Limpiar campos si vienen null/undefined
             datosEmpleado.telefonoSecundario = datosEmpleado.telefonoSecundario ?? "";
             datosEmpleado.observaciones = datosEmpleado.observaciones ?? "";
 

@@ -34,6 +34,7 @@ public class UsuarioService {
         }
 
         // Encriptar la contraseña
+        validarClave(usuario.getClave());
         usuario.setClave(passwordEncoder.encode(usuario.getClave()));
         Usuario nuevo = usuarioRepository.save(usuario);
 
@@ -67,9 +68,19 @@ public class UsuarioService {
         usuarioExistente.setNombreUsuario(usuarioActualizado.getNombreUsuario());
 
         // Solo actualizar la contraseña si se proporciona una nueva
-        if (usuarioActualizado.getClave() != null && !usuarioActualizado.getClave().isEmpty()) {
-            usuarioExistente.setClave(passwordEncoder.encode(usuarioActualizado.getClave()));
+        if (usuarioActualizado.getClave() != null
+                && !usuarioActualizado.getClave().isEmpty()) {
+
+            validarClave(usuarioActualizado.getClave());
+
+            usuarioExistente.setClave(
+                    passwordEncoder.encode(usuarioActualizado.getClave())
+            );
         }
+
+        /*if (usuarioActualizado.getClave() != null && !usuarioActualizado.getClave().isEmpty()) {
+            usuarioExistente.setClave(passwordEncoder.encode(usuarioActualizado.getClave()));
+        }*/
 
         Usuario actualizado = usuarioRepository.save(usuarioExistente);
 
@@ -102,6 +113,7 @@ public class UsuarioService {
 
     public void save(Usuario admin) {
     }
+
     public String obtenerUsuarioActual() {
         try {
             Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -115,6 +127,20 @@ public class UsuarioService {
             System.out.println("⚠️ Error obteniendo usuario actual: " + e.getMessage());
         }
         return "Sistema/Desconocido";
+    }
+
+    private void validarClave(String clave) {
+
+        String regex =
+                "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&.#_-])[A-Za-z\\d@$!%*?&.#_-]{8,}$";
+
+        if (!clave.matches(regex)) {
+
+            throw new RuntimeException(
+                    "La contraseña debe tener mínimo 8 caracteres, "
+                            + "una mayúscula, una minúscula, un número y un carácter especial"
+            );
+        }
     }
 
 }
