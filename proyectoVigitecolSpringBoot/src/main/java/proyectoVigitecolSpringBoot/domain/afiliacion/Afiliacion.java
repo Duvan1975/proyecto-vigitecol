@@ -82,5 +82,6 @@ public class Afiliacion {
         if (datos.fechaAfiliacion() != null) {
             this.fechaAfiliacion = datos.fechaAfiliacion();
         }
+        this.fechaAfiliacion = datos.fechaAfiliacion();
     }
 }

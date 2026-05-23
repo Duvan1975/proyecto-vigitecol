@@ -30,6 +30,16 @@ export function Formulario({ setVista }) {
 
     const [vistaPrevia, setVistaPrevia] = useState(null);
 
+    // Helper to validate a date string is between two ISO dates (inclusive)
+    const isDateInRange = (dateString, minDate, maxDate) => {
+        if (!dateString) return false;
+        const d = new Date(dateString);
+        if (isNaN(d.getTime())) return false;
+        const min = new Date(minDate);
+        const max = new Date(maxDate);
+        return d >= min && d <= max;
+    };
+
     // Manejar la selección de archivo
     const manejarSeleccionFoto = (e) => {
         const archivo = e.target.files[0];
@@ -137,6 +147,11 @@ export function Formulario({ setVista }) {
             familiarActual.nombreFamiliar &&
             familiarActual.edadFamiliar
         ) {
+            if (isNaN(familiarActual.edadFamiliar) || familiarActual.edadFamiliar < 0) {
+                Swal.fire("Edad inválida", "Por favor ingresa una edad válida para el familiar.", "error");
+                return;
+            }
+
             setFamiliares([...familiares, { ...familiarActual }]);
             setFamiliarActual({
                 tipoFamiliar: "",
@@ -152,6 +167,12 @@ export function Formulario({ setVista }) {
             cursoActual.categoria &&
             cursoActual.fechaCurso
         ) {
+            // Validar rango de fecha del curso
+            if (!isDateInRange(cursoActual.fechaCurso, "2000-01-01", "2050-12-31")) {
+                Swal.fire("Fecha fuera de rango", "La fecha del curso debe estar entre 2000-01-01 y 2050-12-31.", "error");
+                return;
+            }
+
             setCursos([...cursos, { ...cursoActual }]);
             setCursoActual({
                 tipoCurso: "",
@@ -166,6 +187,12 @@ export function Formulario({ setVista }) {
         if (
             estudioActual.tipoEstudio
         ) {
+            // Si fechaEstudio está presente, validar rango (opcional)
+            if (estudioActual.fechaEstudio && !isDateInRange(estudioActual.fechaEstudio, "2000-01-01", "2050-12-31")) {
+                Swal.fire("Fecha fuera de rango", "La fecha del estudio debe estar entre 2000-01-01 y 2050-12-31.", "error");
+                return;
+            }
+
             setEstudios([...estudios, { ...estudioActual }]);
             setEstudioActual({
                 tipoEstudio: "",
@@ -191,6 +218,12 @@ export function Formulario({ setVista }) {
             afiliacionActual.tipoAfiliacion &&
             afiliacionActual.nombreEntidad
         ) {
+            // Validar fecha de afiliación si fue ingresada (opcional)
+            if (afiliacionActual.fechaAfiliacion && !isDateInRange(afiliacionActual.fechaAfiliacion, "2000-01-01", "2050-12-31")) {
+                Swal.fire("Fecha fuera de rango", "La fecha de afiliación debe estar entre 2000-01-01 y 2050-12-31.", "error");
+                return;
+            }
+
             setAfiliaciones([...afiliaciones, { ...afiliacionActual }]);
             setAfiliacionActual({
                 tipoAfiliacion: "",
@@ -204,6 +237,12 @@ export function Formulario({ setVista }) {
         if (
             documentoActual.tipoOtroDocumento
         ) {
+            // Validar fecha de registro del documento si fue ingresada (opcional)
+            if (documentoActual.fechaRegistro && !isDateInRange(documentoActual.fechaRegistro, "2000-01-01", "2050-12-31")) {
+                Swal.fire("Fecha fuera de rango"
+                    , "La fecha de registro del documento debe estar entre 2000-01-01 y 2050-12-31.", "error");
+                return;
+            }
             setDocumentos([...documentos, { ...documentoActual }]);
             setDocumentoActual({
                 tipoOtroDocumento: "",
@@ -221,6 +260,19 @@ export function Formulario({ setVista }) {
             vehiculoActual.licencia &&
             vehiculoActual.placa
         ) {
+            // Validar fechas del vehículo
+            if (vehiculoActual.tecnomecanico && !isDateInRange(vehiculoActual.tecnomecanico, "2000-01-01", "2050-12-31")) {
+                Swal.fire("Fecha fuera de rango", "La fecha de la tecnomecanico debe estar entre 2000-01-01 y 2050-12-31.", "error");
+                return;
+            }
+            if (vehiculoActual.soat && !isDateInRange(vehiculoActual.soat, "2000-01-01", "2050-12-31")) {
+                Swal.fire("Fecha fuera de rango", "La fecha del soat debe estar entre 2000-01-01 y 2050-12-31.", "error");
+                return;
+            }
+            if (vehiculoActual.licencia && !isDateInRange(vehiculoActual.licencia, "2000-01-01", "2050-12-31")) {
+                Swal.fire("Fecha fuera de rango", "La fecha de la licencia debe estar entre 2000-01-01 y 2050-12-31.", "error");
+                return;
+            }
             setVehiculos([...vehiculos, { ...vehiculoActual }]);
             setVehiculoActual({
                 tipoVehiculo: "",
@@ -231,6 +283,19 @@ export function Formulario({ setVista }) {
             });
         }
     };
+    // Validar las fechas del contrato antes de enviar
+    const validarContrato = () => {
+        if (contrato.fechaIngreso && !isDateInRange(contrato.fechaIngreso, "2000-01-01", "2050-12-31")) {
+            Swal.fire("Fecha fuera de rango", "La fecha de ingreso debe estar entre 2000-01-01 y 2050-12-31.", "error");
+            return false;
+        }
+        if (contrato.fechaRetiro && !isDateInRange(contrato.fechaRetiro, "2000-01-01", "2050-12-31")) {
+            Swal.fire("Fecha fuera de rango", "La fecha de retiro debe estar entre 2000-01-01 y 2050-12-31.", "error");
+            return false;
+        }
+        return true;
+    };
+
 
     const limpiarFormulario = () => {
         setEmpleado({
@@ -256,6 +321,7 @@ export function Formulario({ setVista }) {
         });
         setContrato({
             fechaIngreso: "",
+            fechaRetiro: "",
         });
         setFamiliarActual({
             tipoFamiliar: "",
@@ -452,6 +518,8 @@ export function Formulario({ setVista }) {
                     placeholderinput="Seleccione la fecha de nacimiento"
                     value={empleado.fechaNacimiento}
                     onChange={(e) => setEmpleado({ ...empleado, fechaNacimiento: e.target.value })}
+                    min="1940-01-01"
+                    max="2050-12-31"
                     required={true}
                 />
                 <CuadrosTexto
@@ -729,6 +797,8 @@ export function Formulario({ setVista }) {
                     onChange={(e) =>
                         setCursoActual({ ...cursoActual, fechaCurso: e.target.value })
                     }
+                    min="2000-01-01"
+                    max="2050-12-31"
                 />
                 <div className="col-md-2 d-flex align-items-end">
                     <button
@@ -849,6 +919,8 @@ export function Formulario({ setVista }) {
                     onChange={(e) =>
                         setEstudioActual({ ...estudioActual, fechaEstudio: e.target.value })
                     }
+                    min="2000-01-01"
+                    max="2050-12-31"
                 />
                 <div className="col-md-2 d-flex align-items-end">
                     <button
@@ -1027,6 +1099,8 @@ export function Formulario({ setVista }) {
                     onChange={(e) =>
                         setAfiliacionActual({ ...afiliacionActual, fechaAfiliacion: e.target.value })
                     }
+                    min="2000-01-01"
+                    max="2050-12-31"
                 />
                 <div className="col-md-2 d-flex align-items-end">
                     <button
@@ -1134,6 +1208,8 @@ export function Formulario({ setVista }) {
                     onChange={(e) =>
                         setDocumentoActual({ ...documentoActual, fechaRegistro: e.target.value })
                     }
+                    min="2000-01-01"
+                    max="2050-12-31"
                 />
                 <div className="col-md-2 d-flex align-items-end">
                     <button
@@ -1225,6 +1301,8 @@ export function Formulario({ setVista }) {
                     onChange={(e) =>
                         setVehiculoActual({ ...vehiculoActual, tecnomecanico: e.target.value })
                     }
+                    min="2000-01-01"
+                    max="2050-12-31"
                 />
 
             </div>
@@ -1240,6 +1318,8 @@ export function Formulario({ setVista }) {
                     onChange={(e) =>
                         setVehiculoActual({ ...vehiculoActual, soat: e.target.value })
                     }
+                    min="2000-01-01"
+                    max="2050-12-31"
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-3"
@@ -1251,6 +1331,8 @@ export function Formulario({ setVista }) {
                     onChange={(e) =>
                         setVehiculoActual({ ...vehiculoActual, licencia: e.target.value })
                     }
+                    min="2000-01-01"
+                    max="2050-12-31"
                 />
                 <CuadrosTexto
                     tamanoinput="col-md-3"
@@ -1371,6 +1453,8 @@ export function Formulario({ setVista }) {
                     idinput="fechaIngreso"
                     value={contrato.fechaIngreso}
                     onChange={(e) => setContrato({ ...contrato, fechaIngreso: e.target.value })}
+                    min="2000-01-01"
+                    max="2050-12-31"
                 />
 
                 <CuadrosTexto
@@ -1381,6 +1465,8 @@ export function Formulario({ setVista }) {
                     idinput="fechaRetiro"
                     value={contrato.fechaRetiro}
                     onChange={(e) => setContrato({ ...contrato, fechaRetiro: e.target.value })}
+                    min="2000-01-01"
+                    max="2050-12-31"
                 />
             </div>
 
@@ -1402,18 +1488,32 @@ export function Formulario({ setVista }) {
             <br />
             <div className='col-md-auto'>
                 <button
-                    onClick={() => AgregarTabla(
-                        contrato,
-                        familiares,
-                        cursos,
-                        estudios,
-                        experienciasLaborales,
-                        afiliaciones,
-                        documentos,
-                        vehiculos,
-                        empleado,
-                        limpiarFormulario
-                    )}
+                    onClick={async () => {
+                        // Validar fechaNacimiento antes de enviar
+                        if (!empleado.fechaNacimiento) {
+                            Swal.fire("Campo incompleto", "Por favor ingresa la fecha de nacimiento.", "warning");
+                            return;
+                        }
+                        if (!isDateInRange(empleado.fechaNacimiento, "1940-01-01", "2050-12-31")) {
+                            Swal.fire("Fecha fuera de rango", "La fecha de nacimiento debe estar entre 1940-01-01 y 2050-12-31.", "error");
+                            return;
+                        }
+                        if (!validarContrato()) {
+                            return;
+                        }
+                        await AgregarTabla(
+                            contrato,
+                            familiares,
+                            cursos,
+                            estudios,
+                            experienciasLaborales,
+                            afiliaciones,
+                            documentos,
+                            vehiculos,
+                            empleado,
+                            limpiarFormulario
+                        );
+                    }}
                     className=" btn btn-success me-2"
                 >
                     Registrar Empleado

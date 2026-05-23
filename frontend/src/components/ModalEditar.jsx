@@ -326,6 +326,59 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         setFotoSeleccionada(null); // Resetear foto seleccionada al abrir
     }, [empleado]);
 
+    // Efecto para resetear los campos cuando se abre el modal
+    useEffect(() => {
+        if (visible) {
+            setNuevaAfiliacion({
+                tipoAfiliacion: "",
+                nombreEntidad: "",
+                fechaAfiliacion: ""
+            });
+            setNuevoFamiliar({
+                tipoFamiliar: "",
+                nombreFamiliar: "",
+                edadFamiliar: ""
+            });
+            setNuevoCurso({
+                tipoCurso: "",
+                categoria: "",
+                fechaCurso: "",
+                funcionEspecifica: ""
+            });
+            setNuevoEstudio({
+                nivelAcademico: "",
+                nombreEstudio: "",
+                fechaEstudio: ""
+            });
+            setNuevaExperienciaLaboral({
+                empresa: "",
+                cargo: "",
+                fechaInicio: "",
+                fechaFin: ""
+            });
+            setNuevaAfiliacion({
+                tipoAfiliacion: "",
+                nombreEntidad: "",
+                fechaAfiliacion: ""
+            });
+            setNuevaExperienciaLaboral({
+                descripcionExperiencia: ""
+            });
+            setNuevoDocumento({
+                tipoOtroDocumento: "",
+                descripcionDocumento: "",
+                fechaRegistro: ""
+            });
+            setNuevoVehiculo({
+                tipoVehiculo: "",
+                tecnomecanico: "",
+                soat: "",
+                licencia: "",
+                placa: ""
+            });
+        }
+    }, [visible]);
+
     // Manejar selección de nueva foto
     const manejarSeleccionFoto = (e) => {
         const archivo = e.target.files[0];
@@ -379,6 +432,28 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
         }
     };
 
+    // Validar formato ISO yyyy-mm-dd (evita entradas como 14/mm/2023)
+    const isValidISODate = (dateString) => {
+        if (!dateString) return false;
+        const m = dateString.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (!m) return false;
+        const y = parseInt(m[1], 10);
+        const mo = parseInt(m[2], 10);
+        const d = parseInt(m[3], 10);
+        const dt = new Date(y, mo - 1, d);
+        return dt.getFullYear() === y && dt.getMonth() === mo - 1 && dt.getDate() === d;
+    };
+
+    // Función para validar que una fecha esté dentro de un rango (asume formato ISO válido)
+    const isDateInRange = (dateString, minDate, maxDate) => {
+        if (!dateString) return false;
+        if (!isValidISODate(dateString)) return false;
+        const date = new Date(dateString);
+        const min = new Date(minDate);
+        const max = new Date(maxDate);
+        return date >= min && date <= max;
+    };
+
     const actualizarEmpleado = async () => {
         try {
             const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
@@ -393,6 +468,20 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             if (mostrarInputFoto && vistaPrevia === "/usuario_default.png") {
                 // Si el usuario quitó la imagen, enviar null para el campo foto
                 datosEmpleado.foto = null;
+            }
+
+            // Validar fecha de nacimiento: obligatoria y dentro de 1940-01-01 a 2050-12-31
+            if (!datosEmpleado.fechaNacimiento) {
+                Swal.fire("Campo incompleto", "Por favor ingresa la fecha de nacimiento.", "warning");
+                return;
+            }
+            if (!isDateInRange(datosEmpleado.fechaNacimiento, "1940-01-01", "2050-12-31")) {
+                Swal.fire(
+                    "Fecha fuera de rango",
+                    "La fecha de nacimiento debe estar entre 1940-01-01 y 2050-12-31.",
+                    "error"
+                );
+                return;
             }
 
             // 1. Primero actualizar los datos del empleado (sin la foto)
@@ -452,6 +541,36 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const actualizarFamiliar = (familiar) => {
+
+            // Validar que tipoFamiliar no esté vacío
+        if (!familiar.tipoFamiliar || !familiar.tipoFamiliar.trim()) {
+            Swal.fire(
+                "Campo incompleto",
+                "Por favor ingresa el tipo de familiar.",
+                "warning"
+            );
+            return;
+        }
+        // Validar que nombreFamiliar no esté vacío
+        if (!familiar.nombreFamiliar || !familiar.nombreFamiliar.trim()) {
+            Swal.fire(
+                "Campo incompleto",
+                "Por favor ingresa el nombre del familiar.",
+                "warning"
+            );
+            return;
+        }
+        // Validar que edadFamiliar sea un número válido y no negativo
+        const edadFamiliar = parseInt(familiar.edadFamiliar, 10);
+        if (familiar.edadFamiliar === "" || isNaN(edadFamiliar) || edadFamiliar < 0) {
+            Swal.fire(
+                "Campo inválido",
+                "Por favor ingresa una edad válida para el familiar.",
+                "warning"
+            );
+            return;
+        }
+
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/familiares`, {
             method: "PUT",
@@ -470,6 +589,25 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const actualizarCurso = (curso) => {
+        // Validar que tipoCurso no esté vacío
+        if (!curso.tipoCurso) {
+            Swal.fire("Campo incompleto", "Por favor selecciona el tipo de Curso.", "warning");
+            return;
+        }
+        if (!curso.categoria) {
+            Swal.fire("Campo incompleto", "Por favor selecciona el tipo de Especialidad.", "warning");
+            return;
+        }
+        // Validar que la fecha esté dentro del rango permitido (2000-01-01 a 2050-12-31)
+        if (curso.fechaCurso && !isDateInRange(curso.fechaCurso, "2000-01-01", "2050-12-31")) {
+            Swal.fire(
+                "Fecha fuera de rango",
+                "La fecha debe estar entre 2000-01-01 y 2050-12-31.",
+                "error"
+            );
+            return;
+        }
+
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/cursos`, {
             method: "PUT",
@@ -488,6 +626,21 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const actualizarEstudio = (estudio) => {
+            // Validar que tipoEstudio no esté vacío
+        if (!estudio.tipoEstudio) {
+            Swal.fire("Campo incompleto", "Por favor selecciona el tipo de estudio.", "warning");
+            return;
+        }
+
+        if (estudio.fechaEstudio && !isDateInRange(estudio.fechaEstudio, "2000-01-01", "2050-12-31")) {
+            Swal.fire(
+                "Fecha fuera de rango",
+                "La fecha del estudio debe estar entre 2000-01-01 y 2050-12-31.",
+                "error"
+            );
+            return;
+        }
+
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/estudios`, {
             method: "PUT",
@@ -524,6 +677,33 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const actualizarAfiliacion = (afiliacion) => {
+        // Validar que tipoAfiliacion no esté vacío
+        if (!afiliacion.tipoAfiliacion || !afiliacion.tipoAfiliacion.trim()) {
+            Swal.fire(
+                "Campo incompleto",
+                "Por favor ingresa el tipo de afiliación.",
+                "warning"
+            );
+            return;
+        }
+        if (!afiliacion.nombreEntidad || !afiliacion.nombreEntidad.trim()) {
+            Swal.fire(
+                "Campo incompleto",
+                "Por favor ingresa el nombre de la entidad.",
+                "warning"
+            );
+            return;
+        }
+
+        if (afiliacion.fechaAfiliacion && !isDateInRange(afiliacion.fechaAfiliacion, "2000-01-01", "2050-12-31")) {
+            Swal.fire(
+                "Fecha fuera de rango",
+                "La fecha de afiliación debe estar entre 2000-01-01 y 2050-12-31.",
+                "error"
+            );
+            return;
+        }
+
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/afiliaciones`, {
             method: "PUT",
@@ -533,7 +713,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             body: JSON.stringify(afiliacion)
         })
             .then(res => {
-                if (!res.ok) throw new Error("Error al actualizar afiliación. Actualiza los datos generales y vuelve a intentarlo");
+                if (!res.ok) throw new Error("Error al actualizar afiliación. Actualiza o completa los datos generales y vuelve a intentarlo");
                 Swal.fire("Afiliación actualizada correctamente", "", "success");
             })
             .catch(err => {
@@ -542,6 +722,25 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const actualizarDocumento = (documento) => {
+            
+            // Validar que tipoOtroDocumento no esté vacío
+        if (!documento.tipoOtroDocumento || !documento.tipoOtroDocumento.trim()) {
+            Swal.fire(
+                "Campo incompleto",
+                "Por favor ingresa el tipo de documento.",
+                "warning"
+            );
+            return;
+        }
+        if (documento.fechaRegistro && !isDateInRange(documento.fechaRegistro, "2000-01-01", "2050-12-31")) {
+            Swal.fire(
+                "Fecha fuera de rango",
+                "La fecha de registro del documento debe estar entre 2000-01-01 y 2050-12-31.",
+                "error"
+            );
+            return;
+        }
+
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/documentos`, {
             method: "PUT",
@@ -560,6 +759,47 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const actualizarVehiculo = (vehiculo) => {
+        // Validar campos obligatorios
+        if (!vehiculo.tipoVehiculo || !vehiculo.tipoVehiculo.trim()) {
+            Swal.fire("Campo incompleto", "Por favor selecciona el tipo de vehículo.", "warning");
+            return;
+        }
+        if (!vehiculo.tecnomecanico) {
+            Swal.fire("Campo incompleto", "Por favor ingresa la fecha del tecnomecánico.", "warning");
+            return;
+        }
+        if (!vehiculo.soat) {
+            Swal.fire("Campo incompleto", "Por favor ingresa la fecha del soat.", "warning");
+            return;
+        }
+        if (!vehiculo.licencia) {
+            Swal.fire("Campo incompleto", "Por favor ingresa la fecha de licencia.", "warning");
+            return;
+        }
+        if (!vehiculo.placa || !vehiculo.placa.trim()) {
+            Swal.fire("Campo incompleto", "Por favor ingresa la placa del vehículo.", "warning");
+            return;
+        }
+
+        const fechas = [
+            { label: "tecnomecánico", value: vehiculo.tecnomecanico },
+            { label: "soat", value: vehiculo.soat },
+            { label: "licencia", value: vehiculo.licencia }
+        ];
+
+        const fechaFueraDeRango = fechas.find(
+            (item) => item.value && !isDateInRange(item.value, "2000-01-01", "2050-12-31")
+        );
+
+        if (fechaFueraDeRango) {
+            Swal.fire(
+                "Fecha fuera de rango",
+                `La fecha de ${fechaFueraDeRango.label} debe estar entre 2000-01-01 y 2050-12-31.`,
+                "error"
+            );
+            return;
+        }
+
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/vehiculos`, {
             method: "PUT",
@@ -579,15 +819,17 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
     //Function para registrar un nuevo hijo/hijastros en el Modal
     const registrarNuevoFamiliar = () => {
+        const edadFamiliar = parseInt(nuevoFamiliar.edadFamiliar, 10);
 
-        // Valida que ningún campo este vacío
+        // Valida que ningún campo esté vacío y que la edad sea un número válido y no negativo
         if (
             !nuevoFamiliar.tipoFamiliar ||
             !nuevoFamiliar.nombreFamiliar.trim() ||
             nuevoFamiliar.edadFamiliar === "" ||
-            isNaN(parseInt(nuevoFamiliar.edadFamiliar))
+            isNaN(edadFamiliar) ||
+            edadFamiliar < 0
         ) {
-            Swal.fire("Campos incompletos", "Por favor llena todos los campos.", "warning");
+            Swal.fire("Campos incompletos", "Por favor llena todos los campos con datos válidos.", "warning");
             return;
         }
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
@@ -660,6 +902,16 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             Swal.fire("Fecha inválida", "Verifica que la fecha tenga el formato correcto (yyyy-MM-dd).", "error");
             return;
         }
+
+        // Validar que la fecha esté dentro del rango permitido (2000-01-01 a 2050-12-31)
+        if (!isDateInRange(nuevoCurso.fechaCurso, "2000-01-01", "2050-12-31")) {
+            Swal.fire(
+                "Fecha fuera de rango",
+                "La fecha debe estar entre 2000-01-01 y 2050-12-31.",
+                "error"
+            );
+            return;
+        }
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/cursos/${empleado.id}`, {
             method: "POST",
@@ -698,11 +950,16 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             return;
         }
 
-        // Validar fechaEstudio (vacía o inválida)
-        /*if (!nuevoEstudio.fechaEstudio) {
-            Swal.fire("Campo incompleto", "Por favor ingresa la fecha del estudio.", "warning");
-            return;
-        }*/
+        if (nuevoEstudio.fechaEstudio) {
+            if (!isDateInRange(nuevoEstudio.fechaEstudio, "2000-01-01", "2050-12-31")) {
+                Swal.fire(
+                    "Fecha fuera de rango",
+                    "La fecha del estudio debe estar entre 2000-01-01 y 2050-12-31.",
+                    "error"
+                );
+                return;
+            }
+        }
 
         // Si todo está correcto, proceder con el fetch
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
@@ -736,6 +993,10 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
 
     //Function para registrar una nueva experiencia en el Modal
     const registrarNuevaExperienciaLaboral = () => {
+        if (!nuevaExperienciaLaboral.descripcionExperiencia || !nuevaExperienciaLaboral.descripcionExperiencia.trim()) {
+            Swal.fire("Campo incompleto", "Por favor ingresa la descripción de la experiencia laboral.", "warning");
+            return;
+        }
 
         // Si todo está correcto, proceder con el fetch
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
@@ -773,9 +1034,18 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             return;
         }
 
-        // Validar fechaAfiliacion (vacía o inválida)
         if (!nuevaAfiliacion.nombreEntidad) {
             Swal.fire("Campo incompleto", "Por favor ingresa el nombre de la entidad.", "warning");
+            return;
+        }
+
+        // La fecha de afiliación es opcional, solo validar rango si está presente
+        if (nuevaAfiliacion.fechaAfiliacion && !isDateInRange(nuevaAfiliacion.fechaAfiliacion, "2000-01-01", "2050-12-31")) {
+            Swal.fire(
+                "Fecha fuera de rango",
+                "La fecha de afiliación debe estar entre 2000-01-01 y 2050-12-31.",
+                "error"
+            );
             return;
         }
 
@@ -817,11 +1087,19 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             return;
         }
 
-        // Validar fechaRegistro (vacía o inválida)
-        /*if (!nuevoDocumento.fechaRegistro) {
+        if (!nuevoDocumento.fechaRegistro) {
             Swal.fire("Campo incompleto", "Por favor ingresa la fecha de registro.", "warning");
             return;
-        }*/
+        }
+
+        if (!isDateInRange(nuevoDocumento.fechaRegistro, "2000-01-01", "2050-12-31")) {
+            Swal.fire(
+                "Fecha fuera de rango",
+                "La fecha de registro debe estar entre 2000-01-01 y 2050-12-31.",
+                "error"
+            );
+            return;
+        }
 
         // Si todo está correcto, proceder con el fetch
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
@@ -881,6 +1159,25 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
             return;
         }
 
+        const vehiculoFechas = [
+            { label: "tecnomecánico", value: nuevoVehiculo.tecnomecanico },
+            { label: "soat", value: nuevoVehiculo.soat },
+            { label: "licencia", value: nuevoVehiculo.licencia }
+        ];
+
+        const fechaVehiculoFueraDeRango = vehiculoFechas.find(
+            (item) => !isDateInRange(item.value, "2000-01-01", "2050-12-31")
+        );
+
+        if (fechaVehiculoFueraDeRango) {
+            Swal.fire(
+                "Fecha fuera de rango",
+                `La fecha de ${fechaVehiculoFueraDeRango.label} debe estar entre 2000-01-01 y 2050-12-31.`,
+                "error"
+            );
+            return;
+        }
+
         // Si todo está correcto, proceder con el fetch
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/vehiculos/${empleado.id}`, {
@@ -915,6 +1212,46 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
     };
 
     const actualizarContrato = (contrato) => {
+        // Validar campos de fecha opcionales (rango 2000-01-01 a 2050-12-31)
+        const fechaCampos = [
+            { key: "fechaIngreso", label: "fecha de ingreso" },
+            { key: "fechaRetiro", label: "fecha de retiro" },
+            { key: "fechaRenuncia", label: "fecha de renuncia" },
+            { key: "fechaOtroSi", label: "fecha otro sí" },
+            { key: "vacacionesDesde", label: "vacaciones desde" },
+            { key: "vacacionesHasta", label: "vacaciones hasta" }
+        ];
+
+        // Primero detectar formatos inválidos (p. ej. '14/mm/2023')
+        const fechaInvalida = fechaCampos.find(f => {
+            const val = contrato[f.key];
+            return val && !isValidISODate(val);
+        });
+
+        if (fechaInvalida) {
+            Swal.fire(
+                "Fecha inválida",
+                `La ${fechaInvalida.label} tiene un formato inválido. Use YYYY-MM-DD.`,
+                "error"
+            );
+            return;
+        }
+
+        // Luego validar rango
+        const fueraDeRango = fechaCampos.find(f => {
+            const val = contrato[f.key];
+            return val && !isDateInRange(val, "2000-01-01", "2050-12-31");
+        });
+
+        if (fueraDeRango) {
+            Swal.fire(
+                "Fecha fuera de rango",
+                `La ${fueraDeRango.label} debe estar entre 2000-01-01 y 2050-12-31.`,
+                "error"
+            );
+            return;
+        }
+
         const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8080";
         authFetch(`${backendUrl}/contratos`, {
             method: "PUT",
@@ -1705,7 +2042,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                 </td>
                                                 <td style={{ minWidth: "180px" }}>
                                                     <input
-                                                        type="date"
+                                                        type="date" min="2000-01-01" max="2050-12-31"
                                                         className="form-control"
                                                         placeholder="Fecha de Realización"
                                                         value={nuevoCurso.fechaCurso}
@@ -1763,7 +2100,7 @@ export function ModalEditar({ empleado, visible, onClose, onActualizado }) {
                                                 </td>
                                                 <td>
                                                     <input
-                                                        type="date"
+                                                        type="date" min="2000-01-01" max="2050-12-31"
                                                         className="form-control"
                                                         value={c.fechaCurso !== undefined && c.fechaCurso !== null ? c.fechaCurso : ""}
                                                         onChange={(e) => handleCursoChange(idx, "fechaCurso", e.target.value)}

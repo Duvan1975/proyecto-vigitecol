@@ -51,15 +51,23 @@ public class Contrato {
         if (datos.fechaIngreso() != null) {
             this.fechaIngreso = datos.fechaIngreso();
         }
+        this.fechaIngreso = datos.fechaIngreso();
+
         if (datos.fechaRetiro() != null) {
             this.fechaRetiro = datos.fechaRetiro();
         }
+        this.fechaRetiro = datos.fechaRetiro();
+
         if (datos.fechaRenuncia() != null) {
             this.fechaRenuncia = datos.fechaRenuncia();
         }
+        this.fechaRenuncia = datos.fechaRenuncia();
+
         if (datos.fechaOtroSi() != null) {
             this.fechaOtroSi = datos.fechaOtroSi();
         }
+        this.fechaOtroSi = datos.fechaOtroSi();
+
         if (datos.omiso() != null) {
             this.omiso = datos.omiso();
         }
@@ -69,9 +77,12 @@ public class Contrato {
         if (datos.vacacionesDesde() != null) {
             this.vacacionesDesde = datos.vacacionesDesde();
         }
+        this.vacacionesDesde = datos.vacacionesDesde();
+
         if (datos.vacacionesHasta() != null) {
             this.vacacionesHasta = datos.vacacionesHasta();
         }
+        this.vacacionesHasta = datos.vacacionesHasta();
     }
     //Getters and Setters
 

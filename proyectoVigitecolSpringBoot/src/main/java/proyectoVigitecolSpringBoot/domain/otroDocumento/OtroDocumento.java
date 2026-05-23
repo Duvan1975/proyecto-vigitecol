@@ -82,5 +82,6 @@ public class OtroDocumento {
         if (datos.fechaRegistro() != null) {
             this.fechaRegistro = datos.fechaRegistro();
         }
+        this.fechaRegistro = datos.fechaRegistro();
     }
 }
